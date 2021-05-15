@@ -118,12 +118,7 @@ public class Frag3 extends Fragment {
             @Override
             public void onClick(View v) {
                 auth.signOut();
-                auth.removeAuthStateListener(new FirebaseAuth.AuthStateListener() {
-                    @Override
-                    public void onAuthStateChanged(@NonNull @NotNull FirebaseAuth firebaseAuth) {
-
-                    }
-                });
+                sqLiteManager.deleteAll();
                 Intent intent1 = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent1);
                 getActivity().finish();

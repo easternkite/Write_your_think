@@ -452,7 +452,6 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                sqLiteManager.deleteAll();
                 // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
                     Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
