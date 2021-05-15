@@ -36,8 +36,8 @@ public class SQLiteManager extends SQLiteOpenHelper {
 
     public void insert2(String userName, String title, String contents, String profile, String date, String time, String address) {
         SQLiteDatabase db = getWritableDatabase();
-        //String query = "INSERT INTO " + tableName + " SELECT null, '" + userName + "', '" + title + "','" + contents + "','" + profile + "','" + date + "','" + time + "','" + address + "' FROM " + tableName +  " WHERE NOT EXISTS (SELECT * FROM " +  tableName + " WHERE date = '" + date + "' AND time = '" + time + "')";
-        String query = "INSERT INTO " + tableName + " VALUES(null,'" + userName + "', '" + title + "', '" + contents+ "', '" + profile+ "', '" + date + "', '" + time + "', '" + address + "') WHERE NOT EXISTS (SELECT * FROM " + tableName + " WHERE date = '" + date + "' AND time = '" + time + "');";
+        String query = "INSERT INTO " + tableName + " SELECT null, '" + userName + "', '" + title + "','" + contents + "','" + profile + "','" + date + "','" + time + "','" + address + "'  WHERE NOT EXISTS (SELECT * FROM " +  tableName + " WHERE date = '" + date + "' AND time = '" + time + "')";
+        //String query = "INSERT INTO " + tableName + " VALUES(null,'" + userName + "', '" + title + "', '" + contents+ "', '" + profile+ "', '" + date + "', '" + time + "', '" + address + "') WHERE NOT EXISTS (SELECT * FROM " + tableName + " WHERE date = '" + date + "' AND time = '" + time + ");";
         db.execSQL(query);
     }
 
@@ -54,6 +54,12 @@ public class SQLiteManager extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String query = "DELETE FROM " + tableName + " WHERE id='" + id + "';";
         db.delete(tableName,"_id= '" + id + "';", null);
+    }
+
+    public void deleteAll() {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "DELETE FROM " + tableName + "';";
+        db.delete(tableName,"", null);
     }
 
     // table 내용 전부 삭제
