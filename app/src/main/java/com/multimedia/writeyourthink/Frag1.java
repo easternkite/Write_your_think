@@ -2,6 +2,7 @@ package com.multimedia.writeyourthink;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -33,8 +34,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
@@ -68,6 +72,17 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     private String time;
     private String addressJin;
     private String weekDay;
+
+
+    private String date1;
+    private String location1;
+    private String with1;
+    private String profile1;
+    private String userUID1;
+    private String contents1;
+    private String userName;
+
+
     /**
      * FireBase Setting
      */
@@ -78,7 +93,6 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     private DatabaseReference databaseReference;
     private RecyclerView.Adapter adapter;
     private RecyclerView recyclerView;
-    private String  userName;
 
 
     private ArrayList<String> idIndicator = new ArrayList<String>();
@@ -121,6 +135,9 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag1, container, false);
+
+
+
         auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.
         user = auth.getCurrentUser();
         userName = user.getUid();
@@ -258,8 +275,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         // SQLite 객체 초기화
         sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
 
-        updateList();
-
+        firebaseUpdate();
 
 
 
@@ -418,4 +434,63 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
         }
     }
+
+    private void firebaseUpdate(){
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("데이터 동기화중...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+
+        sqLiteManager = new SQLiteManager(getActivity(), "writeYourThink123.db", null, 1);
+
+
+
+
+        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+        databaseReference = database.getReference(userName); // DB 테이블 연결
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                sqLiteManager.deleteAll();
+                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
+                    Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
+                    if (diary.getDate() != null){
+                        date = diary.getDate();
+                        location1 = diary.getLocation();
+                        with1 = diary.getWith();
+                        contents1 = diary.getContents();
+                        profile1= diary.getProfile();
+                        userUID1= diary.getUserUID();
+
+
+                        sqLiteManager.insert2(userUID1,
+                                with1,
+                                contents1,
+                                profile1,
+                                date.substring(0,10),
+                                date.substring(11,19), location1.equals(" ") || location1.equals(null)?" ":location1);
+                        updateList();
+                        LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
+                        recyclerView.setLayoutAnimation(controller);
+                        Log.d("Lee", date);
+                    }
+
+
+                }
+
+                progressDialog.dismiss();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // 디비를 가져오던중 에러 발생 시
+                Log.e("MainActivity", String.valueOf(databaseError.toException())); // 에러문 출력
+            }
+        });
+
+    }
+
 }

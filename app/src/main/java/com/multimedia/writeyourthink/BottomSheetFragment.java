@@ -172,30 +172,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
-        arrayList = new ArrayList<>();
-        diaryAdapter = new DiaryAdapter();
-        diaryAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(DiaryAdapter.ViewHolder holder, View view, final int position) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        sqLiteManager.delete(idIndicator.get(position));
-                        Toast.makeText(getActivity().getApplicationContext(), "[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 삭제 완료", Toast.LENGTH_SHORT).show();
-                        LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                        recyclerView.setLayoutAnimation(controller);
-                    }
-                });
-
-                builder.setCancelable(true);
-                builder.setNegativeButton("아니오", null);
-                builder.setTitle("데이터 삭제");
-                builder.setMessage("[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
-                builder.show();
-            }
-        });
-
 
         DateUp = view.findViewById(R.id.DateUp);
         DateDown = view.findViewById(R.id.DateDown);
@@ -501,7 +477,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             Date now = new Date();
             String filename = formatter.format(now) + ".png";
             //storage 주소와 폴더 파일명을 지정해 준다.
-            storageRef = storage.getReferenceFromUrl("gs://diary-d5627.appspot.com/").child("images/" + filename);
+            storageRef = storage.getReferenceFromUrl("gs://diary-d5627.appspot.com/").child("images/" +userName+"/"+ filename);
             //올라가거라...
             storageRef.putFile(filePath)
                     //성공시
