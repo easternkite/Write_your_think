@@ -1,9 +1,9 @@
 package com.multimedia.writeyourthink;
 
 public class Diary {
-    private String userName;
+    private String userUID;
     private String profile;
-    private String title;
+    private String with;
     private String contents;
     private String date;
     private String location;
@@ -12,21 +12,21 @@ public class Diary {
     public Diary(){
     }
 
-    public Diary(String userName, String profile, String title, String contents, String date, String location){
-        this.userName = userName;
+    public Diary(String userUID, String profile, String with, String contents, String date, String location){
+        this.userUID = userUID;
         this.profile = profile;
-        this.title = title;
+        this.with = with;
         this.contents = contents;
         this.date = date;
         this.location = location;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserUID() {
+        return userUID;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(String userUID) {
+        this.userUID = userUID;
     }
 
     public String getProfile() {
@@ -37,12 +37,12 @@ public class Diary {
         this.profile = profile;
     }
 
-    public String getTitle() {
-        return title;
+    public String getWith() {
+        return with;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setWith(String with) {
+        this.with = with;
     }
 
     public String getContents() {

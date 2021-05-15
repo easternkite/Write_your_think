@@ -77,7 +77,7 @@ public class Frag3 extends Fragment {
 
         tv_selDate = view.findViewById(R.id.tv_selDate);
         tv_count= view.findViewById(R.id.tv_count);
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink2.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
         Bundle bundle = getArguments();
         text = bundle.getString("text");
 

@@ -77,7 +77,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     public SQLiteManager sqLiteManager;
     private String myFormat = "yyyy-MM-dd";    // 출력형식   2018/11/28
     private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.KOREA);
-    private SimpleDateFormat sdf2 = new SimpleDateFormat("kk:mm:ss", Locale.KOREA);
+    private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
     private Button DateUp;
     private Button DateDown;
     private TextView textView;
@@ -279,7 +279,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
  * SQLite 제어 설정
  */
         // SQLite 객체 초기화
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink2.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
 
 
 
@@ -302,7 +302,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                     sqLiteManager.insert(userName,
                             edit_title.getText().toString(),
                             edit_contents.getText().toString(),
-                            stringUri,                           //edit_upload.getText().toString(),
+                            stringUri != null?stringUri:" ",                           //edit_upload.getText().toString(),
                             textView.getText().toString(),
                             time, address.equals(" ") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
                     Log.d("Lee", " 주소값,.,?:" + address);
@@ -315,10 +315,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                      */
 
                     database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-                    databaseReference = database.getReference(userName + ":"+ textView.getText().toString()); // DB 테이블 연결
+                    databaseReference = database.getReference(userName); // DB 테이블 연결
 
                     writeNewUser(  userName, time,
-                            time,
+                            stringUri != null?stringUri:" ",
                             edit_title.getText().toString(),
                             edit_contents.getText().toString() ,
                             textView.getText().toString() + "(" + time + ")",
@@ -347,6 +347,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
             }
         });
+
 
     }
     @Override
@@ -473,10 +474,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    public void writeNewUser(String userName, String time , String prifile, String title,String contents,String date, String location) {
-        Diary diary = new Diary(userName, prifile, title, contents, date, location);
+    public void writeNewUser(String userUID, String time , String profile, String title,String contents,String date, String location) {
+        Diary diary = new Diary(userUID, profile, title, contents, date, location);
 
-        databaseReference.child(time).setValue(diary);
+        databaseReference.child(date ).setValue(diary);
     }
 
 

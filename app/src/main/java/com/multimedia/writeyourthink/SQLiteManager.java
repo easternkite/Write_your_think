@@ -34,6 +34,14 @@ public class SQLiteManager extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    public void insert2(String userName, String title, String contents, String profile, String date, String time, String address) {
+        SQLiteDatabase db = getWritableDatabase();
+        //String query = "INSERT INTO " + tableName + " SELECT null, '" + userName + "', '" + title + "','" + contents + "','" + profile + "','" + date + "','" + time + "','" + address + "' FROM " + tableName +  " WHERE NOT EXISTS (SELECT * FROM " +  tableName + " WHERE date = '" + date + "' AND time = '" + time + "')";
+        String query = "INSERT INTO " + tableName + " VALUES(null,'" + userName + "', '" + title + "', '" + contents+ "', '" + profile+ "', '" + date + "', '" + time + "', '" + address + "') WHERE NOT EXISTS (SELECT * FROM " + tableName + " WHERE date = '" + date + "' AND time = '" + time + "');";
+        db.execSQL(query);
+    }
+
+
     // id 값에 맞는 DB row 업데이트
     public void update(int id,String userName, String title, String contents, String profile, String date, String time, String address) {
         SQLiteDatabase db = getWritableDatabase();
@@ -124,7 +132,15 @@ public class SQLiteManager extends SQLiteOpenHelper {
 
         return array;
     }
+    public void setResult(String userName, String title, String contents, String profile, String date, String time, String address) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + tableName  + "';'", null);
+        if (cursor.moveToFirst()){
 
+        }else{
+            insert(userName, title, contents, profile, date, time, address);
+        }
+    }
 
 
     @Override

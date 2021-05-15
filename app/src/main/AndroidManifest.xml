@@ -18,7 +18,9 @@
 
         </activity>
         <activity android:name="com.multimedia.writeyourthink.ResultActivity"></activity>
-        <activity android:name="com.multimedia.writeyourthink.DBActivity" />
+        <activity android:name="com.multimedia.writeyourthink.DBActivity">
+
+        </activity>
         <activity
             android:name="com.multimedia.writeyourthink.SplashActivity3"
             android:theme="@style/SplashTheme2" />

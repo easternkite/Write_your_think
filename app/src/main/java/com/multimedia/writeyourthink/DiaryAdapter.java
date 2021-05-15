@@ -86,7 +86,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> 
 
         public void setItem(Diary diary){
             Glide.with(itemView).load(diary.getProfile()).into(iconImageView);
-            textView.setText(diary.getTitle());
+            textView.setText(diary.getWith());
             textView2.setText(diary.getContents());
             date.setText(diary.getDate());
             location.setText(diary.getLocation());

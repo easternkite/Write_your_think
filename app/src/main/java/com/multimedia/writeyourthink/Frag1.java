@@ -61,14 +61,13 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     private String myFormat = "yyyy-MM-dd";    // 출력형식   2018/11/28
     private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.KOREA);
     private SimpleDateFormat sdf3 = new SimpleDateFormat("EEEE" , Locale.KOREA);
-    private SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm:ss", Locale.KOREA);
+    private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
     private Button DateUp;
     private Button DateDown;
     private TextView textView;
     private String time;
     private String addressJin;
     private String weekDay;
-
     /**
      * FireBase Setting
      */
@@ -148,11 +147,14 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        delete(position);
+
                         sqLiteManager.delete(idIndicator.get(position));
                         Toast.makeText(getActivity().getApplicationContext(), "[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 삭제 완료", Toast.LENGTH_SHORT).show();
                         updateList();
                         LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
                         recyclerView.setLayoutAnimation(controller);
+
 
                         
                     }
@@ -161,7 +163,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 builder.setCancelable(true);
                 builder.setNegativeButton("아니오", null);
                 builder.setTitle("데이터 삭제");
-                builder.setMessage("[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
+                builder.setMessage("[" + matchdate.get(position) + "]" + matchtitle.get(position) + matchdate.get(position) + "(" +matchtime.get(position) + ")"+ " 데이터를 삭제하시겠습니까?");
                 builder.show();
             }
         });
@@ -254,7 +256,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink2.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
 
         updateList();
 
@@ -310,6 +312,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         idIndicator.clear();
         matchtitle.clear();
         matchdate.clear();
+        matchtime.clear();
         diaryAdapter.removeItem();    // ListView 내용 모두 삭제
         ArrayList<JSONObject> array = sqLiteManager.getResult(textView.getText().toString()); // DB의 내용을 배열단위로 모두 가져온다
         try {
@@ -326,16 +329,20 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 String address = object.getString("address");
 
 
+                matchdate.add(date);
+                matchtime.add(time);
+                idIndicator.add(id);
+                matchtitle.add(title);
+
                 // 저장한 내용을 토대로 ListView에 다시 그린다.
                 diaryAdapter.addItem(new Diary(userName, profile, "with " + title,  contents,
                         date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
                                 date.substring(8) + "일" +   "("+time+")", address));
                 recyclerView.setAdapter(diaryAdapter);
 
-                idIndicator.add(id);
-                matchtitle.add(title);
-                matchdate.add(date);
-                matchtime.add(time);
+
+
+
             }
         } catch (Exception e) {
             Log.i("seo", "error : " + e);
@@ -404,8 +411,11 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     }
 
     private void delete(int position){
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-        databaseReference = database.getReference(userName+":"+matchdate.get(position));// DB 테이블 연결
-        databaseReference.child(matchtime.get(position));
+        if (matchtime.size()>0){
+            database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+            databaseReference = database.getReference(userName);// DB 테이블 연결
+            databaseReference.child(matchdate.get(position) + "(" +matchtime.get(position) + ")").setValue(null);
+
+        }
     }
 }
