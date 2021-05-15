@@ -1,11 +1,15 @@
 package com.multimedia.writeyourthink;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,11 +20,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.applandeo.materialcalendarview.EventDay;
+import com.bumptech.glide.Glide;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -29,6 +35,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static java.lang.String.valueOf;
 
 public class Frag3 extends Fragment {
     public SQLiteManager sqLiteManager;
@@ -58,6 +68,10 @@ public class Frag3 extends Fragment {
     TextView tv_selDate;
     TextView tv_count;
 
+    private Button btn_logout;
+    private CircleImageView iv_profile;
+    private TextView tv_nickname;
+
     private ArrayList<String> selectedDate = new ArrayList<String>();
     private ArrayList<String> countedDate = new ArrayList<String>();
 
@@ -74,6 +88,14 @@ public class Frag3 extends Fragment {
 
         auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.
         user = auth.getCurrentUser();
+        Intent intent = getActivity().getIntent();
+        String nickName = intent.getStringExtra("nickName"); // MainActivity로 부터 닉네임 전달받음.
+        String photoUrl = intent.getStringExtra("photoUrl"); // MainActivity로 부터 프로필사진 Url 전달받음.
+
+
+        tv_nickname = view.findViewById(R.id.tv_nickname);
+        iv_profile = view.findViewById(R.id.iv_profile);
+        btn_logout = view.findViewById(R.id.btn_logout);
 
         tv_selDate = view.findViewById(R.id.tv_selDate);
         tv_count= view.findViewById(R.id.tv_count);
@@ -90,9 +112,25 @@ public class Frag3 extends Fragment {
         Setdate();
 
 
+        tv_nickname.setText(nickName);
+        Glide.with(getActivity().getApplicationContext()).load(valueOf(photoUrl)).into(iv_profile);
+        btn_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
+                auth.removeAuthStateListener(new FirebaseAuth.AuthStateListener() {
+                    @Override
+                    public void onAuthStateChanged(@NonNull @NotNull FirebaseAuth firebaseAuth) {
 
+                    }
+                });
+                Intent intent1 = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent1);
+                getActivity().finish();
+            }
+        });
 
-        tx_date.setText(""+formattedDate);
+        tx_date.setText(simpleDateFormat.format(myCalendar.getTime()));
 
 
         ly_left.setOnClickListener(new View.OnClickListener() {

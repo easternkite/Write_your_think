@@ -28,9 +28,6 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
 
-
-
-
     </style>
 
     <style name="TextMaterialButton" parent="Theme.MaterialComponents">
@@ -39,6 +36,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- set the rounded drawable as background to your bottom sheet -->
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+
+    출처: https://jinseongsoft.tistory.com/56 [진성 소프트]   <!-- set the rounded drawable as background to your bottom sheet -->
 
 </resources>

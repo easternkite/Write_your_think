@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +32,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomSheetFragment.BottomSheetListener {
 
-
+    private long backpressedTime = 0;
     private BottomNavigationView bottomNavigationView;
     private FragmentManager fm;
     private FragmentTransaction ft;
@@ -159,5 +160,15 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     @Override
     public void onButtonClicked(String text) {
         mTextView.setText(text);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (System.currentTimeMillis() > backpressedTime + 2000) {
+            backpressedTime = System.currentTimeMillis();
+            Toast.makeText(this, "\'뒤로\' 버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
+        } else if (System.currentTimeMillis() <= backpressedTime + 2000) {
+            finish();
+        }
     }
 }
