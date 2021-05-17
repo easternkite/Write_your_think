@@ -5,17 +5,19 @@ public class User {
     private String id;
     private int pw;
     private String userName;
+    private String userPhone;
 
     public User(){
     }
 
 
 
-    public User(String profile, String id, int pw, String userName){
+    public User(String profile, String id, int pw, String userName, String userPhone){
         this.profile = profile;
         this.id = id;
         this.pw = pw;
         this.userName = userName;
+        this.userPhone = userPhone;
     }
 
     public String getProfile() {
@@ -48,5 +50,13 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 }

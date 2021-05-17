@@ -40,7 +40,9 @@ public class SplashActivity2 extends AppCompatActivity {
                     }
 
                     Intent intent2 = new Intent(SplashActivity2.this, LoginActivity.class);
+                    intent2.putExtra("viewNum", 1);
                     startActivity(intent2);
+                    overridePendingTransition(0, 0);
                     finish();
                 }
 

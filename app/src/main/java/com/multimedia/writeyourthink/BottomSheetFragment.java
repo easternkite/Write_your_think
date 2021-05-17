@@ -255,7 +255,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
  * SQLite 제어 설정
  */
         // SQLite 객체 초기화
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink.db", null, 1);
 
 
 

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.facebook.AccessToken;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,13 +40,12 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     private BottomSheetFragment bottomSheetFragment;
     private Frag1 frag1;
     private Frag3 frag3;
-    private String date;
-    private String location;
-    private String with;
-    private String profile;
-    private String userUID;
-    private String contents;
+    private AccessToken accessToken;
+    private String userEmail;
+    private String userProfile;
+    private String userUID;;
     private String userName;
+    private int loginNum;
     public SQLiteManager sqLiteManager;
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
@@ -66,10 +66,60 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         setContentView(R.layout.activity_main);
         tedPermission();
 
+        Intent intent = getIntent();
+        String Token = intent.getStringExtra("accessToken");
+        String fbLogin = intent.getStringExtra("fbLogin");
+        /**
+         * 파이어베이스 초기 셋팅
+         */
         auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.
         user = auth.getCurrentUser();
-        userName = user.getUid();
+        userUID = user.getUid();
 
+
+
+        Log.d("Lee", String.valueOf(Token));
+        accessToken = AccessToken.getCurrentAccessToken();
+        Log.d("Lee", "LoginNum : " + loginNum);
+        userProfile = user.getPhotoUrl().toString();
+        userName = user.getDisplayName();
+        userEmail = user.getEmail();
+        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+        databaseReference = database.getReference(userUID); // DB 테이블 연결
+        String photoUrl = userProfile + "?height=500&access_token=" + Token;
+        sqLiteManager = new SQLiteManager(this, "writeYourThink.db", null, 1);
+        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+        databaseReference = database.getReference(userUID); // DB 테이블 연결
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
+                    UserInfo userInfo = snapshot.getValue(UserInfo.class); // 만들어뒀던 User 객체에 데이터를 담는다.
+                    if (userInfo.getUserName() != null){
+                        userUID = userInfo.getUserUID();
+                        userName = userInfo.getUserName();
+                        userProfile = userInfo.getUserProfile();;
+                        userEmail = userInfo.getUserEmail();
+
+                        sqLiteManager.insertUser2(userUID,userName,userProfile,userEmail);
+
+
+                    }
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // 디비를 가져오던중 에러 발생 시
+                Log.e("MainActivity", String.valueOf(databaseError.toException())); // 에러문 출력
+            }
+        });
+
+        writeNewUser(userUID,userName,photoUrl,userEmail);
         bottomNavigationView = findViewById(R.id.bottomNavi);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -170,5 +220,10 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         } else if (System.currentTimeMillis() <= backpressedTime + 2000) {
             finish();
         }
+    }
+    public void writeNewUser(String userUID, String userName , String userProfile, String userEmail) {
+        UserInfo userInfo = new UserInfo(userUID, userName, userProfile, userEmail);
+
+        databaseReference.child("UserInfo").setValue(userInfo);
     }
 }

@@ -180,7 +180,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 builder.setCancelable(true);
                 builder.setNegativeButton("아니오", null);
                 builder.setTitle("데이터 삭제");
-                builder.setMessage("[" + matchdate.get(position) + "]" + matchtitle.get(position) + matchdate.get(position) + "(" +matchtime.get(position) + ")"+ " 데이터를 삭제하시겠습니까?");
+                builder.setMessage("[" + matchdate.get(position) + "]" +matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
                 builder.show();
             }
         });
@@ -273,7 +273,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink123.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink.db", null, 1);
 
         firebaseUpdate();
 
@@ -442,7 +442,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         progressDialog.show();
 
 
-        sqLiteManager = new SQLiteManager(getActivity(), "writeYourThink123.db", null, 1);
+        sqLiteManager = new SQLiteManager(getActivity(), "writeYourThink.db", null, 1);
 
 
 

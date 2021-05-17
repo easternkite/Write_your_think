@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class SQLiteManager extends SQLiteOpenHelper {
     private String tableName = "Diary";
+    private String tableNameUser = "User";
     public SQLiteManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -20,6 +21,7 @@ public class SQLiteManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + tableName + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT, title TEXT, contents INTEGER, profile TEXT, date TEXT, time TEXT, address TEXT);");
+        db.execSQL("CREATE TABLE " + tableNameUser + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, userUID TEXT, userName TEXT, userProfile TEXT, userEmail TEXT);");
     }
 
     @Override
@@ -41,6 +43,19 @@ public class SQLiteManager extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    public void insertUser(String userUID, String userName, String userProfile, String userEmail) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "INSERT INTO " + tableNameUser + " VALUES(null,'" + userUID + "', '" + userName + "', '" + userProfile+ "', '" + userEmail+  "');";
+        db.execSQL(query);
+    }
+    public void insertUser2(String userUID, String userName, String userProfile, String userEmail) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "INSERT INTO " + tableNameUser + " SELECT null, '" + userUID + "', '" + userName + "','" + userProfile + "','" + userEmail + "'  WHERE NOT EXISTS (SELECT * FROM " +  tableNameUser + " WHERE userUID = '" + userUID + "')";
+        //String query = "INSERT INTO " + tableName + " VALUES(null,'" + userName + "', '" + title + "', '" + contents+ "', '" + profile+ "', '" + date + "', '" + time + "', '" + address + "') WHERE NOT EXISTS (SELECT * FROM " + tableName + " WHERE date = '" + date + "' AND time = '" + time + ");";
+        db.execSQL(query);
+    }
+
+
 
     // id 값에 맞는 DB row 업데이트
     public void update(int id,String userName, String title, String contents, String profile, String date, String time, String address) {
@@ -48,6 +63,13 @@ public class SQLiteManager extends SQLiteOpenHelper {
         String query = "UPDATE " + tableName +" SET title='" + title + "', contents='" + contents + "', profile='" + profile + "', date='" + date +"', time='" + time + "', time='" + address + "' WHERE id=" + id + ";";
         db.execSQL(query);
     }
+    public void updateUser(int id,String userUID, String userName, String userProfile, String userEmail) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "UPDATE " + tableNameUser +" SET userUID='" + userUID + "', userName='" + userName + "', userProfile='" + userProfile + "', userEmail='" + userEmail +"' WHERE id=" + id + ";";
+        db.execSQL(query);
+    }
+
+
 
     // id에 맞는 DB row 삭제
     public void delete(String id) {
@@ -60,6 +82,7 @@ public class SQLiteManager extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         String query = "DELETE FROM " + tableName + "';";
         db.delete(tableName,"", null);
+        db.delete(tableNameUser,"", null);
     }
 
     // table 내용 전부 삭제
@@ -122,7 +145,6 @@ public class SQLiteManager extends SQLiteOpenHelper {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id",cursor.getString(0));
                 jsonObject.put("userName",cursor.getString(1));
-
                 jsonObject.put("title",cursor.getString(2));
                 jsonObject.put("contents",cursor.getString(3));
                 jsonObject.put("profile",cursor.getString(4));
@@ -138,6 +160,30 @@ public class SQLiteManager extends SQLiteOpenHelper {
 
         return array;
     }
+
+    public ArrayList<JSONObject> getResultUser() {
+        ArrayList<JSONObject> array = new ArrayList<JSONObject>();
+        try{
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM " + tableNameUser  + "';'", null);
+            while (cursor.moveToNext()) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id",cursor.getString(0));
+                jsonObject.put("userUID",cursor.getString(1));
+                jsonObject.put("userName",cursor.getString(2));
+                jsonObject.put("userProfile",cursor.getString(3));
+                jsonObject.put("userEmail",cursor.getString(4));
+                array.add(jsonObject);
+            }
+        }
+        catch (Exception e){
+            Log.i("seo","error : " + e);
+        }
+
+        return array;
+    }
+
+
     public void setResult(String userName, String title, String contents, String profile, String date, String time, String address) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + tableName  + "';'", null);
