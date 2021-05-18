@@ -212,6 +212,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             intent.putExtra("accessToken",accessToken);
                             intent.putExtra("fbLogin","fbLogin");
                             startActivity(intent);
+                            finish();
                         } else {
                             // 로그인 실패
                             Toast.makeText(LoginActivity.this, "로그인 실패", Toast.LENGTH_SHORT).show();

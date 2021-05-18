@@ -43,7 +43,4 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-
-    출처: https://jinseongsoft.tistory.com/56 [진성 소프트]   <!-- set the rounded drawable as background to your bottom sheet -->
-
 </resources>
