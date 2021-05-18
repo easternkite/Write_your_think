@@ -11,7 +11,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="205dp"
         android:layout_height="60dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="92dp"
         app:cardBackgroundColor="@color/my_orange"
         app:cardCornerRadius="10dp"
         app:cardElevation="5dp"
@@ -37,7 +37,7 @@
         android:id="@+id/cardView3"
         android:layout_width="205dp"
         android:layout_height="60dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="48dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="10dp"
         app:cardElevation="5dp"
@@ -46,11 +46,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.gms.common.SignInButton
+        <com.shobhitpuri.custombuttons.GoogleSignInButton
             android:id="@+id/btn_google"
             android:layout_width="197dp"
             android:layout_height="100dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:text="@string/fui_sign_in_with_google"
+            />
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

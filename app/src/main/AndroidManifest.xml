@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WriteYourThink">
-
+        <meta-data android:name="android.max_aspect" android:value="2.1" />
         <activity android:name="com.multimedia.writeyourthink.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme2">

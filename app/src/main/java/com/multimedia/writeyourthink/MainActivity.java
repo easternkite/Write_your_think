@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         user = auth.getCurrentUser();
         userUID = user.getUid();
 
-
+        Toast.makeText(this, user.getDisplayName() + "님, 환영합니다!", Toast.LENGTH_SHORT).show();
 
         Log.d("Lee", String.valueOf(Token));
         accessToken = AccessToken.getCurrentAccessToken();
