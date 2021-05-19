@@ -351,7 +351,9 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 matchtitle.add(title);
 
                 // 저장한 내용을 토대로 ListView에 다시 그린다.
-                diaryAdapter.addItem(new Diary(userName, profile, "with " + title,  contents,
+                diaryAdapter.addItem(new Diary(userName, profile,
+                        address.equals(" ") || address.equals(null)? "어느 한 " + title + "에서..": "의 어느 한 "+ title + "에서..",
+                        contents,
                         date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
                                 date.substring(8) + "일" +   "("+time+")", address));
                 recyclerView.setAdapter(diaryAdapter);
@@ -458,7 +460,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                     if (diary.getDate() != null){
                         date = diary.getDate();
                         location1 = diary.getLocation();
-                        with1 = diary.getWith();
+                        with1 = diary.getWhere();
                         contents1 = diary.getContents();
                         profile1= diary.getProfile();
                         userUID1= diary.getUserUID();

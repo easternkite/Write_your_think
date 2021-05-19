@@ -2,6 +2,8 @@ package com.multimedia.writeyourthink;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,6 +46,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.shobhitpuri.custombuttons.GoogleSignInButton;
 
+import java.util.Locale;
+
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private GoogleSignInButton btn_google; // 구글 로그인 버튼
     private FirebaseAuth auth; // 파이어 베이스 인증 객체
@@ -65,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        changeLocale("en");
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -115,6 +119,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             intent.putExtra("nickName",user.getDisplayName());
             intent.putExtra("photoUrl",String.valueOf(user.getPhotoUrl()));
             intent.putExtra("accessToken",accessToken);
+            intent.putExtra("fbLogin",1);
             startActivity(intent);
 
             finish();
@@ -178,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.putExtra("nickName",account.getGivenName());
                             intent.putExtra("photoUrl",String.valueOf(account.getPhotoUrl())); // String.valueOf() 특정 자료형을 String 형태로 변환.
-
+                            intent.putExtra("fbLogin",1);
                             startActivity(intent);
                             finish();
                         } else { // 로그인이 실패했으면..
@@ -210,7 +215,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.putExtra("loginNum",2);
                             intent.putExtra("accessToken",accessToken);
-                            intent.putExtra("fbLogin","fbLogin");
+                            intent.putExtra("fbLogin",1);
                             startActivity(intent);
                             finish();
                         } else {
@@ -231,5 +236,30 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 return;
             }
         }
+    }
+
+    private void changeLocale(String localeLang){
+
+        Locale locale = null;
+
+        switch (localeLang){
+            case "ko":
+                locale = new Locale("ko");
+                break;
+
+            case "en":
+                locale = new Locale("en");
+                break;
+        }
+        Configuration config = getApplicationContext().getResources().getConfiguration();
+
+        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+            config.setLocale(locale);
+        }
+        else {
+            config.locale = locale;
+        }
+
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 }

@@ -3,7 +3,7 @@ package com.multimedia.writeyourthink;
 public class Diary {
     private String userUID;
     private String profile;
-    private String with;
+    private String where;
     private String contents;
     private String date;
     private String location;
@@ -12,10 +12,10 @@ public class Diary {
     public Diary(){
     }
 
-    public Diary(String userUID, String profile, String with, String contents, String date, String location){
+    public Diary(String userUID, String profile, String where, String contents, String date, String location){
         this.userUID = userUID;
         this.profile = profile;
-        this.with = with;
+        this.where = where;
         this.contents = contents;
         this.date = date;
         this.location = location;
@@ -37,12 +37,12 @@ public class Diary {
         this.profile = profile;
     }
 
-    public String getWith() {
-        return with;
+    public String getWhere() {
+        return where;
     }
 
-    public void setWith(String with) {
-        this.with = with;
+    public void setWhere(String where) {
+        this.where = where;
     }
 
     public String getContents() {

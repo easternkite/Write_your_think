@@ -83,7 +83,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     private TextView textView;
     private String time;
     private LinearLayout invisibleLayout;
-
+    private String address;
 
     /**
      * Fire Base 등장
@@ -161,7 +161,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         gpsTracker = new GpsTracker(getActivity());
         double latitude = gpsTracker.getLatitude(); // 위도
         double longitude = gpsTracker.getLongitude(); //경도
-        String address = getCurrentAddress(latitude, longitude);
+        address = getCurrentAddress(latitude, longitude);
 
 
 
@@ -273,15 +273,15 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 if (edit_title.getText().toString().equals("") || edit_contents.getText().toString().equals("")) {
                     Toast.makeText(getActivity().getApplicationContext(), "내용을 입력하십시오.", Toast.LENGTH_SHORT).show();
                 } else {
-
-
+                    address = getCurrentAddress(latitude, longitude);
+                    Log.d("Lee", " 주소값,.,?:" + address);
                     sqLiteManager.insert(userName,
                             edit_title.getText().toString(),
                             edit_contents.getText().toString(),
                             stringUri != null?stringUri:" ",                           //edit_upload.getText().toString(),
                             textView.getText().toString(),
-                            time, address.equals(" ") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
-                    Log.d("Lee", " 주소값,.,?:" + address);
+                            time, address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
+
 
 
 
@@ -298,7 +298,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                             edit_title.getText().toString(),
                             edit_contents.getText().toString() ,
                             textView.getText().toString() + "(" + time + ")",
-                            address.equals(" ") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
+                            address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
 
 
                     // EditText에 입력한 정보를 DB에 Insert.
@@ -450,8 +450,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    public void writeNewUser(String userUID, String time , String profile, String title,String contents,String date, String location) {
-        Diary diary = new Diary(userUID, profile, title, contents, date, location);
+    public void writeNewUser(String userUID, String time , String profile, String where,String contents,String date, String location) {
+        Diary diary = new Diary(userUID, profile, where, contents, date, location);
 
         databaseReference.child(date ).setValue(diary);
     }

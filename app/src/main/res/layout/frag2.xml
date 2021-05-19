@@ -94,7 +94,7 @@
                 android:id="@+id/edit_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="누구와 함께 하셨나요?"
+                android:hint="장소를 알려주세요!"
                 android:nextFocusDown="@id/edit_contents"
                 app:layout_constraintBottom_toTopOf="@+id/edit_contents"
                 app:layout_constraintEnd_toEndOf="parent"

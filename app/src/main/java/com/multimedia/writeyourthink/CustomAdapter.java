@@ -63,7 +63,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         public void setItem(Diary diary){
             Glide.with(itemView).load(diary.getProfile()).into(iconImageView);
-            textView.setText(diary.getWith());
+            textView.setText(diary.getWhere());
             textView2.setText(diary.getContents());
             tv_date.setText(diary.getDate());
             tv_location.setText(diary.getLocation());

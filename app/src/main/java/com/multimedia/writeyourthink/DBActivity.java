@@ -62,7 +62,7 @@ public class DBActivity extends AppCompatActivity {
                     if (diary.getDate() != null){
                         date = diary.getDate();
                         location = diary.getLocation();
-                        with = diary.getWith();
+                        with = diary.getWhere();
                         contents = diary.getContents();
                         profile= diary.getProfile();
                         userUID= diary.getUserUID();

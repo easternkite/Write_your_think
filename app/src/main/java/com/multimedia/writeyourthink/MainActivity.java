@@ -3,6 +3,8 @@ package com.multimedia.writeyourthink;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -29,6 +31,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements BottomSheetFragment.BottomSheetListener {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     public SQLiteManager sqLiteManager;
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
+    private int fbLogin;
 
     /**
      * FireBase 등장
@@ -65,18 +69,20 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tedPermission();
-
+        changeLocale("ko");
         Intent intent = getIntent();
         String Token = intent.getStringExtra("accessToken");
-        String fbLogin = intent.getStringExtra("fbLogin");
+        fbLogin = intent.getIntExtra("fbLogin",0);
         /**
          * 파이어베이스 초기 셋팅
          */
         auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.
         user = auth.getCurrentUser();
         userUID = user.getUid();
+        if (fbLogin == 1){
+            Toast.makeText(this, user.getDisplayName() + "님, 환영합니다!", Toast.LENGTH_SHORT).show();
+        }
 
-        Toast.makeText(this, user.getDisplayName() + "님, 환영합니다!", Toast.LENGTH_SHORT).show();
 
         Log.d("Lee", String.valueOf(Token));
         accessToken = AccessToken.getCurrentAccessToken();
@@ -225,5 +231,30 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         UserInfo userInfo = new UserInfo(userUID, userName, userProfile, userEmail);
 
         databaseReference.child("UserInfo").setValue(userInfo);
+    }
+
+    private void changeLocale(String localeLang){
+
+        Locale locale = null;
+
+        switch (localeLang){
+            case "ko":
+                locale = new Locale("ko");
+                break;
+
+            case "en":
+                locale = new Locale("en");
+                break;
+        }
+        Configuration config = getApplicationContext().getResources().getConfiguration();
+
+        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+            config.setLocale(locale);
+        }
+        else {
+            config.locale = locale;
+        }
+
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 }
