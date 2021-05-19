@@ -352,7 +352,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
                 // 저장한 내용을 토대로 ListView에 다시 그린다.
                 diaryAdapter.addItem(new Diary(userName, profile,
-                        address.equals(" ") || address.equals(null)? "어느 한 " + title + "에서..": "의 어느 한 "+ title + "에서..",
+                        address.equals(" ") || address.equals(null)?  title + "에서..": "의 "+ title + "에서..",
                         contents,
                         date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
                                 date.substring(8) + "일" +   "("+time+")", address));
