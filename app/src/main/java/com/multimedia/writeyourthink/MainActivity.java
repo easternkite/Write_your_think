@@ -19,6 +19,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
      */
     private FirebaseAuth auth; // 파이어 베이스 인증 객체
     private FirebaseUser user;
-
 
     private TextView mTextView;
     private ImageButton button;
@@ -125,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
             }
         });
 
+
+
+
         writeNewUser(userUID,userName,photoUrl,userEmail);
         bottomNavigationView = findViewById(R.id.bottomNavi);
 
@@ -170,6 +175,19 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         bundle.putString("text", user.getUid());
         bottomSheetFragment.setArguments(bundle);
         frag3.setArguments(bundle);
+        FirebaseMessaging.getInstance().subscribeToTopic("weather")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = getString(R.string.msg_subscribed);
+                        if (!task.isSuccessful()) {
+                            msg = getString(R.string.msg_subscribe_failed);
+                        }
+                        Log.d("MainActivity", msg);
+                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
 
     }
 

@@ -27,4 +27,10 @@
     <string name="facebook_app_id">465200471240774</string>
     <string name="fb_login_protocol_scheme">fb465200471240774</string>
 
+
+    <string name="msg_subscribed">msg_subscribed</string>
+    <string name="msg_subscribe_failed">msg_subscribe_failed</string>
+
+
+
 </resources>
