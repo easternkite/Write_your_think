@@ -324,6 +324,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
 
     private void updateList() {
+        int AA1 = R.string.syncData;
         Bundle bundle = getArguments();
         idIndicator.clear();
         matchtitle.clear();
@@ -349,14 +350,23 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 matchtime.add(time);
                 idIndicator.add(id);
                 matchtitle.add(title);
+                if(Locale.getDefault().getISO3Language().equals("eng")){
+                    diaryAdapter.addItem(new Diary(userName, profile,
+                            "At a " + title + ", " + address,
+                            contents,
+                            date.substring(0,4) + "-" + date.substring(5,7) + "-" +
+                                    date.substring(8) + "-" +   "("+time+")",""));
+                    recyclerView.setAdapter(diaryAdapter);
+                }else{
+                    // 저장한 내용을 토대로 ListView에 다시 그린다.
+                    diaryAdapter.addItem(new Diary(userName, profile,
+                            address.equals(" ") || address.equals(null)?  title + "에서..": "의 "+ title + "에서..",
+                            contents,
+                            date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
+                                    date.substring(8) + "일" +   "("+time+")", address));
+                    recyclerView.setAdapter(diaryAdapter);
+                }
 
-                // 저장한 내용을 토대로 ListView에 다시 그린다.
-                diaryAdapter.addItem(new Diary(userName, profile,
-                        address.equals(" ") || address.equals(null)?  title + "에서..": "의 "+ title + "에서..",
-                        contents,
-                        date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
-                                date.substring(8) + "일" +   "("+time+")", address));
-                recyclerView.setAdapter(diaryAdapter);
 
 
 
@@ -439,7 +449,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
     private void firebaseUpdate(){
         final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle("데이터 동기화중...");
+        progressDialog.setTitle(getString(R.string.syncData));
         progressDialog.setCancelable(false);
         progressDialog.show();
 

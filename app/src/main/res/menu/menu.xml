@@ -5,7 +5,7 @@
             android:id="@+id/action_list"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_view_list_24"
-            android:title="목록"/>
+            android:title="@string/list" />
 
         <item
 
@@ -18,7 +18,7 @@
             android:id="@+id/action_chart"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_calendar_today_24"
-            android:title="캘린더"/>
+            android:title="@string/calendar" />
 
     </group>
 

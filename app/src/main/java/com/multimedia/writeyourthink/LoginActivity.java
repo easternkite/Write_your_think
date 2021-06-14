@@ -69,7 +69,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        changeLocale("en");
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -187,7 +186,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             startActivity(intent);
                             finish();
                         } else { // 로그인이 실패했으면..
-                            Toast.makeText(LoginActivity.this, "로그인 실패", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -220,7 +219,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             finish();
                         } else {
                             // 로그인 실패
-                            Toast.makeText(LoginActivity.this, "로그인 실패", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -238,28 +237,5 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    private void changeLocale(String localeLang){
 
-        Locale locale = null;
-
-        switch (localeLang){
-            case "ko":
-                locale = new Locale("ko");
-                break;
-
-            case "en":
-                locale = new Locale("en");
-                break;
-        }
-        Configuration config = getApplicationContext().getResources().getConfiguration();
-
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
-            config.setLocale(locale);
-        }
-        else {
-            config.locale = locale;
-        }
-
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-    }
 }

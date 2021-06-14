@@ -118,8 +118,6 @@ public class Frag3 extends Fragment {
 
         tv_selDate = view.findViewById(R.id.tv_selDate);
         tv_count= view.findViewById(R.id.tv_count);
-        Bundle bundle = getArguments();
-        text = bundle.getString("text");
 
 
         sqLiteManager = new SQLiteManager(getActivity(), "writeYourThink.db", null, 1);
@@ -143,7 +141,7 @@ public class Frag3 extends Fragment {
                 auth.signOut();
                 LoginManager.getInstance().logOut();
                 sqLiteManager.deleteAll();
-                Toast.makeText(getActivity(),"로그아웃 되었습니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),getString(R.string.logout),Toast.LENGTH_SHORT).show();
                 Intent intent1 = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent1);
                 getActivity().finish();
@@ -196,7 +194,6 @@ public class Frag3 extends Fragment {
         ly_left = (LinearLayout) view.findViewById(R.id.layout_left);
         ly_right = (LinearLayout) view.findViewById(R.id.layout_right);
         im_back = (ImageView) view.findViewById(R.id.image_back);
-        tx_today = (TextView) view.findViewById(R.id.text_today);
     }
 
     public void calendarlistener() {
@@ -208,9 +205,9 @@ public class Frag3 extends Fragment {
                 sqLiteManager.close();
                 tv_selDate.setText(DateFormat.format(dateClicked));
                 if (profile_counts>0){
-                    tv_count.setText("기록된 사소한 일 : " + profile_counts + "건");
+                    tv_count.setText(getString(R.string.frag3_2 ) + " : " + profile_counts +" "+ getString(R.string.cases));
                 }else{
-                    tv_count.setText("기록된 일이 없습니다. 기록해보세요!" );
+                    tv_count.setText(getString(R.string.frag3_1));
                 }
 
 
@@ -246,9 +243,9 @@ public class Frag3 extends Fragment {
         formattedDate = df.format(c);
         tv_selDate.setText(formattedDate);
         if (profile_counts>0){
-            tv_count.setText("기록된 사소한 일 : " + profile_counts + "건" );
+            tv_count.setText(getString(R.string.frag3_2 ) + " : " + profile_counts +" "+ getString(R.string.cases));
         }else{
-            tv_count.setText("기록된 일이 없습니다. 기록해보세요!");
+            tv_count.setText(getString(R.string.frag3_1));
         }
         myCalendar = Calendar.getInstance();
 

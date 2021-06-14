@@ -94,7 +94,7 @@
                 android:id="@+id/edit_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="장소를 알려주세요!"
+                android:hint="@string/question1"
                 android:nextFocusDown="@id/edit_contents"
                 app:layout_constraintBottom_toTopOf="@+id/edit_contents"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +105,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:hint="어떤 일을 하셨는지 알려주세요!"
+                android:hint="@string/question2"
                 android:inputType="textMultiLine"
                 android:lines="8"
                 android:maxLines="10"
@@ -208,7 +208,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/ripple_effect"
-                    android:text="업로드"
+                    android:text="@string/upload"
                     android:textColor="@color/gray"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>

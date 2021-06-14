@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
 
         android:layout_height="?attr/actionBarSize"
-
+        android:gravity="center"
         android:background="@color/colorPrimary"
 
         >
@@ -31,10 +31,10 @@
             android:layout_width="30dp"
 
             android:layout_height="20dp"
-            android:visibility="gone"
             android:layout_marginLeft="20dp"
-            app:tint="@color/white"
-            android:src="@drawable/back_arrow" />
+            android:src="@drawable/back_arrow"
+            android:visibility="gone"
+            app:tint="@color/white" />
 
         <TextView
 
@@ -44,31 +44,15 @@
 
             android:layout_marginLeft="20dp"
 
-            android:text="Job Detail"
+
+
+            android:text="Calendar"
 
             android:textColor="@android:color/white"
 
             android:textSize="17dp"
-
             android:textStyle="bold" />
 
-        <TextView
-
-            android:id="@+id/text_today"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:layout_gravity="center|right"
-
-            android:padding="10dp"
-
-            android:text="Today"
-
-            android:textColor="@android:color/white"
-
-            android:textSize="15dp" />
     </Toolbar>
 
     <LinearLayout
@@ -211,7 +195,7 @@
             android:id="@+id/tv_selDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="@string/frag3_1"
             app:layout_constraintTop_toBottomOf="@+id/tv_count"
             tools:layout_editor_absoluteX="-6dp" />
 

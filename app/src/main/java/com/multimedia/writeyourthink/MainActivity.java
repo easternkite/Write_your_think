@@ -22,6 +22,9 @@ import com.facebook.AccessToken;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -70,6 +72,10 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(/*context=*/ this);
+        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+        firebaseAppCheck.installAppCheckProviderFactory(
+                SafetyNetAppCheckProviderFactory.getInstance());
         tedPermission();
         changeLocale("ko");
         Intent intent = getIntent();
@@ -82,7 +88,11 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         user = auth.getCurrentUser();
         userUID = user.getUid();
         if (fbLogin == 1){
-            Toast.makeText(this, user.getDisplayName() + "님, 환영합니다!", Toast.LENGTH_SHORT).show();
+            if (Locale.getDefault().getISO3Language().equals("kor")){
+                Toast.makeText(this, user.getDisplayName() + "님, 환영합니다!", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "hello, "+user.getDisplayName(), Toast.LENGTH_SHORT).show();
+            }
         }
 
 
@@ -170,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
                 bottomSheet.show(getSupportFragmentManager(), "exampleBottomSheet");
             }
         });
-
+/*
         Bundle bundle = new Bundle();
         bundle.putString("text", user.getUid());
         bottomSheetFragment.setArguments(bundle);
@@ -188,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
                     }
                 });
 
+
+ */
 
     }
 
