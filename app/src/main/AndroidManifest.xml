@@ -18,7 +18,10 @@
         android:theme="@style/Theme.WriteYourThink">
 
 
-
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9450003299415787~2302074914"/>
         <meta-data android:name="android.max_aspect" android:value="2.1" />
         <activity android:name="com.multimedia.writeyourthink.LoginActivity"
             android:screenOrientation="portrait"
@@ -70,6 +73,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
+
+
         </activity>
 
 
