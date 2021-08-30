@@ -85,6 +85,14 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     private LinearLayout invisibleLayout;
     private String address;
 
+    String where = "";
+    String contents = "";
+    String photoURL = "";
+    String matchDate = "";
+    String matchTime = "";
+    String matchAddress = "";
+    String matchID = "";
+
     /**
      * Fire Base 등장
      */
@@ -145,6 +153,28 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
     @Override
     public void setupDialog(Dialog dialog, int style) {
+
+        try {
+            Bundle mArgs = getArguments();
+             where = mArgs.getString("where").equals("null") ? " " : mArgs.getString("where");
+             contents = mArgs.getString("contents");
+             photoURL = mArgs.getString("url");
+             matchDate = mArgs.getString("date");
+             matchTime = mArgs.getString("time");
+             matchAddress =  mArgs.getString("address");
+             matchID = mArgs.getString("id");
+        }catch (NullPointerException e){
+            where = "";
+            contents = "";
+            photoURL = "";
+            matchDate = "";
+            matchTime = "";
+            matchAddress ="";
+            matchID = "";
+        }
+
+
+
         View view = View.inflate(getContext(), R.layout.frag2, null);
         dialog.setContentView(view);
         ((View) view.getParent()).setBackgroundColor(getResources().getColor(android.R.color.transparent));
@@ -275,6 +305,35 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 } else {
                     address = getCurrentAddress(latitude, longitude);
                     Log.d("Lee", " 주소값,.,?:" + address);
+
+                    if (btn_upload.getText().toString().equals("수정")){ //수정일 때..ㅎ
+                        Log.d("Lee", "아니 여기 수정이잖아!!!!!!!");
+                        /**
+                         * SQLite Data Insert
+                         */
+                        sqLiteManager.update(Integer.parseInt(matchID), userName,
+                                edit_title.getText().toString(),
+                                edit_contents.getText().toString(),
+                                photoURL != null? photoURL:" ",                           //edit_upload.getText().toString(),
+                                matchDate,
+                                matchTime, matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
+
+
+                        /**
+                         * FireBase Data Insert
+                         */
+                        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+                        databaseReference = database.getReference(userName); // DB 테이블 연결
+                            writeNewUser(  userName, time,
+                                    photoURL != null?photoURL:" ",
+                                    edit_title.getText().toString(),
+                                    edit_contents.getText().toString() ,
+                                    matchDate + "(" + matchTime + ")",
+                                    matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
+                    }else{
+                        /**
+                     * SQLite Data Insert
+                     */
                     sqLiteManager.insert(userName,
                             edit_title.getText().toString(),
                             edit_contents.getText().toString(),
@@ -283,22 +342,19 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                             time, address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
 
 
-
-
-
                     /**
                      * FireBase Data Insert
                      */
-
                     database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
                     databaseReference = database.getReference(userName); // DB 테이블 연결
-
                     writeNewUser(  userName, time,
                             stringUri != null?stringUri:" ",
                             edit_title.getText().toString(),
                             edit_contents.getText().toString() ,
                             textView.getText().toString() + "(" + time + ")",
                             address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
+                    }
+
 
 
                     // EditText에 입력한 정보를 DB에 Insert.
@@ -323,7 +379,25 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
             }
         });
+        textView.setText(date);
+        edit_title.setText("");
+        edit_contents.setText("");
+        btn_upload.setText("업로드");
 
+
+        if (!where.equals("")){
+            textView.setText(matchDate);
+            edit_title.setText(where);
+            edit_contents.setText(contents);
+            btn_upload.setText("수정");
+            textView.setFocusable(false);
+            textView.setFocusableInTouchMode(false);
+            textView.setEnabled(false);
+            DateUp.setVisibility(View.GONE);
+            DateDown.setVisibility(View.GONE);
+            invisibleLayout.setVisibility(View.VISIBLE);
+            Glide.with(getActivity().getApplicationContext()).load(photoURL).into(imageView);
+        }
 
     }
     @Override

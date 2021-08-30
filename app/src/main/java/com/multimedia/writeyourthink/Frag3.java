@@ -27,13 +27,6 @@ import com.bumptech.glide.Glide;
 import com.facebook.login.LoginManager;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -91,11 +84,9 @@ public class Frag3 extends Fragment {
     CalendarAdapter adapter;
     TextView tv_selDate;
     TextView tv_count;
-    AdView adView;
     private Button btn_logout;
     private CircleImageView iv_profile;
     private TextView tv_nickname;
-    private AdView mAdView;
     private ArrayList<String> selectedDate = new ArrayList<String>();
     private ArrayList<String> countedDate = new ArrayList<String>();
 
@@ -109,51 +100,6 @@ public class Frag3 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag3, container, false);
-
-        MobileAds.initialize(getActivity());
-
-        MobileAds.initialize(getActivity(), new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
-        mAdView = view.findViewById(R.id.banner);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-                Log.d(TAG, "Frag3 :  onAdLoaded() called");
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-                // Code to be executed when an ad request fails.
-                Log.d(TAG, "Frag3 :  onAdFailedToLoad() called");
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-                Log.d(TAG, "Frag3 :  onAdOpened() called");
-            }
-
-            @Override
-            public void onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-                Log.d(TAG, "Frag3 :  onAdClicked() called");
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-                Log.d(TAG, "Frag3 :  onAdClosed() called");
-            }
-        });
 
 
         auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.

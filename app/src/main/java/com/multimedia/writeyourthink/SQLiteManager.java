@@ -60,7 +60,7 @@ public class SQLiteManager extends SQLiteOpenHelper {
     // id 값에 맞는 DB row 업데이트
     public void update(int id,String userName, String title, String contents, String profile, String date, String time, String address) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "UPDATE " + tableName +" SET title='" + title + "', contents='" + contents + "', profile='" + profile + "', date='" + date +"', time='" + time + "', time='" + address + "' WHERE id=" + id + ";";
+        String query = "UPDATE " + tableName +" SET title='" + title + "', userName='" + userName + "', contents='" + contents + "', profile='" + profile + "', date='" + date +"', time='" + time + "', address ='" + address + "' WHERE _id=" + id + ";";
         db.execSQL(query);
     }
     public void updateUser(int id,String userUID, String userName, String userProfile, String userEmail) {

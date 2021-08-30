@@ -1,3 +1,4 @@
+
 package com.multimedia.writeyourthink;
 
 import android.app.AlertDialog;
@@ -46,6 +47,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -99,6 +101,10 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     private ArrayList<String> matchtitle = new ArrayList<String>();
     private ArrayList<String> matchdate = new ArrayList<String>();
     private ArrayList<String> matchtime = new ArrayList<String>();
+    private ArrayList<String> matchProfile = new ArrayList<String>();
+    private ArrayList<String> matchContents = new ArrayList<String>();
+    private ArrayList<String> matchAddress = new ArrayList<String>();
+    private ArrayList<String> matchID = new ArrayList<String>();
     Button button;
     ImageView imageView;
     private String date;
@@ -108,7 +114,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
     Drawable drawable;
     //리사이클러뷰 등장
     DiaryAdapter diaryAdapter;
-
+    final String[] words = new String[] {"수정","삭제"};
 
     Calendar myCalendar = Calendar.getInstance();
 
@@ -160,32 +166,61 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         diaryAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(DiaryAdapter.ViewHolder holder, View view, final int position) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(getContext()).setItems(words, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        delete(position);
+                        switch (which){
+                            case 0:
+                                Bundle args = new Bundle();
+                                args.putString("where", matchtitle.get(position));
+                                args.putString("contents", matchContents.get(position));
+                                args.putString("url", matchProfile.get(position));
+                                args.putString("date", matchdate.get(position));
+                                args.putString("time", matchtime.get(position));
+                                args.putString("address", matchAddress.get(position));
+                                args.putString("id", matchID.get(position));
+                                Log.d("Lee", "\n where : " + matchtitle.get(position) + "\n contents : " + matchContents.get(position)
+                                        + "\n date : " + matchdate.get(position)+ "\n time : " + matchtime.get(position)
+                                +"\n Address : " + matchAddress.get(position));
 
-                        sqLiteManager.delete(idIndicator.get(position));
-                        Toast.makeText(getActivity().getApplicationContext(), "[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 삭제 완료", Toast.LENGTH_SHORT).show();
-                        updateList();
-                        LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                        recyclerView.setLayoutAnimation(controller);
+                                BottomSheetFragment bottomSheet = new BottomSheetFragment();
+                                bottomSheet.setArguments(args);
+                                bottomSheet.show(getFragmentManager(), "BS");
+
+                                break;
+                            case 1:
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        delete(position);
+
+                                        sqLiteManager.delete(idIndicator.get(position));
+                                        Toast.makeText(getActivity().getApplicationContext(), "[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 삭제 완료", Toast.LENGTH_SHORT).show();
+                                        updateList();
+                                        LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
+                                        recyclerView.setLayoutAnimation(controller);
 
 
-                        
+
+                                    }
+                                });
+
+                                builder.setCancelable(true);
+                                builder.setNegativeButton("아니오", null);
+                                builder.setTitle("데이터 삭제");
+                                builder.setMessage("[" + matchdate.get(position) + "]" +matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
+                                builder.show();
+                                break;
+
+                        }
                     }
-                });
+                }).show();
 
-                builder.setCancelable(true);
-                builder.setNegativeButton("아니오", null);
-                builder.setTitle("데이터 삭제");
-                builder.setMessage("[" + matchdate.get(position) + "]" +matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
-                builder.show();
             }
+
+
         });
-
-
 
 
         DateUp = view.findViewById(R.id.DateUp);
@@ -222,7 +257,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
                 textView.setText(dayDown);
                 updateList();
-               LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
+                LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
                 recyclerView.setLayoutAnimation(controller);
 
 
@@ -298,25 +333,19 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
                     Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
                     arrayList.add(diary); // 담은 데이터들을 배열리스트에 넣고 리사이클러뷰로 보낼 준비
-
                     System.out.println(diary);
-
                 }
                 adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // 디비를 가져오던중 에러 발생 시
                 Log.e("MainActivity", valueOf(databaseError.toException())); // 에러문 출력
             }
         });
-
         adapter = new CustomAdapter(arrayList, getContext());
         recyclerView.setAdapter(adapter); // 리사이클러뷰에 어댑터 연결
-
     }
-
  */
 
 
@@ -324,12 +353,14 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
 
 
     private void updateList() {
-        int AA1 = R.string.syncData;
-        Bundle bundle = getArguments();
         idIndicator.clear();
         matchtitle.clear();
+        matchContents.clear();
+        matchAddress.clear();
+        matchProfile.clear();
         matchdate.clear();
         matchtime.clear();
+        matchID.clear();
         diaryAdapter.removeItem();    // ListView 내용 모두 삭제
         ArrayList<JSONObject> array = sqLiteManager.getResult(textView.getText().toString()); // DB의 내용을 배열단위로 모두 가져온다
         try {
@@ -345,7 +376,10 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 String time = object.getString("time");     // object 내용중 date를 가져와 저장.
                 String address = object.getString("address");
 
-
+                matchID.add(id);
+                matchAddress.add(address);
+                matchContents.add(contents);
+                matchProfile.add(profile);
                 matchdate.add(date);
                 matchtime.add(time);
                 idIndicator.add(id);

@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +33,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
        Diary diary = items.get(position);
        viewHolder.setItem(diary);
+       viewHolder.itemView.setLongClickable(true);
 
 
     }
@@ -54,6 +56,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> 
             listener.onItemClick(holder, view, position);
         }
     }
+
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -82,6 +85,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> 
                     }
                 }
             });
+
         }
 
         public void setItem(Diary diary){
