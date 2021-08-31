@@ -210,6 +210,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             intent.putExtra("fbLogin",2);
                             Bundle args = new Bundle();
                             args.putInt("fbLogin",2);
+                            Frag1 frag1 = new Frag1();
+                            frag1.setArguments(args);
+                            startActivity(intent);
 
                             startActivity(intent);
                             finish();
@@ -243,6 +246,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             intent.putExtra("loginNum",2);
                             intent.putExtra("accessToken",accessToken);
                             intent.putExtra("fbLogin",2);
+                            Bundle args = new Bundle();
+                            args.putInt("fbLogin",2);
+                            Frag1 frag1 = new Frag1();
+                            frag1.setArguments(args);
                             startActivity(intent);
                             finish();
                         } else {
