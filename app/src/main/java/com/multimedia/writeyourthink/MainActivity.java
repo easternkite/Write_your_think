@@ -82,6 +82,9 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent fcm = new Intent(getApplicationContext(), MyFirebaseMessaging.class);
+        startService(fcm);
+
         FirebaseApp.initializeApp(/*context=*/ this);
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
