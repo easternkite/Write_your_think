@@ -71,7 +71,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     final AnimationSet set = new AnimationSet(true);
     private Button btn_upload;// 업로드버튼
     private EditText edit_title, edit_contents, edit_upload;       // 입력받을 폼 3개(음식이름, 음식칼로리, 날짜)
-    private SQLiteManager dbManager;                        // SQLite Class 관리용 객체
     private ListView listView;                              // DB에 저장된 내용을 보여주기위한 리스트뷰
     private ArrayAdapter<String> adapter;
     public SQLiteManager sqLiteManager;
@@ -156,13 +155,13 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
         try {
             Bundle mArgs = getArguments();
-             where = mArgs.getString("where").equals("null") ? " " : mArgs.getString("where");
-             contents = mArgs.getString("contents");
-             photoURL = mArgs.getString("url");
-             matchDate = mArgs.getString("date");
-             matchTime = mArgs.getString("time");
-             matchAddress =  mArgs.getString("address");
-             matchID = mArgs.getString("id");
+            where = mArgs.getString("where").equals("null") ? " " : mArgs.getString("where");
+            contents = mArgs.getString("contents");
+            photoURL = mArgs.getString("url");
+            matchDate = mArgs.getString("date");
+            matchTime = mArgs.getString("time");
+            matchAddress =  mArgs.getString("address");
+            matchID = mArgs.getString("id");
         }catch (NullPointerException e){
             where = "";
             contents = "";
@@ -314,7 +313,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                         sqLiteManager.update(Integer.parseInt(matchID), userName,
                                 edit_title.getText().toString(),
                                 edit_contents.getText().toString(),
-                                photoURL != null? photoURL:" ",                           //edit_upload.getText().toString(),
+                                photoURL != null?stringUri != null ? stringUri: photoURL : stringUri != null ? stringUri : " ",                           //edit_upload.getText().toString(),
                                 matchDate,
                                 matchTime, matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
 
@@ -324,35 +323,35 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                          */
                         database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
                         databaseReference = database.getReference(userName); // DB 테이블 연결
-                            writeNewUser(  userName, time,
-                                    photoURL != null?photoURL:" ",
-                                    edit_title.getText().toString(),
-                                    edit_contents.getText().toString() ,
-                                    matchDate + "(" + matchTime + ")",
-                                    matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
+                        writeNewUser(  userName, time,
+                                photoURL != null?stringUri != null ? stringUri: photoURL : stringUri != null ? stringUri : " " ,
+                                edit_title.getText().toString(),
+                                edit_contents.getText().toString() ,
+                                matchDate + "(" + matchTime + ")",
+                                matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
                     }else{
                         /**
-                     * SQLite Data Insert
-                     */
-                    sqLiteManager.insert(userName,
-                            edit_title.getText().toString(),
-                            edit_contents.getText().toString(),
-                            stringUri != null?stringUri:" ",                           //edit_upload.getText().toString(),
-                            textView.getText().toString(),
-                            time, address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
+                         * SQLite Data Insert
+                         */
+                        sqLiteManager.insert(userName,
+                                edit_title.getText().toString(),
+                                edit_contents.getText().toString(),
+                                stringUri != null?stringUri:" ",                           //edit_upload.getText().toString(),
+                                textView.getText().toString(),
+                                time, address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
 
 
-                    /**
-                     * FireBase Data Insert
-                     */
-                    database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-                    databaseReference = database.getReference(userName); // DB 테이블 연결
-                    writeNewUser(  userName, time,
-                            stringUri != null?stringUri:" ",
-                            edit_title.getText().toString(),
-                            edit_contents.getText().toString() ,
-                            textView.getText().toString() + "(" + time + ")",
-                            address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
+                        /**
+                         * FireBase Data Insert
+                         */
+                        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+                        databaseReference = database.getReference(userName); // DB 테이블 연결
+                        writeNewUser(  userName, time,
+                                stringUri != null?stringUri:" ",
+                                edit_title.getText().toString(),
+                                edit_contents.getText().toString() ,
+                                textView.getText().toString() + "(" + time + ")",
+                                address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
                     }
 
 
@@ -395,7 +394,12 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             textView.setEnabled(false);
             DateUp.setVisibility(View.GONE);
             DateDown.setVisibility(View.GONE);
-            invisibleLayout.setVisibility(View.VISIBLE);
+            if(photoURL.length() > 3){
+                invisibleLayout.setVisibility(View.VISIBLE);
+            }else{
+                invisibleLayout.setVisibility(View.GONE);
+            }
+
             Glide.with(getActivity().getApplicationContext()).load(photoURL).into(imageView);
         }
 
@@ -533,7 +537,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
-//upload the file
+    //upload the file
     private void uploadFile() {
         //업로드할 파일이 있으면 수행
         if (filePath != null) {

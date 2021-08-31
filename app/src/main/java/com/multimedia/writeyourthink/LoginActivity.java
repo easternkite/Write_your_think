@@ -1,5 +1,6 @@
 package com.multimedia.writeyourthink;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,15 +46,21 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.shobhitpuri.custombuttons.GoogleSignInButton;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private GoogleSignInButton btn_google; // 구글 로그인 버튼
+    private ConstraintLayout loginView;
     private FirebaseAuth auth; // 파이어 베이스 인증 객체
     private FirebaseUser user;
-    private ConstraintLayout loginView;
     // 페이스북 콜백 매니저
     private CallbackManager callbackManager;
     // 파이어베이스 인증 객체 생성
@@ -63,7 +71,24 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private String accessToken;
 
 
+    /**
+     * FireBase Setting
+     */
+    private ArrayList<Diary> arrayList;
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView recyclerView;
+    //SQL Setting
+    private String date;
+    private String location1;
+    private String with1;
+    private String profile1;
+    private String userUID1;
+    private String contents1;
+    private String userName;
 
+    public SQLiteManager sqLiteManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +207,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.putExtra("nickName",account.getGivenName());
                             intent.putExtra("photoUrl",String.valueOf(account.getPhotoUrl())); // String.valueOf() 특정 자료형을 String 형태로 변환.
-                            intent.putExtra("fbLogin",1);
+                            intent.putExtra("fbLogin",2);
+                            Bundle args = new Bundle();
+                            args.putInt("fbLogin",2);
+
                             startActivity(intent);
                             finish();
                         } else { // 로그인이 실패했으면..
@@ -214,7 +242,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             intent.putExtra("loginNum",2);
                             intent.putExtra("accessToken",accessToken);
-                            intent.putExtra("fbLogin",1);
+                            intent.putExtra("fbLogin",2);
                             startActivity(intent);
                             finish();
                         } else {

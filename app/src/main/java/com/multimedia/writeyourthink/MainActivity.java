@@ -1,6 +1,7 @@
 package com.multimedia.writeyourthink;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.AccessToken;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -32,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,7 +60,16 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
     private int fbLogin;
-
+    /**
+     * FireBase Setting
+     */
+    //SQL Setting
+    private String date;
+    private String location1;
+    private String with1;
+    private String profile1;
+    private String userUID1;
+    private String contents1;
     /**
      * FireBase 등장
      */
@@ -95,54 +107,11 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
             }else{
                 Toast.makeText(this, "hello, "+user.getDisplayName(), Toast.LENGTH_SHORT).show();
             }
+        }else if(fbLogin == 2){
+            firebaseUpdate();
+            fbLogin = 0;
         }
 
-
-        Log.d("Lee", String.valueOf(Token));
-        accessToken = AccessToken.getCurrentAccessToken();
-        Log.d("Lee", "LoginNum : " + loginNum);
-        userProfile = user.getPhotoUrl().toString();
-        userName = user.getDisplayName();
-        userEmail = user.getEmail();
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-        databaseReference = database.getReference(userUID); // DB 테이블 연결
-        String photoUrl = userProfile + "?height=500&access_token=" + Token;
-        sqLiteManager = new SQLiteManager(this, "writeYourThink.db", null, 1);
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-        databaseReference = database.getReference(userUID); // DB 테이블 연결
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
-                    UserInfo userInfo = snapshot.getValue(UserInfo.class); // 만들어뒀던 User 객체에 데이터를 담는다.
-                    if (userInfo.getUserName() != null){
-                        userUID = userInfo.getUserUID();
-                        userName = userInfo.getUserName();
-                        userProfile = userInfo.getUserProfile();;
-                        userEmail = userInfo.getUserEmail();
-
-                        sqLiteManager.insertUser2(userUID,userName,userProfile,userEmail);
-
-
-                    }
-
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // 디비를 가져오던중 에러 발생 시
-                Log.e("MainActivity", String.valueOf(databaseError.toException())); // 에러문 출력
-            }
-        });
-
-
-
-
-        writeNewUser(userUID,userName,photoUrl,userEmail);
         bottomNavigationView = findViewById(R.id.bottomNavi);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -182,26 +151,6 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
                 bottomSheet.show(getSupportFragmentManager(), "exampleBottomSheet");
             }
         });
-/*
-        Bundle bundle = new Bundle();
-        bundle.putString("text", user.getUid());
-        bottomSheetFragment.setArguments(bundle);
-        frag3.setArguments(bundle);
-        FirebaseMessaging.getInstance().subscribeToTopic("weather")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        String msg = getString(R.string.msg_subscribed);
-                        if (!task.isSuccessful()) {
-                            msg = getString(R.string.msg_subscribe_failed);
-                        }
-                        Log.d("MainActivity", msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
- */
 
     }
 
@@ -291,5 +240,56 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
     }
 
 
+    private void firebaseUpdate(){
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(getString(R.string.syncData));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
+
+        sqLiteManager = new SQLiteManager(this, "writeYourThink.db", null, 1);
+
+
+
+        Log.d("Lee", "랄라랄ㄹㄹ: "+userUID);
+        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
+        databaseReference = database.getReference(userUID); // DB 테이블 연결
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
+                    Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
+                    if (diary.getDate() != null){
+                        date = diary.getDate();
+                        location1 = diary.getLocation();
+                        with1 = diary.getWhere();
+                        contents1 = diary.getContents();
+                        profile1= diary.getProfile();
+                        userUID1= diary.getUserUID();
+
+
+                        sqLiteManager.insert2(userUID1,
+                                with1,
+                                contents1,
+                                profile1,
+                                date.substring(0,10),
+                                date.substring(11,19), location1.equals(" ") || location1.equals(null)?" ":location1);
+                    }
+
+
+                }
+
+                progressDialog.dismiss();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // 디비를 가져오던중 에러 발생 시
+                Log.e("MainActivity", String.valueOf(databaseError.toException())); // 에러문 출력
+            }
+        });
+
+    }
 }
