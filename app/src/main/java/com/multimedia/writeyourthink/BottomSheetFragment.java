@@ -70,8 +70,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     private Bundle bundle;
     final AnimationSet set = new AnimationSet(true);
     private Button btn_upload;// 업로드버튼
-    private EditText edit_title, edit_contents, edit_upload;       // 입력받을 폼 3개(음식이름, 음식칼로리, 날짜)
-    private ListView listView;                              // DB에 저장된 내용을 보여주기위한 리스트뷰
+    private EditText edit_title, edit_contents, edit_upload;       /** 입력받을 폼 3개(음식이름, 음식칼로리, 날짜) */
+    private ListView listView;                              /** DB에 저장된 내용을 보여주기위한 리스트뷰 */
     private ArrayAdapter<String> adapter;
     public SQLiteManager sqLiteManager;
     private String myFormat = "yyyy-MM-dd";    // 출력형식   2018/11/28
@@ -92,9 +92,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     String matchAddress = "";
     String matchID = "";
 
-    /**
-     * Fire Base 등장
-     */
+    /** FIREBASE 관련 */
     private static final String TAG = "MainActivity";
     private FirebaseStorage storage;
     private FirebaseDatabase database;
@@ -188,15 +186,11 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
         gpsTracker = new GpsTracker(getActivity());
-        double latitude = gpsTracker.getLatitude(); // 위도
-        double longitude = gpsTracker.getLongitude(); //경도
+        double latitude = gpsTracker.getLatitude(); /** 위도 */
+        double longitude = gpsTracker.getLongitude(); /** 경도 */
         address = getCurrentAddress(latitude, longitude);
 
-
-
-
-
-        new Thread(r).start();
+        new Thread(r).start(); /** 현재시간 */
 
 
 
@@ -280,22 +274,21 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
-/**
- * SQLite 제어 설정
- */
-        // SQLite 객체 초기화
+        /**
+         * SQLite 제어 설정
+         */
         sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink.db", null, 1);
 
 
 
-        // 각 컴포넌트 제어를 위한 아이디할당 (EditText, Button)
+        /** 각 컴포넌트 제어를 위한 아이디할당 (EditText, Button) */
         btn_upload = view.findViewById(R.id.btn_upload);
         edit_title = view.findViewById(R.id.edit_title);
         edit_contents = view.findViewById(R.id.edit_contents);
         edit_upload = view.findViewById(R.id.edit_upload);
 
 
-        // 버튼을 눌렀을때 해야할 이벤트 작성
+        /** 버튼을 눌렀을때 해야할 이벤트 작성 */
         btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -307,9 +300,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
                     if (btn_upload.getText().toString().equals("수정")){ //수정일 때..ㅎ
                         Log.d("Lee", "아니 여기 수정이잖아!!!!!!!");
-                        /**
-                         * SQLite Data Insert
-                         */
+
+                        /** SQLite Data Insert */
                         sqLiteManager.update(Integer.parseInt(matchID), userName,
                                 edit_title.getText().toString(),
                                 edit_contents.getText().toString(),
@@ -318,9 +310,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                                 matchTime, matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
 
 
-                        /**
-                         * FireBase Data Insert
-                         */
+                        /** FireBase Data Insert */
                         database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
                         databaseReference = database.getReference(userName); // DB 테이블 연결
                         writeNewUser(  userName, time,
@@ -330,9 +320,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                                 matchDate + "(" + matchTime + ")",
                                 matchAddress.equals("주소 미발견") || matchAddress.equals(null)?" ":matchAddress);
                     }else{
-                        /**
-                         * SQLite Data Insert
-                         */
+                        /** SQLite Data Insert */
                         sqLiteManager.insert(userName,
                                 edit_title.getText().toString(),
                                 edit_contents.getText().toString(),
@@ -341,12 +329,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                                 time, address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
 
 
-                        /**
-                         * FireBase Data Insert
-                         */
+                        /** FireBase Data Insert */
                         database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
                         databaseReference = database.getReference(userName); // DB 테이블 연결
-                        writeNewUser(  userName, time,
+                        writeNewUser(userName, time,
                                 stringUri != null?stringUri:" ",
                                 edit_title.getText().toString(),
                                 edit_contents.getText().toString() ,
@@ -354,10 +340,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                                 address.equals("주소 미발견") || address.equals(null)?" ":address.substring(address.indexOf(" ")+1, address.lastIndexOf(" ")));
                     }
 
-
-
-                    // EditText에 입력한 정보를 DB에 Insert.
-                    // 리스트뷰를 갱신한다. (DB의 내용이 달라지니까)
 
 
 
@@ -384,7 +366,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         btn_upload.setText("업로드");
 
 
-        if (!where.equals("")){
+        if (!where.equals("")) {
             textView.setText(matchDate);
             edit_title.setText(where);
             edit_contents.setText(contents);
@@ -394,16 +376,17 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             textView.setEnabled(false);
             DateUp.setVisibility(View.GONE);
             DateDown.setVisibility(View.GONE);
-            if(photoURL.length() > 3){
+
+            if (photoURL.length() > 3) {
                 invisibleLayout.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 invisibleLayout.setVisibility(View.GONE);
             }
 
             Glide.with(getActivity().getApplicationContext()).load(photoURL).into(imageView);
         }
-
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -411,8 +394,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             if (resultCode == RESULT_OK) {
                 try {
                     filePath = data.getData();
-                    //Glide.with(getActivity().getApplicationContext()).load(String.valueOf(filePath)).into(imageView);
-
                     uploadFile();
 
                 } catch (Exception e) {
@@ -426,13 +407,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
     private void updateLabel() {
-
-
         date = sdf.format(myCalendar.getTime());
         textView.setText(sdf.format(myCalendar.getTime()));
 
     }
-
     Runnable r = new Runnable() {
         @Override
         public void run() {
@@ -463,7 +441,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         PermissionListener permissionListener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                //권한요청성공
+                /** 권한요청성공 */
             }
 
             @Override
@@ -537,28 +515,28 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
-    //upload the file
+    /** upload the file */
     private void uploadFile() {
-        //업로드할 파일이 있으면 수행
+        /** 업로드할 파일이 있으면 수행 */
         if (filePath != null) {
-            //업로드 진행 Dialog 보이기
+            /** 업로드 진행 Dialog 보이기 */
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("업로드중...");
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            //storage
+
             storage = FirebaseStorage.getInstance();
 
-            //Unique한 파일명을 만들자.
+            /** Unique한 파일명을 만들자. */
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMHH_mmss");
             Date now = new Date();
             String filename = formatter.format(now) + ".png";
-            //storage 주소와 폴더 파일명을 지정해 준다.
+            /** storage 주소와 폴더 파일명을 지정해 준다. */
             storageRef = storage.getReferenceFromUrl("gs://diary-d5627.appspot.com/").child("images/" +userName+"/"+ filename);
-            //올라가거라...
+            /** 올라가거라... */
             storageRef.putFile(filePath)
-                    //성공시
+                    /** 성공시 */
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -569,7 +547,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                             Toast.makeText(getActivity(), "업로드 완료!", Toast.LENGTH_SHORT).show();
                         }
                     })
-                    //실패시
+                    /** 실패시 */
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
@@ -577,7 +555,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                             Toast.makeText(getActivity(), "업로드 실패!", Toast.LENGTH_SHORT).show();
                         }
                     })
-                    //진행중
+                     /** 진행중 */
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
@@ -593,25 +571,27 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     }
     public void clickLoad() {
 
-        //Firebase Storage에 저장되어 있는 이미지 파일 읽어오기
+        /** Firebase Storage에 저장되어 있는 이미지 파일 읽어오기 */
 
-        //1. Firebase Storeage관리 객체 얻어오기
+        /** 1. Firebase Storeage관리 객체 얻어오기 */
         FirebaseStorage firebaseStorage= FirebaseStorage.getInstance();
 
-        //2. 최상위노드 참조 객체 얻어오기
+        /** 2. 최상위노드 참조 객체 얻어오기 */
         StorageReference rootRef= firebaseStorage.getReference();
 
-        //읽어오길 원하는 파일의 참조객체 얻어오기
-        //예제에서는 자식노드 이름은 monkey.png
+        /**
+         * 읽어오길 원하는 파일의 참조객체 얻어오기
+         * 예제에서는 자식노드 이름은 monkey.png
+         */
 
 
-        //하위 폴더가 있다면 폴더명까지 포함하여
-        if(storageRef!=null){
-            //참조객체로 부터 이미지의 다운로드 URL을 얻어오기
+        /** 하위 폴더가 있다면 폴더명까지 포함 */
+        if (storageRef!=null) {
+            /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기 */
             storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    //다운로드 URL이 파라미터로 전달되어 옴.
+                    /** 다운로드 URL이 파라미터로 전달되어 옴. */
                     Glide.with(getActivity().getApplicationContext()).load(String.valueOf(uri)).into(imageView);
                     stringUri = String.valueOf(uri);
                 }

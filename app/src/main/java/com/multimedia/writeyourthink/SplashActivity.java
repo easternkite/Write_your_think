@@ -19,7 +19,7 @@ public class SplashActivity  extends Activity {
 
         actRand = (int) (Math.random() * activites.length)+1;
         Log.d("Lee", "result :" + actRand);
-        switch (actRand){
+        switch (actRand) {
             case 1 :
                 Intent intent2 = new Intent(SplashActivity.this, SplashActivity2.class);
                 startActivity(intent2);
@@ -32,9 +32,5 @@ public class SplashActivity  extends Activity {
                 break;
 
         }
-
-
-
-
     }
 }

@@ -70,26 +70,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private static final int REQ_SIGN_FACEBOOK = 200; // 구글 로그인 결과 코드
     private String accessToken;
 
-
-    /**
-     * FireBase Setting
-     */
-    private ArrayList<Diary> arrayList;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView recyclerView;
-    //SQL Setting
-    private String date;
-    private String location1;
-    private String with1;
-    private String profile1;
-    private String userUID1;
-    private String contents1;
-    private String userName;
-
-    public SQLiteManager sqLiteManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +83,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         int viewNum = intent2.getIntExtra("viewNum",1);
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
         if (viewNum == 1){
             loginView.setBackground(getDrawable(R.drawable.write_your_think_1));
         }else if(viewNum == 2){
@@ -138,7 +119,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        if (user != null){
+        if (user != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("nickName",user.getDisplayName());
             intent.putExtra("photoUrl",String.valueOf(user.getPhotoUrl()));
@@ -178,9 +159,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { // 구글 로그인 인증을 요청 했을 때 결과 값을 되돌려 받는 곳.
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQ_SIGN_GOOGLE) {
+        if (requestCode == REQ_SIGN_GOOGLE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()) { // 인증결과가 성공적이면..
+            if (result.isSuccess()) { // 인증결과가 성공적이면..
                 GoogleSignInAccount account = result.getSignInAccount(); // account 라는 데이터는 구글로그인 정보를 담고있습니다. (닉네임,프로필사진Url,이메일주소...등)
                 resultLogin(account); // 로그인 결과 값 출력 수행하라는 메소드
             }

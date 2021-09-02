@@ -316,49 +316,15 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink.db", null, 1);
 
         Log.d("Lee", String.valueOf(fblogin) + "ㅁ낭ㄴ망ㅁ");
-        if (fblogin > 1){
+        if (fblogin > 1) {
             firebaseUpdate();
             fblogin = 0;
-        }else{
+        } else {
             updateList();
         }
 
         return view;
     }
-
-    /**
-     * FireBase Data Update
-     */
-/*
-    private void updateList(){
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-        databaseReference = database.getReference(textView.getText().toString());// DB 테이블 연결
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int i = 0;
-                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
-                arrayList.clear(); // 기존 배열리스트가 존재하지않게 초기화
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
-                    Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
-                    arrayList.add(diary); // 담은 데이터들을 배열리스트에 넣고 리사이클러뷰로 보낼 준비
-                    System.out.println(diary);
-                }
-                adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // 디비를 가져오던중 에러 발생 시
-                Log.e("MainActivity", valueOf(databaseError.toException())); // 에러문 출력
-            }
-        });
-        adapter = new CustomAdapter(arrayList, getContext());
-        recyclerView.setAdapter(adapter); // 리사이클러뷰에 어댑터 연결
-    }
- */
-
-
-
 
 
     private void updateList() {
@@ -393,14 +359,14 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                 matchtime.add(time);
                 idIndicator.add(id);
                 matchtitle.add(title);
-                if(Locale.getDefault().getISO3Language().equals("eng")){
+                if (Locale.getDefault().getISO3Language().equals("eng")) {
                     diaryAdapter.addItem(new Diary(userName, profile,
                             "At a " + title + ", " + address,
                             contents,
                             date.substring(0,4) + "-" + date.substring(5,7) + "-" +
                                     date.substring(8) + "-" +   "("+time+")",""));
                     recyclerView.setAdapter(diaryAdapter);
-                }else{
+                } else {
                     // 저장한 내용을 토대로 ListView에 다시 그린다.
                     diaryAdapter.addItem(new Diary(userName, profile,
                             address.equals(" ") || address.equals(null)?  title + "에서..": "의 "+ title + "에서..",
@@ -409,11 +375,6 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                                     date.substring(8) + "일" +   "("+time+")", address));
                     recyclerView.setAdapter(diaryAdapter);
                 }
-
-
-
-
-
             }
         } catch (Exception e) {
             Log.i("seo", "error : " + e);

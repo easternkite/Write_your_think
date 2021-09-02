@@ -128,14 +128,13 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
                     // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
                         UserInfo userInfo = snapshot.getValue(UserInfo.class); // 만들어뒀던 User 객체에 데이터를 담는다.
-                        if (userInfo.getUserName() != null){
+                        if (userInfo.getUserName() != null) {
                             userUID = userInfo.getUserUID();
                             userName = userInfo.getUserName();
                             userProfile = userInfo.getUserProfile();;
                             userEmail = userInfo.getUserEmail();
 
                             sqLiteManager.insertUser2(userUID,userName,userProfile,userEmail);
-
 
                         }
 
@@ -155,9 +154,6 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         }
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
-
-
-
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -262,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
 
         Locale locale = null;
 
-        switch (localeLang){
+        switch (localeLang) {
             case "ko":
                 locale = new Locale("ko");
                 break;
@@ -273,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements BottomSheetFragme
         }
         Configuration config = getApplicationContext().getResources().getConfiguration();
 
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             config.setLocale(locale);
         }
         else {

@@ -33,7 +33,7 @@ public class SplashActivity2 extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animation animation) {
 
-                    try{
+                    try {
                         Thread.sleep(800); //2.5초간 화면 표시
                     } catch (InterruptedException e){
                         e.printStackTrace();

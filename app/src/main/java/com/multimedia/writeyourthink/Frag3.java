@@ -81,7 +81,6 @@ public class Frag3 extends Fragment {
     String[] dates = new String[0];
     RecyclerView recyclerView;
     TextView tx_item;
-    CalendarAdapter adapter;
     TextView tv_selDate;
     TextView tv_count;
     private Button btn_logout;
@@ -165,21 +164,6 @@ public class Frag3 extends Fragment {
                 compactCalendarView.showPreviousMonth();
             }
         });
-    /**
-        tx_today.setOnClickListener(new View.OnClickListener() {
-            @Override
-
-            public void onClick(View v) {
-
-                Intent intent = new Intent(CalendarActivity.this, CalendarActivity.class);
-                startActivity(intent);
-                finish();
-
-            }
-        });
-     **/
-
-
 
         return view;
 
@@ -239,11 +223,13 @@ public class Frag3 extends Fragment {
         sdf = new SimpleDateFormat("MMMM yyyy");
         formattedDate = df.format(c);
         tv_selDate.setText(formattedDate);
-        if (profile_counts>0){
+
+        if (profile_counts>0) {
             tv_count.setText(getString(R.string.frag3_2 ) + " : " + profile_counts +" "+ getString(R.string.cases));
         }else{
             tv_count.setText(getString(R.string.frag3_1));
         }
+
         myCalendar = Calendar.getInstance();
 
         for (int j = 0; j < selectedDate.size(); j++) {
