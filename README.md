@@ -39,7 +39,4 @@
 <img src="https://user-images.githubusercontent.com/83625797/132083294-a54b4f5b-1081-4ac9-a2b3-e36169855112.jpg" width = "200">  
 
 ### -입력창
-<img src="https://user-images.githubusercontent.com/83625797/132082305-0e242505-9651-4866-b81a-34aca578076e.jpg" width = "200">
-
-
-
+<img src="https://user-images.githubusercontent.com/83625797/132083382-6f9edbf7-d10a-4007-b77b-e50ffb33de2e.jpg" width = "200">
