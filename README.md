@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/83625797/132082312-dee6dc10-4215-4b38-bb6a-086ca922b217.png" width="200" >
+<img src="https://user-images.githubusercontent.com/83625797/132083273-a7608015-11aa-4adc-92e1-eb49c0359b4b.png" width="200" >
 
 # WtiteYourThink(롸쳐띵)  
 
@@ -30,27 +30,16 @@
 
 ## Screen Shots
 ### -Login  
- <img src="https://user-images.githubusercontent.com/83625797/132082301-10fe3515-a286-42cb-9898-9dbec11414f0.jpg" width = "200">  
+ <img src="https://user-images.githubusercontent.com/83625797/132083289-1affdb6c-0687-484a-bb82-af972ba41210.jpg" width = "200">  
  
 ### -Main  
-<img src="https://user-images.githubusercontent.com/83625797/132082302-27c991d9-d95c-438e-b1dc-7d79f75b7631.jpg" width= "200">  
+<img src="https://user-images.githubusercontent.com/83625797/132083293-be3a9018-912e-4760-882b-50126022b5da.jpg" width= "200">  
 
-### -스무고개형 음식추천
-<img src="https://user-images.githubusercontent.com/83625797/132082304-6fed3a86-242b-4131-9e39-a182b0805ab5.jpg" width = "200">  
+### -달력
+<img src="https://user-images.githubusercontent.com/83625797/132083294-a54b4f5b-1081-4ac9-a2b3-e36169855112.jpg" width = "200">  
 
-### -룰렛형 음식추천
+### -입력창
 <img src="https://user-images.githubusercontent.com/83625797/132082305-0e242505-9651-4866-b81a-34aca578076e.jpg" width = "200">
-
-### -음식 다이어리
-<img src="https://user-images.githubusercontent.com/83625797/132082308-89496c21-cbea-4394-8393-31a0d42ca0ae.jpg" width = "200">
-
-### -주변 음식점 찾기
-<img src="https://user-images.githubusercontent.com/83625797/132082309-cc46436e-40e4-46a8-824a-589b637fcc52.jpg" width = "200">
-
-### -음식 사전
-<img src="https://user-images.githubusercontent.com/83625797/132082310-c107de4f-fafc-4758-9335-a5bf524bff04.jpg" width = "200">
-
-
 
 
 
