@@ -1,72 +1,56 @@
-package com.multimedia.writeyourthink;
+package com.multimedia.writeyourthink
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Context
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView
+import com.multimedia.writeyourthink.CustomAdapter.CustomViewHolder
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageView
+import com.multimedia.writeyourthink.R
+import android.widget.TextView
+import com.bumptech.glide.Glide
+import java.util.ArrayList
 
-import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
-
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder> {
-
-    private ArrayList<Diary> arrayList;
-    private Context context;
-
-
-    public CustomAdapter(ArrayList<Diary> arrayList, Context context) {
-        this.arrayList = arrayList;
-        this.context = context;
+class CustomAdapter(private val arrayList: ArrayList<Diary>?, private val context: Context) :
+    RecyclerView.Adapter<CustomViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.recycle_layout, parent, false)
+        return CustomViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_layout, parent, false);
-        CustomViewHolder holder = new CustomViewHolder(view);
-        return holder;
+    override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
+        val diary = arrayList!![position]
+        holder.setItem(diary)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
-        Diary diary = arrayList.get(position);
-        holder.setItem(diary);
-    }
-
-    @Override
-    public int getItemCount() {
+    override fun getItemCount(): Int {
         // 삼항 연산자
-        return (arrayList != null ? arrayList.size() : 0);
+        return arrayList?.size ?: 0
     }
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder {
-        ImageView iconImageView;
-        TextView textView;
-        TextView textView2;
-        TextView tv_date;
-        TextView tv_location;
-
-        public CustomViewHolder(@NonNull View itemView) {
-            super(itemView);
-            this.iconImageView = itemView.findViewById(R.id.iconImageView);
-            this.textView = itemView.findViewById(R.id.textView);
-            this.textView2  = itemView.findViewById(R.id.textView2);
-            this.tv_date = itemView.findViewById(R.id.tv_date);
-            this.tv_location = itemView.findViewById(R.id.tv_location);
+    inner class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var iconImageView: ImageView
+        var textView: TextView
+        var textView2: TextView
+        var tv_date: TextView
+        var tv_location: TextView
+        fun setItem(diary: Diary) {
+            Glide.with(itemView).load(diary.profile).into(iconImageView)
+            textView.text = diary.where
+            textView2.text = diary.contents
+            tv_date.text = diary.date
+            tv_location.text = diary.location
         }
 
-        public void setItem(Diary diary){
-            Glide.with(itemView).load(diary.getProfile()).into(iconImageView);
-            textView.setText(diary.getWhere());
-            textView2.setText(diary.getContents());
-            tv_date.setText(diary.getDate());
-            tv_location.setText(diary.getLocation());
+        init {
+            iconImageView = itemView.findViewById(R.id.iconImageView)
+            textView = itemView.findViewById(R.id.textView)
+            textView2 = itemView.findViewById(R.id.textView2)
+            tv_date = itemView.findViewById(R.id.tv_date)
+            tv_location = itemView.findViewById(R.id.tv_location)
         }
     }
 }

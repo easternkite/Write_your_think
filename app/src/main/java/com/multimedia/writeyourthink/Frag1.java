@@ -56,7 +56,6 @@ import static android.app.Activity.RESULT_OK;
 import static java.lang.String.valueOf;
 
 public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetListener{
-    private SharedViewModel sharedViewModel;
     private View view;
     final AnimationSet set = new AnimationSet(true);
     private Button btn_upload;// 업로드버튼

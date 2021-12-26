@@ -1,7 +1,7 @@
-package com.multimedia.writeyourthink;
+package com.multimedia.writeyourthink
 
-import android.view.View;
+import android.view.View
 
-public interface OnItemClickListener {
-    public void onItemClick(DiaryAdapter.ViewHolder holder, View view, int position);
+open interface OnItemClickListener {
+    fun onItemClick(holder: DiaryAdapter.ViewHolder?, view: View?, position: Int)
 }

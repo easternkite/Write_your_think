@@ -58,7 +58,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class BottomSheetFragment extends BottomSheetDialogFragment {
     private BottomSheetListener mListener;
-    private SharedViewModel sharedViewModel;
     private static final int REQUEST_CODE = 0;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
