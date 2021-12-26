@@ -39,7 +39,6 @@ public class SQLiteManager extends SQLiteOpenHelper {
     public void insert2(String userName, String title, String contents, String profile, String date, String time, String address) {
         SQLiteDatabase db = getWritableDatabase();
         String query = "INSERT INTO " + tableName + " SELECT null, '" + userName + "', '" + title + "','" + contents + "','" + profile + "','" + date + "','" + time + "','" + address + "'  WHERE NOT EXISTS (SELECT * FROM " +  tableName + " WHERE date = '" + date + "' AND time = '" + time + "')";
-        //String query = "INSERT INTO " + tableName + " VALUES(null,'" + userName + "', '" + title + "', '" + contents+ "', '" + profile+ "', '" + date + "', '" + time + "', '" + address + "') WHERE NOT EXISTS (SELECT * FROM " + tableName + " WHERE date = '" + date + "' AND time = '" + time + ");";
         db.execSQL(query);
     }
 

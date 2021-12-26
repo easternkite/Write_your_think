@@ -24,10 +24,6 @@
             android:theme="@style/SplashTheme2">
 
         </activity>
-        <activity android:name="com.multimedia.writeyourthink.DBActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
         <activity
             android:name="com.multimedia.writeyourthink.SplashActivity3"
             android:theme="@style/SplashTheme2"

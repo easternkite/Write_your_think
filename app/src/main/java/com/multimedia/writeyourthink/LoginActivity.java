@@ -119,6 +119,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
+        /** 만약 이미 로그인이 되어있는 상태라면?
+        * 바로 메인액티비티로 간다(자동 로그인) */
         if (user != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("nickName",user.getDisplayName());

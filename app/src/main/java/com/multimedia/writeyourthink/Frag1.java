@@ -457,19 +457,16 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-
+        /** SQLite DB 선언 */
         sqLiteManager = new SQLiteManager(getContext(), "writeYourThink.db", null, 1);
-
-
-
-        database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-        databaseReference = database.getReference(userName); // DB 테이블 연결
+        database = FirebaseDatabase.getInstance(); /** 파이어베이스 데이터베이스 연동 */
+        databaseReference = database.getReference(userName); /** DB 테이블 연결 */
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
-                    Diary diary = snapshot.getValue(Diary.class); // 만들어뒀던 User 객체에 데이터를 담는다.
+                /** 파이어베이스 데이터베이스의 데이터를 받아오는 곳 */
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { /** 반복문으로 데이터 List를 추출해냄 */
+                    Diary diary = snapshot.getValue(Diary.class); /** 만들어뒀던 User 객체에 데이터를 담는다. */
                     if (diary.getDate() != null){
                         date = diary.getDate();
                         location1 = diary.getLocation();
@@ -478,7 +475,7 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                         profile1= diary.getProfile();
                         userUID1= diary.getUserUID();
 
-
+                        /** Firebase DB 데이터를 불러오자마자 바로 SQLite DB에 삽입 */
                         sqLiteManager.insert2(userUID1,
                                 with1,
                                 contents1,
@@ -486,8 +483,6 @@ public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetLi
                                 date.substring(0,10),
                                 date.substring(11,19), location1.equals(" ") || location1.equals(null)?" ":location1);
                     }
-
-
                 }
                 LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
                 recyclerView.setLayoutAnimation(controller);

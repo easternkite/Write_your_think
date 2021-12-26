@@ -275,15 +275,15 @@ public class Frag3 extends Fragment {
         selectedDate.clear();
         ArrayList<JSONObject> array = sqLiteManager.getResult2(); // DB의 내용을 배열단위로 모두 가져온다
         try {
-            int length = array.size(); // 배열의 길이
-            for (int idx = 0; idx < length; idx++) {  // 배열의 길이만큼 반복
-                JSONObject object = array.get(idx);// json의 idx번째 object를 가져와서,
-                String id = object.getString("id");         // object 내용중 id를 가져와 저장.
-                String title = object.getString("title");         // object 내용중 id를 가져와 저장.
-                String contents = object.getString("contents");     // object 내용중 contents를 가져와 저장.
-                String profile = object.getString("profile");     // object 내용중 profile를 가져와 저장.
-                String date = object.getString("date");     // object 내용중 date를 가져와 저장.
-                String time = object.getString("time");     // object 내용중 date를 가져와 저장.
+            int length = array.size();                                // 배열의 길이
+            for (int idx = 0; idx < length; idx++) {                  // 배열의 길이만큼 반복
+                JSONObject object = array.get(idx);                   // json의 idx번째 object를 가져와서,
+                String id = object.getString("id");             // object 내용중 id를 가져와 저장.
+                String title = object.getString("title");       // object 내용중 id를 가져와 저장.
+                String contents = object.getString("contents"); // object 내용중 contents를 가져와 저장.
+                String profile = object.getString("profile");   // object 내용중 profile를 가져와 저장.
+                String date = object.getString("date");         // object 내용중 date를 가져와 저장.
+                String time = object.getString("time");         // object 내용중 date를 가져와 저장.
                 String address = object.getString("address");
 
                 selectedDate.add(date);
