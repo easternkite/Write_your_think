@@ -298,5 +298,3 @@ public class Frag3 extends Fragment {
 
 
 }
-
-
