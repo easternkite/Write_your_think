@@ -7,14 +7,14 @@
 
 
 ## Technical Lead
-* Android Native(JAVA)  
-* RecyclerView를 이용한 SQLite 데이터 표시 및 수정, 삭제 기능 구현
-* Firebase를 활용한 로그인 인증(Google, Facebook)
-* SQLite DB와 Firebase DB 연동
+* Firebase Auth를 활용한 구글, 페이스북 계정 로그인 및 계정 연동 기능 구현
+* SQLite를 활용한 로컬 DB와 Firebase DB의 클라우드 DB를 상호 연동기능 (데이터 백업 기능) 구현
+* RecyclerView를 사용한 일기 데이터를 일일 별로 조회할 수 있는 기능 구현
+* Github 오픈소스 달력을 활용하여 어떤 날짜에 몇 건의 데이터가 입력되었는지 조회 가능
 * BottomSheetDialog를 이용한 입력창 구현
-* 달력 구현 (GitHub 오픈소스 활용) : 날짜별로 일기 쓴 횟수 보여줌
-* Firebase를 활용한 FCM(푸시알림) 기능 구현
-* 영문화 작업으로 전 세계 사람들이 이용 가능하도록 구현
+* Firebase를 활용한 FCM(푸시 알림)기능 구현
+* 글로벌 출시를 위한 영문화 작업
+* 구글 플레이 스토어, 삼성 갤럭시 스토어 배포 및 유지보수 (회원 수 : 250명)
 
 ## Project Lead  
 * 구글 플레이스토어, 갤럭시스토어 동시 출시 및 유지보수
@@ -40,3 +40,4 @@
 
 ### -입력창
 <img src="https://user-images.githubusercontent.com/83625797/132083382-6f9edbf7-d10a-4007-b77b-e50ffb33de2e.jpg" width = "200">
+
