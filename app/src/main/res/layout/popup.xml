@@ -18,7 +18,7 @@
             android:layout_marginLeft="50px"
             android:layout_marginRight="30px"
             android:padding="3dp"
-            android:src="@drawable/custom_marker_hr" />
+             />
 
     </LinearLayout>
 

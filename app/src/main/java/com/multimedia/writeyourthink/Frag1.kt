@@ -2,7 +2,6 @@ package com.multimedia.writeyourthink
 
 import android.annotation.SuppressLint
 
-import com.multimedia.writeyourthink.BottomSheetFragment.BottomSheetListener
 import android.view.animation.AnimationSet
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.auth.FirebaseAuth
@@ -37,7 +36,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Frag1 : Fragment(), BottomSheetListener {
+class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: Frag1Binding
     val set = AnimationSet(true)
     var sqLiteManager: SQLiteManager? = null
@@ -128,7 +127,7 @@ class Frag1 : Fragment(), BottomSheetListener {
                                  time : ${matchtime[position]}
                                  Address : ${matchAddress[position]}"""
                             )
-                            val bottomSheet = BottomSheetFragment()
+                            val bottomSheet = BottomSheetDialogFragment()
                             bottomSheet.arguments = args
                             bottomSheet.show(fragmentManager!!, "BS")
                         }
@@ -156,7 +155,7 @@ class Frag1 : Fragment(), BottomSheetListener {
                 }.show()
             }
         })
-        binding.tvDate!!.setOnClickListener {
+        binding.tvDate.setOnClickListener {
             DatePickerDialog(
                 context!!,
                 myDatePicker,
@@ -325,7 +324,7 @@ class Frag1 : Fragment(), BottomSheetListener {
         }
     }
 
-    override fun onButtonClicked(text: String) {}
+    override fun onButtonClicked(text: String?) {}
     private fun delete(position: Int) {
         if (matchtime.size > 0) {
             database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동

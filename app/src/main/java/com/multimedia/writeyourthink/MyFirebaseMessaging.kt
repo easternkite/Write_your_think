@@ -30,7 +30,7 @@ class MyFirebaseMessaging : FirebaseMessagingService() {
         val remoteViews = RemoteViews(applicationContext.packageName, R.layout.popup)
         remoteViews.setTextViewText(R.id.noti_title, title)
         remoteViews.setTextViewText(R.id.noti_message, message)
-        remoteViews.setImageViewResource(R.id.logo, R.drawable.custom_marker_hr)
+        remoteViews.setImageViewResource(R.id.logo, R.drawable.radius)
         return remoteViews
     }
 

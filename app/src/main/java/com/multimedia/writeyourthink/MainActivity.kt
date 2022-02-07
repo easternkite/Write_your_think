@@ -2,7 +2,6 @@ package com.multimedia.writeyourthink
 
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
-import com.multimedia.writeyourthink.BottomSheetFragment.BottomSheetListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DatabaseReference
@@ -28,12 +27,12 @@ import androidx.fragment.app.FragmentTransaction
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import java.util.*
 
-class MainActivity : AppCompatActivity(), BottomSheetListener {
+class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: ActivityMainBinding
     private var backpressedTime: Long = 0
     private var fm: FragmentManager? = null
     private var ft: FragmentTransaction? = null
-    private var bottomSheetFragment: BottomSheetFragment? = null
+    private var bottomSheetFragment: BottomSheetDialogFragment? = null
     private var frag1: Frag1? = null
     private var frag3: Frag3? = null
     private var userEmail: String? = null
@@ -133,12 +132,12 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             true
         })
         frag1 = Frag1()
-        bottomSheetFragment = BottomSheetFragment()
+        bottomSheetFragment = BottomSheetDialogFragment()
         frag3 = Frag3()
         setFrag(0)
 
         binding.button3.setOnClickListener(View.OnClickListener {
-            val bottomSheet = BottomSheetFragment()
+            val bottomSheet = BottomSheetDialogFragment()
             bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
         })
     }
@@ -152,7 +151,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                 ft!!.commit()
             }
             1 -> {
-                val bottomSheet = BottomSheetFragment()
+                val bottomSheet = BottomSheetDialogFragment()
                 bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
             }
             2 -> {
@@ -178,7 +177,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             .check()
     }
 
-    override fun onButtonClicked(text: String) {
+    override fun onButtonClicked(text: String?) {
         mTextView!!.text = text
     }
 
