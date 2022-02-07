@@ -1,501 +1,391 @@
+package com.multimedia.writeyourthink
 
-package com.multimedia.writeyourthink;
+import android.annotation.SuppressLint
 
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.LayoutAnimationController;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import com.multimedia.writeyourthink.BottomSheetFragment.BottomSheetListener
+import android.view.animation.AnimationSet
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import android.graphics.drawable.Drawable
+import android.app.DatePickerDialog.OnDateSetListener
+import android.view.animation.LayoutAnimationController
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.os.Bundle
+import android.content.Intent
+import androidx.recyclerview.widget.GridLayoutManager
+import android.app.DatePickerDialog
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
+import android.view.animation.AlphaAnimation
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.ProgressDialog
+import com.bumptech.glide.Glide
+import android.util.Log
+import android.view.View
+import android.widget.*
+import androidx.fragment.app.Fragment
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.multimedia.writeyourthink.databinding.Frag1Binding
+import java.lang.Exception
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Locale;
-
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-import static java.lang.String.valueOf;
-
-public class Frag1 extends Fragment implements BottomSheetFragment.BottomSheetListener{
-    private View view;
-    final AnimationSet set = new AnimationSet(true);
-    private Button btn_upload;// 업로드버튼
-    private EditText edit_title, edit_contents, edit_upload;       // 입력받을 폼 3개(음식이름, 음식칼로리, 날짜)
-    private SQLiteManager dbManager;                        // SQLite Class 관리용 객체
-    private ListView listView;                              // DB에 저장된 내용을 보여주기위한 리스트뷰
-    public SQLiteManager sqLiteManager;
-    private String myFormat = "yyyy-MM-dd";    // 출력형식   2018/11/28
-    private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.KOREA);
-    private SimpleDateFormat sdf3 = new SimpleDateFormat("EEEE" , Locale.KOREA);
-    private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
-    private Button DateUp;
-    private Button DateDown;
-    private TextView textView;
-    private String time;
-    private String addressJin;
-    private String weekDay;
-
-
-    private String date1;
-    private String location1;
-    private String with1;
-    private String profile1;
-    private String userUID1;
-    private String contents1;
-    private String userName;
-
+class Frag1 : Fragment(), BottomSheetListener {
+    private lateinit var binding: Frag1Binding
+    val set = AnimationSet(true)
+    var sqLiteManager: SQLiteManager? = null
+    private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
+    private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
+    private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
+    private var time: String? = null
+    private var location1: String? = null
+    private var with1: String? = null
+    private var profile1: String? = null
+    private var userUID1: String? = null
+    private var contents1: String? = null
+    private var userName: String? = null
 
     /**
      * FireBase Setting
      */
-    private ArrayList<Diary> arrayList;
-    private FirebaseDatabase database;
-    private FirebaseAuth auth; // 파이어 베이스 인증 객체
-    private FirebaseUser user;
-    private DatabaseReference databaseReference;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView recyclerView;
+    private var arrayList: ArrayList<Diary>? = null
+    private var database: FirebaseDatabase? = null
+    private var auth // 파이어 베이스 인증 객체
+            : FirebaseAuth? = null
+    private var user: FirebaseUser? = null
+    private var databaseReference: DatabaseReference? = null
+    private val idIndicator = ArrayList<String>()
+    private val matchtitle = ArrayList<String>()
+    private val matchdate = ArrayList<String>()
+    private val matchtime = ArrayList<String>()
+    private val matchProfile = ArrayList<String>()
+    private val matchContents = ArrayList<String>()
+    private val matchAddress = ArrayList<String?>()
+    private val matchID = ArrayList<String>()
+    private var date: String? = null
+    var drawable: Drawable? = null
 
-
-    private ArrayList<String> idIndicator = new ArrayList<String>();
-    private ArrayList<String> matchtitle = new ArrayList<String>();
-    private ArrayList<String> matchdate = new ArrayList<String>();
-    private ArrayList<String> matchtime = new ArrayList<String>();
-    private ArrayList<String> matchProfile = new ArrayList<String>();
-    private ArrayList<String> matchContents = new ArrayList<String>();
-    private ArrayList<String> matchAddress = new ArrayList<String>();
-    private ArrayList<String> matchID = new ArrayList<String>();
-    Button button;
-    ImageView imageView;
-    private String date;
-    private static final int REQUEST_CODE = 0;
-    Long now = System.currentTimeMillis();
-    Date mDate = new Date(now);
-    Drawable drawable;
     //리사이클러뷰 등장
-    DiaryAdapter diaryAdapter;
-    final String[] words = new String[] {"수정","삭제"};
+    var diaryAdapter: DiaryAdapter? = null
+    val words = arrayOf("수정", "삭제")
+    var myCalendar = Calendar.getInstance()
+    var myDatePicker = OnDateSetListener { view, year, month, dayOfMonth ->
+        myCalendar[Calendar.YEAR] = year
+        myCalendar[Calendar.MONTH] = month
+        myCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
+        date = "$year/$month/$dayOfMonth"
+        updateLabel()
+        updateList()
+        val controller = LayoutAnimationController(set, 0.17f)
+        binding.rv.layoutAnimation = controller
+    }
 
-    Calendar myCalendar = Calendar.getInstance();
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = Frag1Binding.inflate(inflater, container, false) // view binding
+        var fblogin = 0
+        val intent = activity!!.intent
+        val Token = intent.getStringExtra("accessToken")
+        fblogin = intent.getIntExtra("fbLogin", 0)
+        auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
+        user = auth!!.currentUser
+        userName = user!!.uid
 
-    DatePickerDialog.OnDateSetListener myDatePicker = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, month);
-            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            date = year + "/" + month + "/" + dayOfMonth;
-            updateLabel();
-            updateList();
-
-            LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-            recyclerView.setLayoutAnimation(controller);
-
-
-
-        }
-    };
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag1, container, false);
-        int fblogin = 0;
-        Intent intent = getActivity().getIntent();
-        String Token = intent.getStringExtra("accessToken");
-        fblogin = intent.getIntExtra("fbLogin",0);
-
-
-
-
-        auth = FirebaseAuth.getInstance(); // 파이어베이스 인증 객체 초기화.
-        user = auth.getCurrentUser();
-        userName = user.getUid();
-
-
-
-
-
-        new Thread(r).start();
-
-        recyclerView = (RecyclerView) view.findViewById(R.id.rv);
-        recyclerView.setHasFixedSize(true);
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
-        recyclerView.setLayoutManager(layoutManager);
-        arrayList = new ArrayList<>(); // User 객체를 담을 어레이 리스트 (어댑터쪽으로)
-
-
-
-        diaryAdapter = new DiaryAdapter();
-        diaryAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(DiaryAdapter.ViewHolder holder, View view, final int position) {
-                new AlertDialog.Builder(getContext()).setItems(words, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case 0:
-                                Bundle args = new Bundle();
-                                args.putString("where", matchtitle.get(position));
-                                args.putString("contents", matchContents.get(position));
-                                args.putString("url", matchProfile.get(position));
-                                args.putString("date", matchdate.get(position));
-                                args.putString("time", matchtime.get(position));
-                                args.putString("address", matchAddress.get(position));
-                                args.putString("id", matchID.get(position));
-                                Log.d("Lee", "\n where : " + matchtitle.get(position) + "\n contents : " + matchContents.get(position)
-                                        + "\n date : " + matchdate.get(position)+ "\n time : " + matchtime.get(position)
-                                +"\n Address : " + matchAddress.get(position));
-
-                                BottomSheetFragment bottomSheet = new BottomSheetFragment();
-                                bottomSheet.setArguments(args);
-                                bottomSheet.show(getFragmentManager(), "BS");
-
-                                break;
-                            case 1:
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        delete(position);
-
-                                        sqLiteManager.delete(idIndicator.get(position));
-                                        Toast.makeText(getActivity().getApplicationContext(), "[" + matchdate.get(position) + "]" + matchtitle.get(position) + " 삭제 완료", Toast.LENGTH_SHORT).show();
-                                        updateList();
-                                        LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                                        recyclerView.setLayoutAnimation(controller);
-
-
-
-                                    }
-                                });
-
-                                builder.setCancelable(true);
-                                builder.setNegativeButton("아니오", null);
-                                builder.setTitle("데이터 삭제");
-                                builder.setMessage("[" + matchdate.get(position) + "]" +matchtitle.get(position) + " 데이터를 삭제하시겠습니까?");
-                                builder.show();
-                                break;
-
+        Thread(r).start()
+        binding.rv.setHasFixedSize(true)
+        val layoutManager = GridLayoutManager(context, 1)
+        binding.rv.layoutManager = layoutManager
+        arrayList = ArrayList() // User 객체를 담을 어레이 리스트 (어댑터쪽으로)
+        diaryAdapter = DiaryAdapter()
+        diaryAdapter!!.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(holder: DiaryAdapter.ViewHolder?, view: View?, position: Int) {
+                AlertDialog.Builder(context).setItems(words) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val args = Bundle()
+                            args.putString("where", matchtitle[position])
+                            args.putString("contents", matchContents[position])
+                            args.putString("url", matchProfile[position])
+                            args.putString("date", matchdate[position])
+                            args.putString("time", matchtime[position])
+                            args.putString("address", matchAddress[position])
+                            args.putString("id", matchID[position])
+                            Log.d(
+                                "Lee", """
+                                 where : ${matchtitle[position]}
+                                 contents : ${matchContents[position]}
+                                 date : ${matchdate[position]}
+                                 time : ${matchtime[position]}
+                                 Address : ${matchAddress[position]}"""
+                            )
+                            val bottomSheet = BottomSheetFragment()
+                            bottomSheet.arguments = args
+                            bottomSheet.show(fragmentManager!!, "BS")
+                        }
+                        1 -> {
+                            val builder = AlertDialog.Builder(context)
+                            builder.setPositiveButton("예") { dialog, which ->
+                                delete(position)
+                                sqLiteManager!!.delete(idIndicator[position])
+                                Toast.makeText(
+                                    activity!!.applicationContext,
+                                    "[" + matchdate[position] + "]" + matchtitle[position] + " 삭제 완료",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                updateList()
+                                val controller = LayoutAnimationController(set, 0.17f)
+                                binding.rv.layoutAnimation = controller
+                            }
+                            builder.setCancelable(true)
+                            builder.setNegativeButton("아니오", null)
+                            builder.setTitle("데이터 삭제")
+                            builder.setMessage("[" + matchdate[position] + "]" + matchtitle[position] + " 데이터를 삭제하시겠습니까?")
+                            builder.show()
                         }
                     }
-                }).show();
-
+                }.show()
             }
-
-
-        });
-
-
-        DateUp = view.findViewById(R.id.DateUp);
-        DateDown = view.findViewById(R.id.DateDown);
-
-        textView = (TextView) view.findViewById(R.id.tv_date);
-        imageView = view.findViewById(R.id.imageView);
-
-
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(getContext(), myDatePicker, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+        })
+        binding.tvDate!!.setOnClickListener {
+            DatePickerDialog(
+                context!!,
+                myDatePicker,
+                myCalendar[Calendar.YEAR],
+                myCalendar[Calendar.MONTH],
+                myCalendar[Calendar.DAY_OF_MONTH]
+            ).show()
+        } //달력 꺼내기
+        updateLabel()
+        binding.DateDown.setOnClickListener(View.OnClickListener {
+            var dayDown = sdf.format(myCalendar.time).replace("-", "")
+            var dayDownint = dayDown.toInt()
+            dayDownint = dayDownint - 1
+            dayDown = dayDownint.toString()
+            val sdfmt = SimpleDateFormat("yyyyMMdd")
+            try {
+                val date = sdfmt.parse(dayDown)
+                dayDown = SimpleDateFormat("yyyy-MM-dd").format(date)
+                myCalendar.time = date
+            } catch (e: ParseException) {
+                e.printStackTrace()
             }
-        }); //달력 꺼내기
-        updateLabel();
-
-        DateDown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String dayDown = sdf.format(myCalendar.getTime()).replace("-", "");
-                int dayDownint = Integer.parseInt(dayDown);
-                dayDownint = dayDownint - 1;
-                dayDown = valueOf(dayDownint);
-
-                SimpleDateFormat sdfmt = new SimpleDateFormat("yyyyMMdd");
-                try {
-                    Date date = sdfmt.parse(dayDown);
-                    dayDown = new SimpleDateFormat("yyyy-MM-dd").format(date);
-                    myCalendar.setTime(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                textView.setText(dayDown);
-                updateList();
-                LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                recyclerView.setLayoutAnimation(controller);
-
-
+            binding.tvDate.text = dayDown
+            updateList()
+            val controller = LayoutAnimationController(set, 0.17f)
+            binding.rv.layoutAnimation = controller
+        })
+        binding.DateUp.setOnClickListener(View.OnClickListener {
+            var dayUp = sdf.format(myCalendar.time).replace("-", "")
+            var dayUpint = dayUp.toInt()
+            dayUpint = dayUpint + 1
+            dayUp = dayUpint.toString()
+            val sdfmt = SimpleDateFormat("yyyyMMdd")
+            try {
+                val date = sdfmt.parse(dayUp)
+                dayUp = SimpleDateFormat("yyyy-MM-dd").format(date)
+                myCalendar.time = date
+            } catch (e: ParseException) {
+                e.printStackTrace()
             }
-        });
-
-        DateUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String dayUp = sdf.format(myCalendar.getTime()).replace("-", "");
-                int dayUpint = Integer.parseInt(dayUp);
-                dayUpint = dayUpint + 1;
-                dayUp = valueOf(dayUpint);
-
-                SimpleDateFormat sdfmt = new SimpleDateFormat("yyyyMMdd");
-                try {
-                    Date date = sdfmt.parse(dayUp);
-                    dayUp = new SimpleDateFormat("yyyy-MM-dd").format(date);
-                    myCalendar.setTime(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                textView.setText(dayUp);
-                updateList();
-                LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                recyclerView.setLayoutAnimation(controller);
-            }
-        });
-
-        Animation rtl = new TranslateAnimation(
-                Animation.RELATIVE_TO_SELF, -1,
-                Animation.RELATIVE_TO_SELF, 0,
-                Animation.RELATIVE_TO_SELF, -1,
-                Animation.RELATIVE_TO_SELF, 0);
-        rtl.setDuration(500);
-        set.addAnimation(rtl);
-
-        Animation alpha = new AlphaAnimation(0, 1);
-        alpha.setDuration(700);
-        set.addAnimation(alpha);
-
-        final LayoutAnimationController[] controller = {new LayoutAnimationController(set, 0.17f)};
-        recyclerView.setLayoutAnimation(controller[0]);
-
-
+            binding.tvDate.text = dayUp
+            updateList()
+            val controller = LayoutAnimationController(set, 0.17f)
+            binding.rv.layoutAnimation = controller
+        })
+        val rtl: Animation = TranslateAnimation(
+            Animation.RELATIVE_TO_SELF, -1f,
+            Animation.RELATIVE_TO_SELF, 0f,
+            Animation.RELATIVE_TO_SELF, -1f,
+            Animation.RELATIVE_TO_SELF, 0f
+        )
+        rtl.duration = 500
+        set.addAnimation(rtl)
+        val alpha: Animation = AlphaAnimation(0f, 1f)
+        alpha.duration = 700
+        set.addAnimation(alpha)
+        val controller = arrayOf(LayoutAnimationController(set, 0.17f))
+        binding.rv.layoutAnimation = controller[0]
         /**
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = new SQLiteManager(getActivity().getApplicationContext(), "writeYourThink.db", null, 1);
-
-        Log.d("Lee", String.valueOf(fblogin) + "ㅁ낭ㄴ망ㅁ");
+        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
         if (fblogin > 1) {
-            firebaseUpdate();
-            fblogin = 0;
+            firebaseUpdate()
+            fblogin = 0
         } else {
-            updateList();
+            updateList()
         }
-
-        return view;
+        return binding.root
     }
 
-
-    private void updateList() {
-        idIndicator.clear();
-        matchtitle.clear();
-        matchContents.clear();
-        matchAddress.clear();
-        matchProfile.clear();
-        matchdate.clear();
-        matchtime.clear();
-        matchID.clear();
-        diaryAdapter.removeItem();    // ListView 내용 모두 삭제
-        ArrayList<JSONObject> array = sqLiteManager.getResult(textView.getText().toString()); // DB의 내용을 배열단위로 모두 가져온다
+    @SuppressLint("NotifyDataSetChanged")
+    private fun updateList() {
+        idIndicator.clear()
+        matchtitle.clear()
+        matchContents.clear()
+        matchAddress.clear()
+        matchProfile.clear()
+        matchdate.clear()
+        matchtime.clear()
+        matchID.clear()
+        diaryAdapter!!.removeItem() // ListView 내용 모두 삭제
+        val array = sqLiteManager!!.getResult(binding.tvDate.text.toString()) // DB의 내용을 배열단위로 모두 가져온다
         try {
-            int length = array.size(); // 배열의 길이
-            for (int idx = 0; idx < length; idx++) {  // 배열의 길이만큼 반복
-                JSONObject object = array.get(idx);// json의 idx번째 object를 가져와서,
-                String userName = object.getString("userName");         // object 내용중 id를 가져와 저장.
-                String id = object.getString("id");         // object 내용중 id를 가져와 저장.
-                String title = object.getString("title");         // object 내용중 id를 가져와 저장.
-                String contents = object.getString("contents");     // object 내용중 contents를 가져와 저장.
-                String profile = object.getString("profile");     // object 내용중 profile를 가져와 저장.
-                String date =  object.getString("date");     // object 내용중 date를 가져와 저장.
-                String time = object.getString("time");     // object 내용중 date를 가져와 저장.
-                String address = object.getString("address");
-
-                matchID.add(id);
-                matchAddress.add(address);
-                matchContents.add(contents);
-                matchProfile.add(profile);
-                matchdate.add(date);
-                matchtime.add(time);
-                idIndicator.add(id);
-                matchtitle.add(title);
-                if (Locale.getDefault().getISO3Language().equals("eng")) {
-                    diaryAdapter.addItem(new Diary(userName, profile,
-                            "At a " + title + ", " + address,
+            val length = array.size // 배열의 길이
+            for (idx in 0 until length) {  // 배열의 길이만큼 반복
+                val `object` = array[idx] // json의 idx번째 object를 가져와서,
+                val userName = `object`.getString("userName") // object 내용중 id를 가져와 저장.
+                val id = `object`.getString("id") // object 내용중 id를 가져와 저장.
+                val title = `object`.getString("title") // object 내용중 id를 가져와 저장.
+                val contents = `object`.getString("contents") // object 내용중 contents를 가져와 저장.
+                val profile = `object`.getString("profile") // object 내용중 profile를 가져와 저장.
+                val date = `object`.getString("date") // object 내용중 date를 가져와 저장.
+                val time = `object`.getString("time") // object 내용중 date를 가져와 저장.
+                val address = `object`.getString("address")
+                matchID.add(id)
+                matchAddress.add(address)
+                matchContents.add(contents)
+                matchProfile.add(profile)
+                matchdate.add(date)
+                matchtime.add(time)
+                idIndicator.add(id)
+                matchtitle.add(title)
+                if (Locale.getDefault().isO3Language == "eng") {
+                    diaryAdapter!!.addItem(
+                        Diary(
+                            userName, profile,
+                            "At a $title, $address",
                             contents,
-                            date.substring(0,4) + "-" + date.substring(5,7) + "-" +
-                                    date.substring(8) + "-" +   "("+time+")",""));
-                    recyclerView.setAdapter(diaryAdapter);
+                            date.substring(0, 4) + "-" + date.substring(5, 7) + "-" +
+                                    date.substring(8) + "-" + "(" + time + ")", ""
+                        )
+                    )
+                    binding.rv.adapter = diaryAdapter
                 } else {
                     // 저장한 내용을 토대로 ListView에 다시 그린다.
-                    diaryAdapter.addItem(new Diary(userName, profile,
-                            address.equals(" ") || address.equals(null)?  title + "에서..": "의 "+ title + "에서..",
+                    diaryAdapter!!.addItem(
+                        Diary(
+                            userName, profile,
+                            if (address == " " || address == null) title + "에서.." else "의 " + title + "에서..",
                             contents,
-                            date.substring(0,4) + "년 " + date.substring(5,7) + "월 " +
-                                    date.substring(8) + "일" +   "("+time+")", address));
-                    recyclerView.setAdapter(diaryAdapter);
+                            date.substring(0, 4) + "년 " + date.substring(5, 7) + "월 " +
+                                    date.substring(8) + "일" + "(" + time + ")", address
+                        )
+                    )
+                    binding.rv.adapter = diaryAdapter
                 }
             }
-        } catch (Exception e) {
-            Log.i("seo", "error : " + e);
-
+        } catch (e: Exception) {
+            Log.i("seo", "error : $e")
         }
-        diaryAdapter.notifyDataSetChanged();
+        diaryAdapter!!.notifyDataSetChanged()
     }
 
-
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 try {
-                    Uri uri = data.getData();
-                    Glide.with(getActivity().getApplicationContext()).load(valueOf(uri)).into(imageView);
-                    edit_upload.setText(valueOf(uri));
-                } catch (Exception e) {
-
+                    val uri = data!!.data
+                    Glide.with(activity!!.applicationContext).load(uri.toString()).into(binding.imageView)
+                    binding.editUpload.setText(uri.toString())
+                } catch (e: Exception) {
                 }
-            } else if (resultCode == RESULT_CANCELED) {
-
+            } else if (resultCode == Activity.RESULT_CANCELED) {
             }
         }
     }
 
-    private void updateLabel() {
-
-
-        date = sdf.format(myCalendar.getTime());
-        textView.setText(sdf.format(myCalendar.getTime()));
-
+    private fun updateLabel() {
+        date = sdf.format(myCalendar.time)
+        binding.tvDate.text = sdf.format(myCalendar.time)
     }
 
-    Runnable r = new Runnable() {
-        @Override
-        public void run() {
-
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-
-                } catch (Exception e) {
-
-                }
-                if (getActivity() != null){
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            time = sdf2.format(new Date());
-                        }
-                    });
-                }
-
+    var r = Runnable {
+        while (true) {
+            try {
+                Thread.sleep(1000)
+            } catch (e: Exception) {
+            }
+            if (activity != null) {
+                activity!!.runOnUiThread { time = sdf2.format(Date()) }
             }
         }
-
-    };
-
-    @Override
-    public void onButtonClicked(String text) {
-
     }
 
-    private void delete(int position){
-        if (matchtime.size()>0){
-            database = FirebaseDatabase.getInstance(); // 파이어베이스 데이터베이스 연동
-            databaseReference = database.getReference(userName);// DB 테이블 연결
-            databaseReference.child(matchdate.get(position) + "(" +matchtime.get(position) + ")").setValue(null);
-
+    override fun onButtonClicked(text: String) {}
+    private fun delete(position: Int) {
+        if (matchtime.size > 0) {
+            database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
+            databaseReference = database!!.getReference(userName!!) // DB 테이블 연결
+            databaseReference!!.child(matchdate[position] + "(" + matchtime[position] + ")")
+                .setValue(null)
         }
     }
 
-    private void firebaseUpdate(){
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
-        progressDialog.setTitle(getString(R.string.syncData));
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
-        /** SQLite DB 선언 */
-        sqLiteManager = new SQLiteManager(getContext(), "writeYourThink.db", null, 1);
-        database = FirebaseDatabase.getInstance(); /** 파이어베이스 데이터베이스 연동 */
-        databaseReference = database.getReference(userName); /** DB 테이블 연결 */
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                /** 파이어베이스 데이터베이스의 데이터를 받아오는 곳 */
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { /** 반복문으로 데이터 List를 추출해냄 */
-                    Diary diary = snapshot.getValue(Diary.class); /** 만들어뒀던 User 객체에 데이터를 담는다. */
-                    if (diary.getDate() != null){
-                        date = diary.getDate();
-                        location1 = diary.getLocation();
-                        with1 = diary.getWhere();
-                        contents1 = diary.getContents();
-                        profile1= diary.getProfile();
-                        userUID1= diary.getUserUID();
-
-                        /** Firebase DB 데이터를 불러오자마자 바로 SQLite DB에 삽입 */
-                        sqLiteManager.insert2(userUID1,
-                                with1,
-                                contents1,
-                                profile1,
-                                date.substring(0,10),
-                                date.substring(11,19), location1.equals(" ") || location1.equals(null)?" ":location1);
+    private fun firebaseUpdate() {
+        val progressDialog = ProgressDialog(context)
+        progressDialog.setTitle(getString(R.string.syncData))
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        /** SQLite DB 선언  */
+        sqLiteManager = SQLiteManager(context, "writeYourThink.db", null, 1)
+        database = FirebaseDatabase.getInstance()
+        /** 파이어베이스 데이터베이스 연동  */
+        databaseReference = database!!.getReference(userName!!)
+        /** DB 테이블 연결  */
+        databaseReference!!.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                /** 파이어베이스 데이터베이스의 데이터를 받아오는 곳  */
+                for (snapshot in dataSnapshot.children) {
+                    /** 반복문으로 데이터 List를 추출해냄  */
+                    val diary = snapshot.getValue(Diary::class.java)
+                    /** 만들어뒀던 User 객체에 데이터를 담는다.  */
+                    if (diary!!.date != null) {
+                        date = diary.date
+                        location1 = diary.location
+                        with1 = diary.where
+                        contents1 = diary.contents
+                        profile1 = diary.profile
+                        userUID1 = diary.userUID
+                        /** Firebase DB 데이터를 불러오자마자 바로 SQLite DB에 삽입  */
+                        sqLiteManager!!.insert2(
+                            userUID1,
+                            with1,
+                            contents1,
+                            profile1,
+                            date!!.substring(0, 10),
+                            date!!.substring(11, 19),
+                            if (location1 == " " || location1 == null) " " else location1
+                        )
                     }
                 }
-                LayoutAnimationController controller = new LayoutAnimationController(set, 0.17f);
-                recyclerView.setLayoutAnimation(controller);
-                updateList();
-                progressDialog.dismiss();
-
+                val controller = LayoutAnimationController(set, 0.17f)
+                binding.rv.layoutAnimation = controller
+                updateList()
+                progressDialog.dismiss()
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            override fun onCancelled(databaseError: DatabaseError) {
                 // 디비를 가져오던중 에러 발생 시
-                Log.e("MainActivity", String.valueOf(databaseError.toException())); // 에러문 출력
+                Log.e("MainActivity", databaseError.toException().toString()) // 에러문 출력
             }
-        });
+        })
+    }
 
+    companion object {
+        private const val REQUEST_CODE = 0
     }
 }
