@@ -137,7 +137,11 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         setFrag(0)
 
         binding.button3.setOnClickListener(View.OnClickListener {
-            val bottomSheet = BottomSheetDialogFragment()
+            // Dialog창 중복 실행 방지를 위한 싱글톤 패턴 적용
+            var bottomSheet : BottomSheetDialogFragment? = null
+            if (bottomSheet == null) {
+                bottomSheet = BottomSheetDialogFragment()
+            }
             bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
         })
     }
@@ -151,8 +155,7 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
                 ft!!.commit()
             }
             1 -> {
-                val bottomSheet = BottomSheetDialogFragment()
-                bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
+
             }
             2 -> {
                 ft!!.replace(R.id.main_frame, frag3!!)
