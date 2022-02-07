@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.location.Address
@@ -22,7 +21,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -34,9 +32,6 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.databinding.Frag2Binding
 import java.io.IOException
-import java.lang.ClassCastException
-import java.lang.Exception
-import java.lang.IllegalArgumentException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -75,15 +70,12 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var auth // 파이어 베이스 인증 객체
             : FirebaseAuth? = null
     private var user: FirebaseUser? = null
-    private var button: ImageButton? = null
     var imageView: ImageView? = null
     private var date: String? = null
     var now = System.currentTimeMillis()
-    var mDate = Date(now)
     var drawable: Drawable? = null
 
     //리사이클러뷰 등장
-    private val arrayList: ArrayList<Diary>? = null
     var myCalendar = Calendar.getInstance()
     var myDatePicker: DatePickerDialog.OnDateSetListener =
         DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -105,22 +97,28 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        try {
+            val mArgs = arguments
+            where = if (mArgs!!.getString("where") == "null") " " else mArgs!!.getString("where")!!
+            contents = mArgs!!.getString("contents")
+            photoURL = mArgs!!.getString("url")
+            matchDate = mArgs!!.getString("date")
+            matchTime = mArgs!!.getString("time")
+            matchAddress = mArgs!!.getString("address")
+            matchID = mArgs!!.getString("id")
+        } catch (e: NullPointerException) {
+            where = ""
+            contents = ""
+            photoURL = ""
+            matchDate = ""
+            matchTime = ""
+            matchAddress = ""
+            matchID = ""
+        }
 
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
         userName = user!!.uid
-        /** 각 컴포넌트 제어를 위한 아이디할당 (EditText, Button)
-        btn_upload = view.findViewById(R.id.btn_upload)
-        edit_title = view.findViewById(R.id.edit_title)
-        edit_contents = view.findViewById(R.id.edit_contents)
-        edit_upload = view.findViewById(R.id.edit_upload)
-        DateUp = view.findViewById(R.id.DateUp)
-        DateDown = view.findViewById(R.id.DateDown)
-        textView = view.findViewById<View>(R.id.tv_date) as TextView
-        imageView = view.findViewById(R.id.imageView)
-        button = view.findViewById(R.id.button)
-        invisibleLayout = view.findViewById(R.id.invisibleLayout)
-         */
         binding.invisibleLayout.setVisibility(View.GONE)
         gpsTracker = GpsTracker((activity)!!)
         val latitude = gpsTracker!!.latitude
