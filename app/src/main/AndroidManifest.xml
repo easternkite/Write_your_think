@@ -27,28 +27,18 @@
 
         </activity>
         <activity
-            android:name="com.multimedia.writeyourthink.SplashActivity3"
-            android:theme="@style/SplashTheme2"
-            android:screenOrientation="portrait"
-                android:exported="false"/>
-        <activity
-            android:name="com.multimedia.writeyourthink.SplashActivity2"
+            android:name="com.multimedia.writeyourthink.SplashActivity"
             android:fitsSystemWindows="true"
             android:theme="@style/SplashTheme2"
             android:screenOrientation="portrait"
-                android:exported="false"/>
-        <activity
-            android:name="com.multimedia.writeyourthink.SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/black"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+
         <activity
             android:name="com.multimedia.writeyourthink.MainActivity"
             android:screenOrientation="portrait"
