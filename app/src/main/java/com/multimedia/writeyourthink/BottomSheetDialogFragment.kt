@@ -16,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationSet
 import android.widget.ArrayAdapter
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import com.bumptech.glide.Glide
@@ -70,9 +69,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var auth // 파이어 베이스 인증 객체
             : FirebaseAuth? = null
     private var user: FirebaseUser? = null
-    var imageView: ImageView? = null
     private var date: String? = null
-    var now = System.currentTimeMillis()
     var drawable: Drawable? = null
 
     //리사이클러뷰 등장
@@ -430,7 +427,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기  */
             storageRef!!.downloadUrl.addOnSuccessListener(OnSuccessListener { uri ->
                 /** 다운로드 URL이 파라미터로 전달되어 옴.  */
-                Glide.with(activity!!.applicationContext).load(uri.toString()).into((imageView)!!)
+                Glide.with(activity!!.applicationContext).load(uri.toString()).into((binding.imageView))
                 stringUri = uri.toString()
             })
         }
