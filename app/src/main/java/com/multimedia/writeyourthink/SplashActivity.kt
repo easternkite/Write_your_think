@@ -42,7 +42,7 @@ class SplashActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                     val intent2 = Intent(this@SplashActivity, LoginActivity::class.java)
-                    intent2.putExtra("viewNum", 1)
+                    intent2.putExtra("viewNum", actRand)
                     startActivity(intent2)
                     overridePendingTransition(0, 0)
                     finish()
