@@ -48,7 +48,6 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
     private var callbackManager: CallbackManager? = null
 
     // 파이어베이스 인증 객체 생성
-    private var btn_facebook: LoginButton? = null
     private var googleApiClient // 구글 API 클라이언트 객체
             : GoogleApiClient? = null
     private var accessToken: String? = null
