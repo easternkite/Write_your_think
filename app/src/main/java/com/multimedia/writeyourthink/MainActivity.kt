@@ -24,7 +24,16 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
@@ -48,6 +57,7 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
     /**
      * FireBase 등장
      */
+    private lateinit var userDocumentRef : DocumentReference
     private var auth // 파이어 베이스 인증 객체
             : FirebaseAuth? = null
     private var user: FirebaseUser? = null
@@ -72,11 +82,11 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
          * 파이어베이스 초기 셋팅
          */
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
-        userUID = user!!.uid
-        userProfile = user!!.photoUrl.toString()
-        userName = user!!.displayName
-        userEmail = user!!.email
+        user = auth?.currentUser
+        userUID = user?.uid
+        userProfile = user?.photoUrl.toString()
+        userName = user?.displayName
+        userEmail = user?.email
         database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
         databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
         val photoUrl = "$userProfile?height=500&access_token=$Token"
@@ -112,6 +122,9 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
                     Log.e("MainActivity", databaseError.toException().toString()) // 에러문 출력
                 }
             })
+            userDocumentRef = Firebase.firestore.collection(userUID!!).document("Info")
+            val userInfo = UserInfo(userUID, userName, photoUrl, userEmail)
+            saveUser(userInfo)
             writeNewUser(userUID, userName, photoUrl, userEmail)
             fbLogin = 0
         }
@@ -192,6 +205,18 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
             finish()
         }
     }
+    private fun saveUser(userInfo: UserInfo) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            userDocumentRef.set(userInfo).await()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@MainActivity, "유저 정보 저장 완료", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     fun writeNewUser(
         userUID: String?,
@@ -203,20 +228,7 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         databaseReference!!.child("UserInfo").setValue(userInfo)
     }
 
-    private fun changeLocale(localeLang: String) {
-        var locale: Locale? = null
-        when (localeLang) {
-            "ko" -> locale = Locale("ko")
-            "en" -> locale = Locale("en")
-        }
-        val config = applicationContext.resources.configuration
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale)
-        } else {
-            config.locale = locale
-        }
-        resources.updateConfiguration(config, resources.displayMetrics)
-    }
+
 
     companion object {
         private const val AD_UNIT_ID = "ca-app-pub-9450003299415787/4031932869"
