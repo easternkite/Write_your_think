@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -184,13 +185,13 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         /**
          * SQLite 제어 설정
          */
-        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
         /** 버튼을 눌렀을때 해야할 이벤트 작성  */
         binding.btnUpload.setOnClickListener(View.OnClickListener {
             if ((binding.editTitle.getText().toString() == "") || (binding.editContents.getText()
                     .toString() == "")
             ) {
-                Toast.makeText(activity!!.applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
+                Toast.makeText(requireActivity().applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 address = getCurrentAddress(latitude, longitude)
@@ -269,7 +270,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     )
                     saveDiray(diary)
                 }
-                Toast.makeText(activity!!.applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
                 binding.editTitle.setText(null)
                 binding.editContents.setText(null)
                 binding.editUpload.setText(null)
@@ -300,7 +301,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 binding.invisibleLayout.setVisibility(View.GONE)
             }
-            Glide.with(activity!!.applicationContext).load(photoURL).into(binding.imageView)
+            Glide.with(requireActivity().applicationContext).load(photoURL).into(binding.imageView)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -329,7 +330,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                activity!!.runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
             }
         }
     }
@@ -383,7 +384,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun saveDiray(diary: Diary) = CoroutineScope(Dispatchers.IO).launch {
         try {
-            diaryCollectionRef.add(diary).await()
+            diaryCollectionRef.document(diary.date!!).set(diary).await()
             withContext(Dispatchers.Main) {
                 Log.d("BottomSheet", "데이터 업로드 성공 !")
             }
