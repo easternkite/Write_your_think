@@ -30,7 +30,15 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.multimedia.writeyourthink.databinding.Frag1Binding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -38,6 +46,7 @@ import java.util.*
 
 class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: Frag1Binding
+    private lateinit var diaryCollectionRef: CollectionReference
     val set = AnimationSet(true)
     var sqLiteManager: SQLiteManager? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
@@ -93,12 +102,13 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     ): View? {
         binding = Frag1Binding.inflate(inflater, container, false) // view binding
         var fblogin = 0
-        val intent = activity!!.intent
+        val intent = requireActivity().intent
         val Token = intent.getStringExtra("accessToken")
         fblogin = intent.getIntExtra("fbLogin", 0)
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
         userName = user!!.uid
+        diaryCollectionRef = Firebase.firestore.collection(userName!!)
 
         Thread(r).start()
         binding.rv.setHasFixedSize(true)
@@ -135,6 +145,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
                             val builder = AlertDialog.Builder(context)
                             builder.setPositiveButton("예") { dialog, which ->
                                 delete(position)
+                                diaryDelete(position)
                                 sqLiteManager!!.delete(idIndicator[position])
                                 Toast.makeText(
                                     activity!!.applicationContext,
@@ -157,7 +168,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         })
         binding.tvDate.setOnClickListener {
             DatePickerDialog(
-                context!!,
+                requireContext(),
                 myDatePicker,
                 myCalendar[Calendar.YEAR],
                 myCalendar[Calendar.MONTH],
@@ -218,7 +229,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
         Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
         if (fblogin > 1) {
             firebaseUpdate()
@@ -298,7 +309,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
             if (resultCode == Activity.RESULT_OK) {
                 try {
                     val uri = data!!.data
-                    Glide.with(activity!!.applicationContext).load(uri.toString()).into(binding.imageView)
+                    Glide.with(requireActivity().applicationContext).load(uri.toString()).into(binding.imageView)
                     binding.editUpload.setText(uri.toString())
                 } catch (e: Exception) {
                 }
@@ -319,12 +330,24 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                activity!!.runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
             }
         }
     }
 
     override fun onButtonClicked(text: String?) {}
+    private fun diaryDelete(position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            diaryCollectionRef.document(matchdate[position] + "(" + matchtime[position] + ")").delete().await()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "데이터 삭제 성공!", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     private fun delete(position: Int) {
         if (matchtime.size > 0) {
             database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
