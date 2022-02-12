@@ -93,7 +93,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     ): View? {
         binding = Frag1Binding.inflate(inflater, container, false) // view binding
         var fblogin = 0
-        val intent = activity!!.intent
+        val intent = requireActivity().intent
         val Token = intent.getStringExtra("accessToken")
         fblogin = intent.getIntExtra("fbLogin", 0)
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
@@ -157,7 +157,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         })
         binding.tvDate.setOnClickListener {
             DatePickerDialog(
-                context!!,
+                requireContext(),
                 myDatePicker,
                 myCalendar[Calendar.YEAR],
                 myCalendar[Calendar.MONTH],
@@ -218,7 +218,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
         Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
         if (fblogin > 1) {
             firebaseUpdate()
@@ -298,7 +298,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
             if (resultCode == Activity.RESULT_OK) {
                 try {
                     val uri = data!!.data
-                    Glide.with(activity!!.applicationContext).load(uri.toString()).into(binding.imageView)
+                    Glide.with(requireActivity().applicationContext).load(uri.toString()).into(binding.imageView)
                     binding.editUpload.setText(uri.toString())
                 } catch (e: Exception) {
                 }
@@ -319,7 +319,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                activity!!.runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
             }
         }
     }
