@@ -25,18 +25,27 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.databinding.Frag2Binding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
 class BottomSheetDialogFragment : BottomSheetDialogFragment() {
-
+    private lateinit var diaryCollectionRef : CollectionReference
     private lateinit var binding: Frag2Binding
     private var mListener: BottomSheetListener? = null
     private var gpsTracker // 위치정보
@@ -125,6 +134,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         address = getCurrentAddress(latitude, longitude)
         Thread(r).start()
         /** 현재시간  */
+
+        diaryCollectionRef = Firebase.firestore.collection(userName)
         binding.button.setOnClickListener(View.OnClickListener {
             val intent = Intent()
             intent.type = "image/*"
@@ -174,13 +185,13 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         /**
          * SQLite 제어 설정
          */
-        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
         /** 버튼을 눌렀을때 해야할 이벤트 작성  */
         binding.btnUpload.setOnClickListener(View.OnClickListener {
             if ((binding.editTitle.getText().toString() == "") || (binding.editContents.getText()
                     .toString() == "")
             ) {
-                Toast.makeText(activity!!.applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
+                Toast.makeText(requireActivity().applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 address = getCurrentAddress(latitude, longitude)
@@ -211,8 +222,17 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                         "$matchDate($matchTime)",
                         if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
                     )
+
+                    val diary = Diary(
+                        userName,
+                        if (photoURL != null) if (stringUri != null) stringUri else photoURL else if (stringUri != null) stringUri else " ",
+                        binding.editTitle.getText().toString(),
+                        binding.editContents.getText().toString(),
+                        "$matchDate($matchTime)",
+                        if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
+                    )
+                    saveDiray(diary)
                 } else {
-                    /** SQLite Data Insert  */
                     /** SQLite Data Insert  */
                     sqLiteManager!!.insert(
                         userName,
@@ -226,7 +246,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                         )
                     )
                     /** FireBase Data Insert  */
-                    /** FireBase Data Insert  */
                     database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
                     databaseReference = database!!.getReference(userName) // DB 테이블 연결
                     writeNewUser(
@@ -239,8 +258,19 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                             address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
                         )
                     )
+                    val diary = Diary(
+                        userName,
+                        if (stringUri != null) stringUri else " ",
+                        binding.editTitle.getText().toString(),
+                        binding.editContents.getText().toString(),
+                        binding.tvDate!!.text.toString() + "(" + time + ")",
+                        if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
+                            address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
+                        )
+                    )
+                    saveDiray(diary)
                 }
-                Toast.makeText(activity!!.applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
                 binding.editTitle.setText(null)
                 binding.editContents.setText(null)
                 binding.editUpload.setText(null)
@@ -271,7 +301,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 binding.invisibleLayout.setVisibility(View.GONE)
             }
-            Glide.with(activity!!.applicationContext).load(photoURL).into(binding.imageView)
+            Glide.with(requireActivity().applicationContext).load(photoURL).into(binding.imageView)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -300,7 +330,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                activity!!.runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
             }
         }
     }
@@ -352,7 +382,18 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         fun onButtonClicked(text: String?)
     }
 
-
+    private fun saveDiray(diary: Diary) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            diaryCollectionRef.document(diary.date!!).set(diary).await()
+            withContext(Dispatchers.Main) {
+                Log.d("BottomSheet", "데이터 업로드 성공 !")
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Log.d("BottomSheet", e.message.toString())
+            }
+        }
+    }
     fun writeNewUser(
         userUID: String?,
         time: String?,

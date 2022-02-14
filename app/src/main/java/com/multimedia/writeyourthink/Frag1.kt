@@ -30,7 +30,15 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.multimedia.writeyourthink.databinding.Frag1Binding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -38,6 +46,7 @@ import java.util.*
 
 class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: Frag1Binding
+    private lateinit var diaryCollectionRef: CollectionReference
     val set = AnimationSet(true)
     var sqLiteManager: SQLiteManager? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
@@ -99,6 +108,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
         userName = user!!.uid
+        diaryCollectionRef = Firebase.firestore.collection(userName!!)
 
         Thread(r).start()
         binding.rv.setHasFixedSize(true)
@@ -135,6 +145,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
                             val builder = AlertDialog.Builder(context)
                             builder.setPositiveButton("예") { dialog, which ->
                                 delete(position)
+                                diaryDelete(position)
                                 sqLiteManager!!.delete(idIndicator[position])
                                 Toast.makeText(
                                     activity!!.applicationContext,
@@ -325,6 +336,18 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     }
 
     override fun onButtonClicked(text: String?) {}
+    private fun diaryDelete(position: Int) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            diaryCollectionRef.document(matchdate[position] + "(" + matchtime[position] + ")").delete().await()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "데이터 삭제 성공!", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     private fun delete(position: Int) {
         if (matchtime.size > 0) {
             database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
