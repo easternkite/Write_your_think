@@ -214,14 +214,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     /** FireBase Data Insert  */
                     database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
                     databaseReference = database!!.getReference(userName) // DB 테이블 연결
-                    writeNewUser(
-                        userName, time,
-                        if (photoURL != null) if (stringUri != null) stringUri else photoURL else if (stringUri != null) stringUri else " ",
-                        binding.editTitle.getText().toString(),
-                        binding.editContents.getText().toString(),
-                        "$matchDate($matchTime)",
-                        if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
-                    )
 
                     val diary = Diary(
                         userName,
@@ -233,31 +225,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     )
                     saveDiray(diary)
                 } else {
-                    /** SQLite Data Insert  */
-                    sqLiteManager!!.insert(
-                        userName,
-                        binding.editTitle.getText().toString(),
-                        binding.editContents.getText().toString(),
-                        if (stringUri != null) stringUri else " ",  //edit_upload.getText().toString(),
-                        binding.tvDate.text.toString(),
-                        time,
-                        if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
-                            address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
-                        )
-                    )
-                    /** FireBase Data Insert  */
-                    database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
-                    databaseReference = database!!.getReference(userName) // DB 테이블 연결
-                    writeNewUser(
-                        userName, time,
-                        if (stringUri != null) stringUri else " ",
-                        binding.editTitle.getText().toString(),
-                        binding.editContents.getText().toString(),
-                        binding.tvDate!!.text.toString() + "(" + time + ")",
-                        if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
-                            address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
-                        )
-                    )
                     val diary = Diary(
                         userName,
                         if (stringUri != null) stringUri else " ",
@@ -279,7 +246,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 binding.imageView.setVisibility(View.GONE)
                 val intent = Intent(activity, MainActivity::class.java)
                 startActivity(intent)
-                activity!!.finish()
+                requireActivity().finish()
             }
         })
         binding.tvDate.text = date
@@ -394,6 +361,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
         }
     }
+    /*
     fun writeNewUser(
         userUID: String?,
         time: String?,
@@ -406,6 +374,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         val diary = Diary(userUID, profile, where, contents, date, location)
         databaseReference!!.child((date)!!).setValue(diary)
     }
+
+     */
 
     /** upload the file  */
     private fun uploadFile() {
@@ -468,7 +438,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기  */
             storageRef!!.downloadUrl.addOnSuccessListener(OnSuccessListener { uri ->
                 /** 다운로드 URL이 파라미터로 전달되어 옴.  */
-                Glide.with(activity!!.applicationContext).load(uri.toString()).into((binding.imageView))
+                Glide.with(requireActivity().applicationContext).load(uri.toString()).into((binding.imageView))
                 stringUri = uri.toString()
             })
         }

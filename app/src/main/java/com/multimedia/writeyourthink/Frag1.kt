@@ -32,6 +32,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.multimedia.writeyourthink.databinding.Frag1Binding
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +91,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         myCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
         date = "$year/$month/$dayOfMonth"
         updateLabel()
-        updateList()
+        //updateList()
         val controller = LayoutAnimationController(set, 0.17f)
         binding.rv.layoutAnimation = controller
     }
@@ -109,7 +110,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         user = auth!!.currentUser
         userName = user!!.uid
         diaryCollectionRef = Firebase.firestore.collection(userName!!)
-
+        subscribeToRealtimeUpdates()
         Thread(r).start()
         binding.rv.setHasFixedSize(true)
         val layoutManager = GridLayoutManager(context, 1)
@@ -119,48 +120,24 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         diaryAdapter!!.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(holder: DiaryAdapter.ViewHolder?, view: View?, position: Int) {
                 AlertDialog.Builder(context).setItems(words) { dialog, which ->
+                    val diary = diaryAdapter!!.getItem(position)
                     when (which) {
                         0 -> {
                             val args = Bundle()
-                            args.putString("where", matchtitle[position])
-                            args.putString("contents", matchContents[position])
-                            args.putString("url", matchProfile[position])
-                            args.putString("date", matchdate[position])
-                            args.putString("time", matchtime[position])
-                            args.putString("address", matchAddress[position])
-                            args.putString("id", matchID[position])
-                            Log.d(
-                                "Lee", """
-                                 where : ${matchtitle[position]}
-                                 contents : ${matchContents[position]}
-                                 date : ${matchdate[position]}
-                                 time : ${matchtime[position]}
-                                 Address : ${matchAddress[position]}"""
-                            )
+                            args.putString("where", diary.where)
+                            args.putString("contents", diary.contents)
+                            args.putString("url", diary.profile)
+                            args.putString("date", diary.date)
+                            args.putString("time", diary.date?.substring(11, 19))
+                            args.putString("address", diary.location)
+                            args.putString("id", diary.userUID)
+
                             val bottomSheet = BottomSheetDialogFragment()
                             bottomSheet.arguments = args
                             bottomSheet.show(fragmentManager!!, "BS")
                         }
                         1 -> {
-                            val builder = AlertDialog.Builder(context)
-                            builder.setPositiveButton("예") { dialog, which ->
-                                delete(position)
-                                diaryDelete(position)
-                                sqLiteManager!!.delete(idIndicator[position])
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "[" + matchdate[position] + "]" + matchtitle[position] + " 삭제 완료",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                updateList()
-                                val controller = LayoutAnimationController(set, 0.17f)
-                                binding.rv.layoutAnimation = controller
-                            }
-                            builder.setCancelable(true)
-                            builder.setNegativeButton("아니오", null)
-                            builder.setTitle("데이터 삭제")
-                            builder.setMessage("[" + matchdate[position] + "]" + matchtitle[position] + " 데이터를 삭제하시겠습니까?")
-                            builder.show()
+                            diaryDelete(diary)
                         }
                     }
                 }.show()
@@ -190,7 +167,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
                 e.printStackTrace()
             }
             binding.tvDate.text = dayDown
-            updateList()
+            //updateList()
             val controller = LayoutAnimationController(set, 0.17f)
             binding.rv.layoutAnimation = controller
         })
@@ -208,7 +185,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
                 e.printStackTrace()
             }
             binding.tvDate.text = dayUp
-            updateList()
+            //updateList()
             val controller = LayoutAnimationController(set, 0.17f)
             binding.rv.layoutAnimation = controller
         })
@@ -229,17 +206,43 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
          * SQLite 제어 설정
          */
         // SQLite 객체 초기화
-        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
-        Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
-        if (fblogin > 1) {
-            firebaseUpdate()
-            fblogin = 0
-        } else {
-            updateList()
-        }
+        //sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
+        //Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
         return binding.root
     }
+    @SuppressLint("NotifyDataSetChanged")
+    private fun subscribeToRealtimeUpdates() {
+        Log.d("Lee", "${userName}}")
+        diaryCollectionRef
+            //.whereEqualTo("userUID", "${userName}-${binding.tvDate.text}")
+            .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                firebaseFirestoreException?.let {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+                    Log.d("Lee", it.message.toString())
+                    return@addSnapshotListener
+                }
+                querySnapshot?.let {
+                    diaryAdapter?.removeItem()
+                    for (document in it) {
+                        val person = document.toObject<Diary>()
 
+                        diaryAdapter?.addItem(
+                            Diary(
+                                person.userUID, person.profile,
+                                person.where,
+                                person.contents,
+                                person.date,
+                                person.location
+                            )
+                        )
+                        binding.rv.adapter = diaryAdapter
+
+                        diaryAdapter?.notifyDataSetChanged()
+                    }
+                }
+            }
+    }
+    /*
     @SuppressLint("NotifyDataSetChanged")
     private fun updateList() {
         idIndicator.clear()
@@ -303,6 +306,8 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         diaryAdapter!!.notifyDataSetChanged()
     }
 
+     */
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE) {
@@ -336,9 +341,9 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
     }
 
     override fun onButtonClicked(text: String?) {}
-    private fun diaryDelete(position: Int) = CoroutineScope(Dispatchers.IO).launch {
+    private fun diaryDelete(diary: Diary) = CoroutineScope(Dispatchers.IO).launch {
         try {
-            diaryCollectionRef.document(matchdate[position] + "(" + matchtime[position] + ")").delete().await()
+            diaryCollectionRef.document("${diary.date}").delete().await()
             withContext(Dispatchers.Main) {
                 Toast.makeText(requireContext(), "데이터 삭제 성공!", Toast.LENGTH_LONG).show()
             }
@@ -356,7 +361,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
                 .setValue(null)
         }
     }
-
+    /*
     private fun firebaseUpdate() {
         val progressDialog = ProgressDialog(context)
         progressDialog.setTitle(getString(R.string.syncData))
@@ -407,6 +412,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         })
     }
 
+     */
     companion object {
         private const val REQUEST_CODE = 0
     }

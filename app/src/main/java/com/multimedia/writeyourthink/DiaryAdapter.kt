@@ -6,14 +6,18 @@ import com.multimedia.writeyourthink.Diary
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import com.multimedia.writeyourthink.R
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import java.util.ArrayList
+import java.util.*
 
-class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClickListener {
+class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClickListener, Filterable {
     var items = ArrayList<Diary>()
+    var filteredList = ArrayList<Diary>(items)
+    var unFilteredList = ArrayList<Diary>(items)
     var listener: OnItemClickListener? = null
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(viewGroup.context)
@@ -22,35 +26,28 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClic
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val diary = items[position]
+        val diary = filteredList[position]
         viewHolder.setItem(diary)
         viewHolder.itemView.isLongClickable = true
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
+    override fun getItemCount(): Int = items.size
 
-    fun addItem(diary: Diary) {
-        items.add(diary)
-    }
 
-    fun removeItem() {
-        items.clear()
-    }
-
+    fun addItem(diary: Diary) = items.add(diary)
+    fun removeItem() = items.clear()
+    fun getItem(position: Int) : Diary = items[position]
     fun setOnItemClickListener(listener: OnItemClickListener?) {
         this.listener = listener
     }
 
     override fun onItemClick(holder: ViewHolder?, view: View?, position: Int) {
-        if (listener != null) {
-            listener!!.onItemClick(holder, view, position)
-        }
+        listener?.onItemClick(holder, view, position)
     }
 
     inner class ViewHolder(itemView: View, listener: OnItemClickListener?) :
         RecyclerView.ViewHolder(itemView) {
+        val locale = Locale.getDefault().isO3Language
         var iconImageView: ImageView
         var textView: TextView
         var textView2: TextView
@@ -58,10 +55,30 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClic
         var location: TextView
         fun setItem(diary: Diary) {
             Glide.with(itemView).load(diary.profile).into(iconImageView)
-            textView.text = diary.where
+            textView.text = if (locale == "kor") {
+                if (diary.location == " ") {
+                    "${diary.where}에서.."
+                } else {
+                    "의 ${diary.where}에서.."
+                }
+            } else {
+                if (diary.location == " ") {
+                    "At a ${diary.where}"
+                }
+                else "${diary.where}"
+            }
+
             textView2.text = diary.contents
             date.text = diary.date
-            location.text = diary.location
+            location.text = if (locale != "kor") {
+                if (diary.location == " ") {
+                    "At a ${diary.location},"
+                } else {
+                    "${diary.location}"
+                }
+            } else {
+                "${diary.location}"
+            }
         }
 
         init {
@@ -76,4 +93,30 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClic
             }
         }
     }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val charString = constraint.toString()
+                filteredList = if (charString.isEmpty()) { //⑶
+                    unFilteredList
+                } else {
+                    var filteringList = ArrayList<Diary>()
+                    for (item in unFilteredList) {
+                        if (item.date!!.substring(0, 11) == charString) filteringList.add(item)
+                    }
+                    filteringList
+                }
+                val filterResults = FilterResults()
+                filterResults.values = filteredList
+                return filterResults
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                filteredList = results?.values as ArrayList<Diary>
+                notifyDataSetChanged()
+            }
+        }
+    }
+
 }
