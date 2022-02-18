@@ -32,7 +32,7 @@
 ## 🖼️ Screen Shots
 | 💻 로그인 화면| ❤️ 메인 화면|🗓️ 캘린더| 🖋️ 입력 창|
 |---|---|---|---|
-|<img src="https://user-images.githubusercontent.com/83625797/132083289-1affdb6c-0687-484a-bb82-af972ba41210.jpg" width = "200">|<img src="https://user-images.githubusercontent.com/83625797/132083293-be3a9018-912e-4760-882b-50126022b5da.jpg" width= "200">|<img src="https://user-images.githubusercontent.com/83625797/132083293-be3a9018-912e-4760-882b-50126022b5da.jpg" width= "200">  |<img src="https://user-images.githubusercontent.com/83625797/132083382-6f9edbf7-d10a-4007-b77b-e50ffb33de2e.jpg" width = "200">|
+|<img src="https://user-images.githubusercontent.com/83625797/132083289-1affdb6c-0687-484a-bb82-af972ba41210.jpg" width = "200">|<img src="https://user-images.githubusercontent.com/83625797/132083293-be3a9018-912e-4760-882b-50126022b5da.jpg" width= "200">|<img src="https://user-images.githubusercontent.com/83625797/132083294-a54b4f5b-1081-4ac9-a2b3-e36169855112.jpg" width = "200">|<img src="https://user-images.githubusercontent.com/83625797/132083382-6f9edbf7-d10a-4007-b77b-e50ffb33de2e.jpg" width = "200">|
 
 
 
