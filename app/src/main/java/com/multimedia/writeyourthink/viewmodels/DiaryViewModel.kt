@@ -1,5 +1,6 @@
 package com.multimedia.writeyourthink.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,12 +15,16 @@ class DiaryViewModel(
 ) : ViewModel() {
 
 
-
+    var selectedDateTime = MutableLiveData<String>()
     fun getData() : MutableLiveData<MutableList<Diary>> {
+        selectedDateTime.value = "2022-02-07"
         val diaryData = MutableLiveData<MutableList<Diary>>()
-        diaryRepository.getFirebaseData(diaryData)
+        diaryRepository.getFirebaseData(diaryData, selectedDateTime)
+        //diaryData.value!!.filter { it.date.isNotEmpty() }?.toMutableList()
+        Log.d("Lee", diaryData.value?.isEmpty().toString())
         return diaryData
     }
+
     fun saveUser(userInfo: UserInfo) {
         diaryRepository.writeNewUserToFirebase(userInfo)
     }

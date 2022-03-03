@@ -108,32 +108,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
         } else if (isSignedIn == 2) {
-            database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
-            databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
-            databaseReference!!.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    // 파이어베이스 데이터베이스의 데이터를 받아오는 곳
-                    for (snapshot in dataSnapshot.children) { // 반복문으로 데이터 List를 추출해냄
-                        val userInfo = snapshot.getValue(
-                            UserInfo::class.java
-                        ) // 만들어뒀던 User 객체에 데이터를 담는다.
-                        if (userInfo!!.userName != null) {
-                            userUID = userInfo.userUID
-                            userName = userInfo.userName
-                            userProfile = userInfo.userProfile
-                            userEmail = userInfo.userEmail
-                        }
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // 디비를 가져오던중 에러 발생 시
-                    Log.e("MainActivity", databaseError.toException().toString()) // 에러문 출력
-                }
-            })
-            val userInfo = UserInfo(userUID, userName, photoUrl, userEmail)
-            viewModel.saveUser(userInfo)
-            isSignedIn = 0
+            
         }
 
         binding.button3.setOnClickListener(View.OnClickListener {

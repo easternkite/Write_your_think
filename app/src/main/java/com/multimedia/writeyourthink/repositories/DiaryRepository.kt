@@ -11,7 +11,6 @@ class DiaryRepository(
 ) {
 
 
-
     fun writeNewUserToFirebase(userInfo: UserInfo) {
         databaseReference.child("UserInfo").setValue(userInfo)
     }
@@ -24,15 +23,19 @@ class DiaryRepository(
         databaseReference.child(diary.date).setValue(null)
     }
 
-    fun getFirebaseData(mutableLiveData: MutableLiveData<MutableList<Diary>>) {
-        databaseReference.addValueEventListener(object : ValueEventListener{
+    fun getFirebaseData(
+        mutableLiveData: MutableLiveData<MutableList<Diary>>,
+        selectedDateTime: MutableLiveData<String>
+    ) {
+        databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val diaryList = mutableListOf<Diary>()
                 for (snapshot in snapshot.children) {
                     val diary = snapshot.getValue(Diary::class.java)
                     diaryList.add(diary!!)
-                    mutableLiveData.value = diaryList
+
                 }
+                mutableLiveData.value = diaryList
                 Log.d("Lee", "Data Changed")
             }
 
