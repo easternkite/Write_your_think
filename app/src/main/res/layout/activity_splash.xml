@@ -5,7 +5,7 @@
     android:id="@+id/Splash_View"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SplashActivity"
+    tools:context=".ui.SplashActivity"
     android:background="@drawable/write_your_think_1">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

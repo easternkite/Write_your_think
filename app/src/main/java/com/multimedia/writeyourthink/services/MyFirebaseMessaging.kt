@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.services
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -13,6 +13,7 @@ import android.app.NotificationChannel
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessaging
+import com.multimedia.writeyourthink.R
 
 class MyFirebaseMessaging : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {

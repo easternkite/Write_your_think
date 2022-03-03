@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.services
 
 import android.Manifest
 import android.app.Service
@@ -7,7 +7,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
-import com.multimedia.writeyourthink.GpsTracker
 import android.os.Bundle
 import android.content.Intent
 import android.location.Location

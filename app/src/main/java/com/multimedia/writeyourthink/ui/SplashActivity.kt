@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,8 +7,8 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.content.Intent
 import android.view.animation.AnimationUtils
+import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivitySplashBinding
-import com.multimedia.writeyourthink.ui.MainActivity
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding

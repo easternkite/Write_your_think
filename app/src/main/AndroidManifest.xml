@@ -20,14 +20,14 @@
 
 
         <meta-data android:name="android.max_aspect" android:value="2.1" />
-        <activity android:name="com.multimedia.writeyourthink.LoginActivity"
+        <activity android:name="com.multimedia.writeyourthink.ui.LoginActivity"
             android:screenOrientation="fullSensor"
             android:theme="@style/SplashTheme2"
                 android:exported="false">
 
         </activity>
         <activity
-            android:name="com.multimedia.writeyourthink.SplashActivity"
+            android:name="com.multimedia.writeyourthink.ui.SplashActivity"
             android:fitsSystemWindows="true"
             android:theme="@style/SplashTheme2"
             android:screenOrientation="portrait"
@@ -63,7 +63,7 @@
 
 
         </activity>
-        <service android:name=".MyFirebaseMessaging"
+        <service android:name=".services.MyFirebaseMessaging"
                 android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

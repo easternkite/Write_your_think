@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.models
 
 class UserInfo {
     var userUID: String? = null

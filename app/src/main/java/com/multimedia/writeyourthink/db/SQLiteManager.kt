@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase.CursorFactory

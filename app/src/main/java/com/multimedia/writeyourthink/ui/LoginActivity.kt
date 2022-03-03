@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.common.api.GoogleApiClient
@@ -12,7 +12,6 @@ import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.Auth
-import com.multimedia.writeyourthink.ui.MainActivity
 import com.facebook.FacebookCallback
 import com.facebook.login.LoginResult
 import com.facebook.FacebookException
@@ -26,6 +25,7 @@ import com.facebook.AccessToken
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.android.gms.common.SignInButton
 import android.widget.TextView
+import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityLoginBinding
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
 

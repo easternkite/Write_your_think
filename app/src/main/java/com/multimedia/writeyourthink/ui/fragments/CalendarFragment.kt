@@ -15,9 +15,9 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView.CompactCalend
 import com.github.sundeepk.compactcalendarview.domain.Event
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.multimedia.writeyourthink.LoginActivity
+import com.multimedia.writeyourthink.ui.LoginActivity
 import com.multimedia.writeyourthink.R
-import com.multimedia.writeyourthink.SQLiteManager
+import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,15 +1,15 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.adapters
 
 
 import androidx.recyclerview.widget.RecyclerView
-import com.multimedia.writeyourthink.Diary
+import com.multimedia.writeyourthink.models.Diary
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
-import com.multimedia.writeyourthink.R
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.multimedia.writeyourthink.R
 import java.util.ArrayList
 
 class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.ViewHolder>(), OnItemClickListener {

@@ -31,7 +31,11 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.multimedia.writeyourthink.*
+import com.multimedia.writeyourthink.adapters.DiaryAdapter
+import com.multimedia.writeyourthink.adapters.OnItemClickListener
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
+import com.multimedia.writeyourthink.db.SQLiteManager
+import com.multimedia.writeyourthink.models.Diary
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat

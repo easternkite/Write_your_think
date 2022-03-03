@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui.fragments
 
 import android.Manifest
 import android.app.Activity
@@ -28,7 +28,11 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
+import com.multimedia.writeyourthink.services.GpsTracker
+import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.databinding.Frag2Binding
+import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.MainActivity
 import java.io.IOException
 import java.text.ParseException

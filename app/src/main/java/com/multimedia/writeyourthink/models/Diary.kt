@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.models
 
 data class Diary (
     var userUID: String? = null,

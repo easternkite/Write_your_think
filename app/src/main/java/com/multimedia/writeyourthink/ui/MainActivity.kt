@@ -2,7 +2,6 @@ package com.multimedia.writeyourthink.ui
 
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.auth.FirebaseAuth
@@ -19,7 +18,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
-import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentManager
@@ -28,6 +26,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
+import com.multimedia.writeyourthink.db.SQLiteManager
+import com.multimedia.writeyourthink.models.UserInfo
+import com.multimedia.writeyourthink.services.MyFirebaseMessaging
+import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
 import com.multimedia.writeyourthink.ui.fragments.CalendarFragment
 import java.util.*
