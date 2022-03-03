@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
         /** 만약 이미 로그인이 되어있는 상태라면?
          * 바로 메인액티비티로 간다(자동 로그인)  */
         if (user != null) {
-            val intent = Intent(applicationContext, MainActivity::class.java)
+            val intent = Intent(applicationContext, DiaryActivity::class.java)
             intent.putExtra("nickName", user!!.displayName)
             intent.putExtra("photoUrl", user!!.photoUrl.toString())
             intent.putExtra("accessToken", accessToken)
@@ -137,7 +137,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
         auth!!.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { // 로그인이 성공했으면...
-                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    val intent = Intent(applicationContext, DiaryActivity::class.java)
                     intent.putExtra("nickName", account.givenName)
                     intent.putExtra(
                         "photoUrl",
@@ -173,7 +173,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // 로그인 성공
-                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    val intent = Intent(applicationContext, DiaryActivity::class.java)
                     intent.putExtra("loginNum", 2)
                     intent.putExtra("accessToken", accessToken)
                     intent.putExtra("fbLogin", 2)

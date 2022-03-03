@@ -33,7 +33,8 @@ import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.databinding.Frag2Binding
 import com.multimedia.writeyourthink.models.Diary
-import com.multimedia.writeyourthink.ui.MainActivity
+import com.multimedia.writeyourthink.ui.DiaryActivity
+import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -76,6 +77,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var date: String? = null
     var drawable: Drawable? = null
 
+    lateinit var viewModel: DiaryViewModel
+
     //리사이클러뷰 등장
     var myCalendar = Calendar.getInstance()
     var myDatePicker: DatePickerDialog.OnDateSetListener =
@@ -98,6 +101,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = (activity as DiaryActivity).viewModel
         try {
             val mArgs = arguments
             where = if (mArgs!!.getString("where") == "null") " " else mArgs!!.getString("where")!!
@@ -121,7 +125,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         user = auth!!.currentUser
         userName = user!!.uid
         binding.invisibleLayout.setVisibility(View.GONE)
-        gpsTracker = GpsTracker((activity)!!)
+        gpsTracker = GpsTracker(requireActivity())
         val latitude = gpsTracker!!.latitude
         /** 위도  */
         val longitude = gpsTracker!!.longitude
@@ -137,7 +141,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         })
         binding.tvDate.setOnClickListener {
             DatePickerDialog(
-                (context)!!,
+                requireContext(),
                 myDatePicker,
                 myCalendar[Calendar.YEAR],
                 myCalendar[Calendar.MONTH],
@@ -175,23 +179,23 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
             binding.tvDate.text = dayUp
         })
+
         /**
          * SQLite 제어 설정
          */
-        sqLiteManager = SQLiteManager(activity!!.applicationContext, "writeYourThink.db", null, 1)
+        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
         /** 버튼을 눌렀을때 해야할 이벤트 작성  */
         binding.btnUpload.setOnClickListener(View.OnClickListener {
             if ((binding.editTitle.getText().toString() == "") || (binding.editContents.getText()
                     .toString() == "")
             ) {
-                Toast.makeText(activity!!.applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
+                Toast.makeText(requireActivity().applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 address = getCurrentAddress(latitude, longitude)
                 Log.d("Lee", " 주소값,.,?:$address")
                 if ((binding.btnUpload.getText().toString() == "수정")) { //수정일 때..ㅎ
                     Log.d("Lee", "아니 여기 수정이잖아!!!!!!!")
-                    /** SQLite Data Insert  */
                     /** SQLite Data Insert  */
                     sqLiteManager!!.update(
                         matchID!!.toInt(),
@@ -207,16 +211,16 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     /** FireBase Data Insert  */
                     database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
                     databaseReference = database!!.getReference(userName) // DB 테이블 연결
-                    writeNewUser(
-                        userName, time,
+                    val diary = Diary(
+                        userName,
                         if (photoURL != null) if (stringUri != null) stringUri else photoURL else if (stringUri != null) stringUri else " ",
                         binding.editTitle.getText().toString(),
                         binding.editContents.getText().toString(),
                         "$matchDate($matchTime)",
                         if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
                     )
+                    viewModel.saveDiary(diary)
                 } else {
-                    /** SQLite Data Insert  */
                     /** SQLite Data Insert  */
                     sqLiteManager!!.insert(
                         userName,
@@ -233,8 +237,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     /** FireBase Data Insert  */
                     database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
                     databaseReference = database!!.getReference(userName) // DB 테이블 연결
-                    writeNewUser(
-                        userName, time,
+                    val diary = Diary(
+                        userName,
                         if (stringUri != null) stringUri else " ",
                         binding.editTitle.getText().toString(),
                         binding.editContents.getText().toString(),
@@ -243,17 +247,18 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                             address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
                         )
                     )
+                    viewModel.saveDiary(diary)
                 }
-                Toast.makeText(activity!!.applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
                 binding.editTitle.setText(null)
                 binding.editContents.setText(null)
                 binding.editUpload.setText(null)
                 drawable = resources.getDrawable(R.mipmap.ic_launcher_round)
                 binding.imageView.setImageDrawable(drawable)
                 binding.imageView.setVisibility(View.GONE)
-                val intent = Intent(activity, MainActivity::class.java)
+                val intent = Intent(activity, DiaryActivity::class.java)
                 startActivity(intent)
-                activity!!.finish()
+                requireActivity().finish()
             }
         })
         binding.tvDate.text = date
@@ -275,7 +280,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 binding.invisibleLayout.setVisibility(View.GONE)
             }
-            Glide.with(activity!!.applicationContext).load(photoURL).into(binding.imageView)
+            Glide.with(requireActivity().applicationContext).load(photoURL).into(binding.imageView)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -304,7 +309,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                activity!!.runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
             }
         }
     }
@@ -357,18 +362,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
 
-    fun writeNewUser(
-        userUID: String?,
-        time: String?,
-        profile: String?,
-        where: String?,
-        contents: String?,
-        date: String?,
-        location: String?
-    ) {
-        val diary = Diary(userUID, profile, where, contents, date, location)
-        databaseReference!!.child((date)!!).setValue(diary)
-    }
+
 
     /** upload the file  */
     private fun uploadFile() {
@@ -431,7 +425,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기  */
             storageRef!!.downloadUrl.addOnSuccessListener(OnSuccessListener { uri ->
                 /** 다운로드 URL이 파라미터로 전달되어 옴.  */
-                Glide.with(activity!!.applicationContext).load(uri.toString()).into((binding.imageView))
+                Glide.with(requireActivity().applicationContext).load(uri.toString()).into((binding.imageView))
                 stringUri = uri.toString()
             })
         }

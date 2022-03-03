@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.widget.RemoteViews
 import android.content.Intent
-import com.multimedia.writeyourthink.ui.MainActivity
+import com.multimedia.writeyourthink.ui.DiaryActivity
 import android.app.PendingIntent
 import android.media.RingtoneManager
 import android.os.Build
@@ -36,7 +36,7 @@ class MyFirebaseMessaging : FirebaseMessagingService() {
 
     fun showNotification(title: String?, message: String?) {
         //팝업 터치시 이동할 액티비티를 지정합니다.
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, DiaryActivity::class.java)
         //알림 채널 아이디 : 본인 하고싶으신대로...
         val channel_id = "CHN_ID"
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

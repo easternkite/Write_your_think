@@ -22,19 +22,23 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.models.UserInfo
+import com.multimedia.writeyourthink.repositories.FirebaseRepository
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
 import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
 import com.multimedia.writeyourthink.ui.fragments.CalendarFragment
+import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
+import com.multimedia.writeyourthink.viewmodels.DiaryViewModelProviderFactory
 import java.util.*
 
-class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
+class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: ActivityMainBinding
     private var backpressedTime: Long = 0
     private var fm: FragmentManager? = null
@@ -48,8 +52,8 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
     private var userName: String? = null
     var sqLiteManager: SQLiteManager? = null
     private var database: FirebaseDatabase? = null
-    private var databaseReference: DatabaseReference? = null
-    private var fbLogin = 0
+    private lateinit var databaseReference: DatabaseReference
+    private var isSignedIn = 0
 
 
     /**
@@ -59,6 +63,8 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
             : FirebaseAuth? = null
     private var user: FirebaseUser? = null
     private val mTextView: TextView? = null
+
+    lateinit var viewModel: DiaryViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -78,7 +84,7 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         tedPermission()
         val intent = intent
         val Token = intent.getStringExtra("accessToken")
-        fbLogin = intent.getIntExtra("fbLogin", 0)
+        isSignedIn = intent.getIntExtra("fbLogin", 0)
         /**
          * 파이어베이스 초기 셋팅
          */
@@ -90,14 +96,21 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         userEmail = user!!.email
         database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
         databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
+
+
+        val firebaseRepository = FirebaseRepository(databaseReference)
+        val viewModelProviderFactory = DiaryViewModelProviderFactory(firebaseRepository)
+        viewModel = ViewModelProvider(this, viewModelProviderFactory).get(DiaryViewModel::class.java)
+
+
         val photoUrl = "$userProfile?height=500&access_token=$Token"
-        if (fbLogin == 1) {
+        if (isSignedIn == 1) {
             if (Locale.getDefault().isO3Language == "kor") {
                 Toast.makeText(this, user!!.displayName + "님, 환영합니다!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
-        } else if (fbLogin == 2) {
+        } else if (isSignedIn == 2) {
             sqLiteManager = SQLiteManager(this, "writeYourThink.db", null, 1)
             database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
             databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
@@ -123,8 +136,9 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
                     Log.e("MainActivity", databaseError.toException().toString()) // 에러문 출력
                 }
             })
-            writeNewUser(userUID, userName, photoUrl, userEmail)
-            fbLogin = 0
+            val userInfo = UserInfo(userUID, userName, photoUrl, userEmail)
+            viewModel.saveUser(userInfo)
+            isSignedIn = 0
         }
 
         binding.button3.setOnClickListener(View.OnClickListener {
@@ -167,15 +181,7 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         }
     }
 
-    fun writeNewUser(
-        userUID: String?,
-        userName: String?,
-        userProfile: String?,
-        userEmail: String?
-    ) {
-        val userInfo = UserInfo(userUID, userName, userProfile, userEmail)
-        databaseReference!!.child("UserInfo").setValue(userInfo)
-    }
+
 
     companion object {
         private const val AD_UNIT_ID = "ca-app-pub-9450003299415787/4031932869"

@@ -6,7 +6,7 @@
     android:background="@drawable/write_your_think_2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.DiaryActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="215dp"
