@@ -13,12 +13,20 @@ import kotlinx.coroutines.launch
 class DiaryViewModel(
     val diaryRepository: DiaryRepository
 ) : ViewModel() {
-
-
+    var diaryData = MutableLiveData<MutableList<Diary>>()
+    var filteredList = MutableLiveData<MutableList<Diary>>()
     var selectedDateTime = MutableLiveData<String>()
-    fun getData() : MutableLiveData<MutableList<Diary>> {
-        selectedDateTime.value = "2022-02-07"
-        val diaryData = MutableLiveData<MutableList<Diary>>()
+
+    fun setFilter() {
+        filteredList.value = diaryData.value?.filter {
+            it.date.isNotEmpty() && it.date.substring(0, 10) == selectedDateTime.value
+        }?.toMutableList()
+
+    }
+    fun setDate(date: String) {
+        selectedDateTime.value = date
+    }
+    fun getData(): MutableLiveData<MutableList<Diary>> {
         diaryRepository.getFirebaseData(diaryData, selectedDateTime)
         //diaryData.value!!.filter { it.date.isNotEmpty() }?.toMutableList()
         Log.d("Lee", diaryData.value?.isEmpty().toString())
@@ -28,9 +36,11 @@ class DiaryViewModel(
     fun saveUser(userInfo: UserInfo) {
         diaryRepository.writeNewUserToFirebase(userInfo)
     }
+
     fun saveDiary(diary: Diary) = viewModelScope.launch {
-            diaryRepository.writeNewDiaryToFirebase(diary)
-        }
+        diaryRepository.writeNewDiaryToFirebase(diary)
+    }
+
     fun deleteDiary(diary: Diary) = viewModelScope.launch {
         diaryRepository.deleteFromFirebase(diary)
     }

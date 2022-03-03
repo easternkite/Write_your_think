@@ -76,11 +76,17 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         viewModel = (activity as DiaryActivity).viewModel
         setRecyclerView()
-
-
+        viewModel.selectedDateTime.observe(viewLifecycleOwner) {
+            viewModel.setFilter()
+        }
+        viewModel.filteredList.observe(viewLifecycleOwner) {
+            diaryAdapter.differ.submitList(it)
+        }
         viewModel.getData().observe(viewLifecycleOwner, Observer {  diary ->
             // 데이터가 변경되면 filterlist를 바꿔주어야한다.
-            diaryAdapter.differ.submitList(diary!!)
+            viewModel.setDate(binding.tvDateAndTime.text.toString())
+            viewModel.setFilter()
+            //diaryAdapter.differ.submitList(diary!!)
             //diaryAdapter.differ.submitList(diary.filter { it.date.isNotEmpty() &&it.date.substring(0,10) == binding.tvDateAndTime.text.toString() })
         })
 
@@ -141,6 +147,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
+            viewModel.setDate(dayDown)
             binding.tvDateAndTime.text = dayDown
 
         })
@@ -157,6 +164,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
+            viewModel.setDate(dayUp)
             binding.tvDateAndTime.text = dayUp
         }
 
@@ -191,6 +199,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
     private fun updateLabel() {
         date = sdf.format(myCalendar.time)
         binding.tvDateAndTime.text = sdf.format(myCalendar.time)
+        viewModel.setDate(sdf.format(myCalendar.time))
     }
 
     var r = Runnable {
