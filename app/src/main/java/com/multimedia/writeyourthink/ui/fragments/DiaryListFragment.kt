@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui.fragments
 
 import android.annotation.SuppressLint
 
@@ -30,14 +30,15 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.multimedia.writeyourthink.databinding.Frag1Binding
+import com.multimedia.writeyourthink.*
+import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
-    private lateinit var binding: Frag1Binding
+class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDialogFragment.BottomSheetListener {
+    private lateinit var binding: FragmentDiaryListBinding
     val set = AnimationSet(true)
     var sqLiteManager: SQLiteManager? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
@@ -91,7 +92,7 @@ class Frag1 : Fragment(), BottomSheetDialogFragment.BottomSheetListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = Frag1Binding.inflate(inflater, container, false) // view binding
+        binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         var fblogin = 0
         val intent = requireActivity().intent
         val Token = intent.getStringExtra("accessToken")

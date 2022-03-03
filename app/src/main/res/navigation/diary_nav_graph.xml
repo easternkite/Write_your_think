@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/diary_nav_graph"
+    app:startDestination="@id/diaryListFragment">
+
+    <fragment
+        android:id="@+id/diaryListFragment"
+        android:name="com.multimedia.writeyourthink.ui.fragments.DiaryListFragment"
+        android:label="DiaryListFragment" />
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.multimedia.writeyourthink.ui.fragments.CalendarFragment"
+        android:label="CalendarFragment" />
+</navigation>

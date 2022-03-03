@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/main_frame"
+        app:layout_constraintBottom_toTopOf="@+id/diaryNavHostFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,10 +32,13 @@
             android:textSize="25sp" />
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/main_frame"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/diaryNavHostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/diary_nav_graph"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -44,7 +47,7 @@
         app:layout_constraintVertical_bias="1.0">
 
 
-    </FrameLayout>
+    </androidx.fragment.app.FragmentContainerView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavi"

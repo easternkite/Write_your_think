@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/action_list"
+            android:id="@+id/diaryListFragment"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_view_list_24"
             android:title="@string/list" />
@@ -15,7 +15,7 @@
             android:title=" "/>
 
         <item
-            android:id="@+id/action_chart"
+            android:id="@+id/calendarFragment"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_calendar_today_24"
             android:title="@string/calendar" />

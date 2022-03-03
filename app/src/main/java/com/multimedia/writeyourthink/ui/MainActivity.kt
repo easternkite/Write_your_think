@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui
 
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +24,12 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
+import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
+import com.multimedia.writeyourthink.ui.fragments.CalendarFragment
 import java.util.*
 
 class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
@@ -33,8 +38,8 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
     private var fm: FragmentManager? = null
     private var ft: FragmentTransaction? = null
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
-    private var frag1: Frag1? = null
-    private var frag3: Frag3? = null
+    private var diaryListFragment: DiaryListFragment? = null
+    private var calendarFragment: CalendarFragment? = null
     private var userEmail: String? = null
     private var userProfile: String? = null
     private var userUID: String? = null
@@ -56,6 +61,10 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        binding.bottomNavi.setupWithNavController(navController)
 
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
@@ -116,26 +125,6 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
             fbLogin = 0
         }
 
-        binding.bottomNavi.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.action_list -> {
-                    setFrag(0)
-                    item.isChecked = true
-                }
-                R.id.action_calendar -> {
-                    item.isCheckable = false
-                    setFrag(1)
-                    setFrag(0)
-                }
-                R.id.action_chart -> setFrag(2)
-            }
-            true
-        })
-        frag1 = Frag1()
-        bottomSheetFragment = BottomSheetDialogFragment()
-        frag3 = Frag3()
-        setFrag(0)
-
         binding.button3.setOnClickListener(View.OnClickListener {
             // Dialog창 중복 실행 방지를 위한 싱글톤 패턴 적용
             var bottomSheet : BottomSheetDialogFragment? = null
@@ -146,23 +135,6 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
         })
     }
 
-    private fun setFrag(n: Int) {
-        fm = supportFragmentManager
-        ft = fm!!.beginTransaction()
-        when (n) {
-            0 -> {
-                ft!!.replace(R.id.main_frame, frag1!!)
-                ft!!.commit()
-            }
-            1 -> {
-
-            }
-            2 -> {
-                ft!!.replace(R.id.main_frame, frag3!!)
-                ft!!.commit()
-            }
-        }
-    }
 
     private fun tedPermission() {
         val permissionListener: PermissionListener = object : PermissionListener {
@@ -201,21 +173,6 @@ class MainActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetL
     ) {
         val userInfo = UserInfo(userUID, userName, userProfile, userEmail)
         databaseReference!!.child("UserInfo").setValue(userInfo)
-    }
-
-    private fun changeLocale(localeLang: String) {
-        var locale: Locale? = null
-        when (localeLang) {
-            "ko" -> locale = Locale("ko")
-            "en" -> locale = Locale("en")
-        }
-        val config = applicationContext.resources.configuration
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale)
-        } else {
-            config.locale = locale
-        }
-        resources.updateConfiguration(config, resources.displayMetrics)
     }
 
     companion object {

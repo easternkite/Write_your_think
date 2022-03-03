@@ -2,34 +2,24 @@ package com.multimedia.writeyourthink
 
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.common.api.GoogleApiClient
-import com.shobhitpuri.custombuttons.GoogleSignInButton
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.facebook.CallbackManager
-import com.facebook.login.widget.LoginButton
 import android.os.Bundle
-import com.multimedia.writeyourthink.R
 import android.content.Intent
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.Auth
-import com.multimedia.writeyourthink.LoginActivity
-import com.multimedia.writeyourthink.MainActivity
+import com.multimedia.writeyourthink.ui.MainActivity
 import com.facebook.FacebookCallback
 import com.facebook.login.LoginResult
 import com.facebook.FacebookException
-import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.AuthResult
-import com.multimedia.writeyourthink.Frag1
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.facebook.AccessToken
@@ -37,6 +27,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.android.gms.common.SignInButton
 import android.widget.TextView
 import com.multimedia.writeyourthink.databinding.ActivityLoginBinding
+import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
 
 class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
     private lateinit var binding: ActivityLoginBinding
@@ -155,7 +146,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
                     intent.putExtra("fbLogin", 2)
                     val args = Bundle()
                     args.putInt("fbLogin", 2)
-                    val frag1 = Frag1()
+                    val frag1 = DiaryListFragment()
                     frag1.arguments = args
                     startActivity(intent)
                     startActivity(intent)
@@ -188,7 +179,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
                     intent.putExtra("fbLogin", 2)
                     val args = Bundle()
                     args.putInt("fbLogin", 2)
-                    val frag1 = Frag1()
+                    val frag1 = DiaryListFragment()
                     frag1.arguments = args
                     startActivity(intent)
                     finish()

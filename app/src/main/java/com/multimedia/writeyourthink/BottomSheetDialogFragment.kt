@@ -16,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationSet
 import android.widget.ArrayAdapter
-import android.widget.ImageView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnSuccessListener
@@ -30,6 +29,7 @@ import com.google.firebase.storage.StorageReference
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.databinding.Frag2Binding
+import com.multimedia.writeyourthink.ui.MainActivity
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat

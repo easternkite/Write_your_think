@@ -8,6 +8,7 @@ import android.view.animation.Animation
 import android.content.Intent
 import android.view.animation.AnimationUtils
 import com.multimedia.writeyourthink.databinding.ActivitySplashBinding
+import com.multimedia.writeyourthink.ui.MainActivity
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding

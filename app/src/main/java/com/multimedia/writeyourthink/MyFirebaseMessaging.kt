@@ -3,9 +3,8 @@ package com.multimedia.writeyourthink
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.widget.RemoteViews
-import com.multimedia.writeyourthink.R
 import android.content.Intent
-import com.multimedia.writeyourthink.MainActivity
+import com.multimedia.writeyourthink.ui.MainActivity
 import android.app.PendingIntent
 import android.media.RingtoneManager
 import android.os.Build

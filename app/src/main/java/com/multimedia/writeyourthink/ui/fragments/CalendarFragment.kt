@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink
+package com.multimedia.writeyourthink.ui.fragments
 
 import android.content.Intent
 import android.graphics.Color
@@ -16,12 +16,14 @@ import com.github.sundeepk.compactcalendarview.domain.Event
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.multimedia.writeyourthink.LoginActivity
-import com.multimedia.writeyourthink.databinding.Frag3Binding
+import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.SQLiteManager
+import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Frag3 : Fragment() {
-    private lateinit var binding: Frag3Binding
+class CalendarFragment : Fragment(R.layout.fragment_calendar) {
+    private lateinit var binding: FragmentCalendarBinding
     private lateinit var sqLiteManager: SQLiteManager
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -45,11 +47,11 @@ class Frag3 : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = Frag3Binding.inflate(inflater, container, false)
+        binding = FragmentCalendarBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
 
-        val intent = activity!!.intent
+        val intent = requireActivity().intent
         val nickName = intent.getStringExtra("nickName") // MainActivity로 부터 닉네임 전달받음.
         val photoUrl = intent.getStringExtra("photoUrl") // MainActivity로 부터 프로필사진 Url 전달받음.
         sqLiteManager = SQLiteManager(activity, "writeYourThink.db", null, 1)
@@ -66,7 +68,7 @@ class Frag3 : Fragment() {
             Toast.makeText(activity, getString(R.string.logout), Toast.LENGTH_SHORT).show()
             val intent1 = Intent(activity, LoginActivity::class.java)
             startActivity(intent1)
-            activity!!.finish()
+            requireActivity().finish()
         }
         binding.text.text = simpleDateFormat.format(myCalendar!!.time)
         binding.layoutLeft!!.setOnClickListener {
@@ -142,7 +144,7 @@ class Frag3 : Fragment() {
 
                 // 저장한 내용을 토대로 ListView에 다시 그린다.
                 binding.tvNickname.text = userName
-                Glide.with(activity!!.applicationContext).load(userProfile.toString()).into(
+                Glide.with(requireActivity().applicationContext).load(userProfile.toString()).into(
                     binding.ivProfile
                 )
             }
