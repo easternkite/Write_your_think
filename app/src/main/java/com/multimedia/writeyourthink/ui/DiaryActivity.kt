@@ -27,9 +27,10 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
+import com.multimedia.writeyourthink.db.DiaryDatabase
 import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.models.UserInfo
-import com.multimedia.writeyourthink.repositories.FirebaseRepository
+import com.multimedia.writeyourthink.repositories.DiaryRepository
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
 import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
@@ -73,7 +74,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val navController = navHostFragment.navController
 
         binding.bottomNavi.setupWithNavController(navController)
-
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
         FirebaseApp.initializeApp( /*context=*/this)
@@ -98,7 +98,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
 
 
-        val firebaseRepository = FirebaseRepository(databaseReference)
+        val firebaseRepository = DiaryRepository(databaseReference, DiaryDatabase(this))
         val viewModelProviderFactory = DiaryViewModelProviderFactory(firebaseRepository)
         viewModel = ViewModelProvider(this, viewModelProviderFactory).get(DiaryViewModel::class.java)
 

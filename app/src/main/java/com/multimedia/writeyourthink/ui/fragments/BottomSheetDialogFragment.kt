@@ -194,8 +194,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 address = getCurrentAddress(latitude, longitude)
                 Log.d("Lee", " 주소값,.,?:$address")
-                if ((binding.btnUpload.getText().toString() == "수정")) { //수정일 때..ㅎ
-                    Log.d("Lee", "아니 여기 수정이잖아!!!!!!!")
+                if ((binding.btnUpload.text.toString() == "수정")) { //수정일 때..ㅎ
                     /** SQLite Data Insert  */
                     sqLiteManager!!.update(
                         matchID!!.toInt(),

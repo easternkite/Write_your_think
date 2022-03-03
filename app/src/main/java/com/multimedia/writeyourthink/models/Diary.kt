@@ -1,10 +1,18 @@
 package com.multimedia.writeyourthink.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(
+    tableName = "diaries"
+)
 data class Diary (
-    var userUID: String? = null,
-    var profile: String? = null,
-    var where: String? = null,
-    var contents: String? = null,
-    var date: String? = null,
-    var location: String? = null,
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null,
+    var userUID: String?,
+    var profile: String?,
+    var where: String?,
+    var contents: String?,
+    var date: String?,
+    var location: String?,
 )
