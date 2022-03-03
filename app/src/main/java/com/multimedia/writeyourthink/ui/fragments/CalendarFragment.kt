@@ -17,14 +17,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.multimedia.writeyourthink.ui.LoginActivity
 import com.multimedia.writeyourthink.R
-import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private lateinit var binding: FragmentCalendarBinding
-    private lateinit var sqLiteManager: SQLiteManager
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val text: String? = null
@@ -54,17 +52,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val intent = requireActivity().intent
         val nickName = intent.getStringExtra("nickName") // MainActivity로 부터 닉네임 전달받음.
         val photoUrl = intent.getStringExtra("photoUrl") // MainActivity로 부터 프로필사진 Url 전달받음.
-        sqLiteManager = SQLiteManager(activity, "writeYourThink.db", null, 1)
         userUID = user!!.uid
-        updateUserInfo()
-        updateList()
 
         calendarlistener()
         Setdate()
         binding.btnLogout.setOnClickListener {
             auth!!.signOut()
             LoginManager.getInstance().logOut()
-            sqLiteManager!!.deleteAll()
             Toast.makeText(activity, getString(R.string.logout), Toast.LENGTH_SHORT).show()
             val intent1 = Intent(activity, LoginActivity::class.java)
             startActivity(intent1)
@@ -86,9 +80,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     fun calendarlistener() {
         binding.compactcalendarView.setListener(object : CompactCalendarViewListener {
             override fun onDayClick(dateClicked: Date) {
-                val profile_counts =
-                    sqLiteManager!!.getProfilesCount(DateFormat.format(dateClicked))
-                sqLiteManager!!.close()
+                val profile_counts = 0
+
                 binding.tvSelDate.text = DateFormat.format(dateClicked)
                 if (profile_counts > 0) {
                     binding.tvCount.text =
@@ -110,8 +103,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     fun Setdate() {
         c = Calendar.getInstance().time
         df = SimpleDateFormat("yyyy-MM-dd")
-        val profile_counts = sqLiteManager!!.getProfilesCount(DateFormat.format(c))
-        sqLiteManager!!.close()
+        val profile_counts = 0
         binding.compactcalendarView.setUseThreeLetterAbbreviation(true)
         sdf = SimpleDateFormat("MMMM yyyy")
         formattedDate = df!!.format(c)
@@ -130,42 +122,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             myCalendar.set(Calendar.DAY_OF_MONTH, selectedDate[j].substring(8).toInt())
             val event = Event(Color.RED, myCalendar.getTimeInMillis(), "test")
             binding.compactcalendarView.addEvent(event)
-        }
-    }
-
-    private fun updateUserInfo() {
-        val array = sqLiteManager!!.resultUser // DB의 내용을 배열단위로 모두 가져온다
-        try {
-            val length = array.size // 배열의 길이
-            for (idx in 0 until length) {  // 배열의 길이만큼 반복
-                val `object` = array[idx] // json의 idx번째 object를 가져와서,
-                val userName = `object`.getString("userName") // object 내용중 name를 가져와 저장.
-                val userProfile = `object`.getString("userProfile") // object 내용중 profile를 가져와 저장.
-
-                // 저장한 내용을 토대로 ListView에 다시 그린다.
-                binding.tvNickname.text = userName
-                Glide.with(requireActivity().applicationContext).load(userProfile.toString()).into(
-                    binding.ivProfile
-                )
-            }
-        } catch (e: Exception) {
-            Log.i("seo", "error : $e")
-        }
-    }
-
-    private fun updateList() {
-        selectedDate.clear()
-        val array = sqLiteManager!!.result2 // DB의 내용을 배열단위로 모두 가져온다
-        try {
-            val length = array.size // 배열의 길이
-            for (idx in 0 until length) {                  // 배열의 길이만큼 반복
-                val `object` = array[idx] // json의 idx번째 object를 가져와서,
-                val date = `object`.getString("date") // object 내용중 date를 가져와 저장.
-                selectedDate.add(date)
-                // 저장한 내용을 토대로 ListView에 다시 그린다.
-            }
-        } catch (e: Exception) {
-            Log.i("seo", "error : $e")
         }
     }
 }

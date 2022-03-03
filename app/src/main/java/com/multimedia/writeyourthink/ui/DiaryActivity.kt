@@ -27,8 +27,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
-import com.multimedia.writeyourthink.db.DiaryDatabase
-import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
@@ -51,7 +49,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
     private var userProfile: String? = null
     private var userUID: String? = null
     private var userName: String? = null
-    var sqLiteManager: SQLiteManager? = null
     private var database: FirebaseDatabase? = null
     private lateinit var databaseReference: DatabaseReference
     private var isSignedIn = 0
@@ -98,7 +95,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
 
 
-        val firebaseRepository = DiaryRepository(databaseReference, DiaryDatabase(this))
+        val firebaseRepository = DiaryRepository(databaseReference)
         val viewModelProviderFactory = DiaryViewModelProviderFactory(firebaseRepository)
         viewModel = ViewModelProvider(this, viewModelProviderFactory).get(DiaryViewModel::class.java)
 
@@ -111,7 +108,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
         } else if (isSignedIn == 2) {
-            sqLiteManager = SQLiteManager(this, "writeYourThink.db", null, 1)
             database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
             databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
             databaseReference!!.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -126,7 +122,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
                             userName = userInfo.userName
                             userProfile = userInfo.userProfile
                             userEmail = userInfo.userEmail
-                            sqLiteManager!!.insertUser2(userUID, userName, userProfile, userEmail)
                         }
                     }
                 }
@@ -170,15 +165,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
 
     override fun onButtonClicked(text: String?) {
         mTextView!!.text = text
-    }
-
-    override fun onBackPressed() {
-        if (System.currentTimeMillis() > backpressedTime + 2000) {
-            backpressedTime = System.currentTimeMillis()
-            Toast.makeText(this, "\'뒤로\' 버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
-        } else if (System.currentTimeMillis() <= backpressedTime + 2000) {
-            finish()
-        }
     }
 
 

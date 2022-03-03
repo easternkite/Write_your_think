@@ -30,12 +30,12 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tv_date"
+                app:layout_constraintEnd_toStartOf="@+id/tvDateAndTime"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tv_date"
+                android:id="@+id/tvDateAndTime"
                 android:layout_width="150dp"
                 android:layout_height="39dp"
                 android:background="@color/my_orange"
@@ -63,7 +63,7 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tv_date"
+                app:layout_constraintStart_toEndOf="@+id/tvDateAndTime"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

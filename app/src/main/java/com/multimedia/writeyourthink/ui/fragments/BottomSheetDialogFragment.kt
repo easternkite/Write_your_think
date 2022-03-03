@@ -30,7 +30,6 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.services.GpsTracker
 import com.multimedia.writeyourthink.R
-import com.multimedia.writeyourthink.db.SQLiteManager
 import com.multimedia.writeyourthink.databinding.Frag2Binding
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
@@ -51,19 +50,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     /** DB에 저장된 내용을 보여주기위한 리스트뷰  */
     private val adapter: ArrayAdapter<String>? = null
-    var sqLiteManager: SQLiteManager? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
     private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
     private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private var time: String? = null
     private var address: String? = null
-    var where = ""
-    var contents: String? = ""
-    var photoURL: String? = ""
-    var matchDate: String? = ""
-    var matchTime: String? = ""
-    var matchAddress: String? = ""
-    var matchID: String? = ""
     private var storage: FirebaseStorage? = null
     private var database: FirebaseDatabase? = null
     private var databaseReference: DatabaseReference? = null
@@ -102,24 +93,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = (activity as DiaryActivity).viewModel
-        try {
-            val mArgs = arguments
-            where = if (mArgs!!.getString("where") == "null") " " else mArgs!!.getString("where")!!
-            contents = mArgs!!.getString("contents")
-            photoURL = mArgs!!.getString("url")
-            matchDate = mArgs!!.getString("date")
-            matchTime = mArgs!!.getString("time")
-            matchAddress = mArgs!!.getString("address")
-            matchID = mArgs!!.getString("id")
-        } catch (e: NullPointerException) {
-            where = ""
-            contents = ""
-            photoURL = ""
-            matchDate = ""
-            matchTime = ""
-            matchAddress = ""
-            matchID = ""
-        }
+        var diary = Diary.EMPTY
+
+        val mArgs = arguments
+        diary = mArgs?.getParcelable("diary") ?: Diary.EMPTY
+
 
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
@@ -139,7 +117,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(intent, REQUEST_CODE)
         })
-        binding.tvDate.setOnClickListener {
+        binding.tvDateAndTime.setOnClickListener {
             DatePickerDialog(
                 requireContext(),
                 myDatePicker,
@@ -162,7 +140,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
-            binding.tvDate.text = dayDown
+            binding.tvDateAndTime.text = dayDown
         })
         binding.DateUp.setOnClickListener(View.OnClickListener {
             var dayUp = sdf.format(myCalendar.time).replace("-", "")
@@ -177,14 +155,9 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
-            binding.tvDate.text = dayUp
+            binding.tvDateAndTime.text = dayUp
         })
 
-        /**
-         * SQLite 제어 설정
-         */
-        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
-        /** 버튼을 눌렀을때 해야할 이벤트 작성  */
         binding.btnUpload.setOnClickListener(View.OnClickListener {
             if ((binding.editTitle.getText().toString() == "") || (binding.editContents.getText()
                     .toString() == "")
@@ -195,53 +168,26 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 address = getCurrentAddress(latitude, longitude)
                 Log.d("Lee", " 주소값,.,?:$address")
                 if ((binding.btnUpload.text.toString() == "수정")) { //수정일 때..ㅎ
-                    /** SQLite Data Insert  */
-                    sqLiteManager!!.update(
-                        matchID!!.toInt(),
-                        userName,
-                        binding.editTitle.getText().toString(),
-                        binding.editContents.getText().toString(),
-                        if (photoURL != null) if (stringUri != null) stringUri else photoURL else if (stringUri != null) stringUri else " ",  //edit_upload.getText().toString(),
-                        matchDate,
-                        matchTime,
-                        if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
-                    )
-
                     /** FireBase Data Insert  */
                     database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
                     databaseReference = database!!.getReference(userName) // DB 테이블 연결
                     val diary = Diary(
                         userName,
-                        if (photoURL != null) if (stringUri != null) stringUri else photoURL else if (stringUri != null) stringUri else " ",
+                        if (diary.profile != null) if (stringUri != null) stringUri else diary.profile else if (stringUri != null) stringUri else " ",
                         binding.editTitle.getText().toString(),
                         binding.editContents.getText().toString(),
-                        "$matchDate($matchTime)",
-                        if ((matchAddress == "주소 미발견") || (matchAddress == null)) " " else matchAddress
+                        diary.date,
+                        diary.location
                     )
                     viewModel.saveDiary(diary)
                 } else {
-                    /** SQLite Data Insert  */
-                    sqLiteManager!!.insert(
-                        userName,
-                        binding.editTitle.getText().toString(),
-                        binding.editContents.getText().toString(),
-                        if (stringUri != null) stringUri else " ",  //edit_upload.getText().toString(),
-                        binding.tvDate.text.toString(),
-                        time,
-                        if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
-                            address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
-                        )
-                    )
                     /** FireBase Data Insert  */
-                    /** FireBase Data Insert  */
-                    database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
-                    databaseReference = database!!.getReference(userName) // DB 테이블 연결
                     val diary = Diary(
                         userName,
                         if (stringUri != null) stringUri else " ",
                         binding.editTitle.getText().toString(),
                         binding.editContents.getText().toString(),
-                        binding.tvDate!!.text.toString() + "(" + time + ")",
+                        binding.tvDateAndTime!!.text.toString() + "(" + time + ")",
                         if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
                             address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
                         )
@@ -249,37 +195,34 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     viewModel.saveDiary(diary)
                 }
                 Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
-                binding.editTitle.setText(null)
-                binding.editContents.setText(null)
-                binding.editUpload.setText(null)
+                binding.editTitle.text = null
+                binding.editContents.text = null
+                binding.editUpload.text = null
                 drawable = resources.getDrawable(R.mipmap.ic_launcher_round)
                 binding.imageView.setImageDrawable(drawable)
-                binding.imageView.setVisibility(View.GONE)
-                val intent = Intent(activity, DiaryActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
+                binding.imageView.visibility = View.GONE
             }
         })
-        binding.tvDate.text = date
+        binding.tvDateAndTime.text = date
         binding.editTitle.setText("")
         binding.editContents.setText("")
         binding.btnUpload.setText("업로드")
-        if (where != "") {
-            binding.tvDate!!.text = matchDate
-            binding.editTitle.setText(where)
-            binding.editContents.setText(contents)
-            binding.btnUpload.setText("수정")
-            binding.tvDate.isFocusable = false
-            binding.tvDate.isFocusableInTouchMode = false
-            binding.tvDate.isEnabled = false
+        if (diary.location != "") {
+            binding.tvDateAndTime.text = diary.date
+            binding.editTitle.setText(diary.where)
+            binding.editContents.setText(diary.contents)
+            binding.btnUpload.text = "수정"
+            binding.tvDateAndTime.isFocusable = false
+            binding.tvDateAndTime.isFocusableInTouchMode = false
+            binding.tvDateAndTime.isEnabled = false
             binding.DateUp.setVisibility(View.GONE)
             binding.DateDown.setVisibility(View.GONE)
-            if (photoURL!!.length > 3) {
+            if (diary.profile!!.length > 3) {
                 binding.invisibleLayout.setVisibility(View.VISIBLE)
             } else {
                 binding.invisibleLayout.setVisibility(View.GONE)
             }
-            Glide.with(requireActivity().applicationContext).load(photoURL).into(binding.imageView)
+            Glide.with(requireActivity().applicationContext).load(diary.profile).into(binding.imageView)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -298,7 +241,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun updateLabel() {
         date = sdf.format(myCalendar.time)
-        binding.tvDate.text = sdf.format(myCalendar.time)
+        binding.tvDateAndTime.text = sdf.format(myCalendar.time)
     }
 
     var r: Runnable = Runnable {

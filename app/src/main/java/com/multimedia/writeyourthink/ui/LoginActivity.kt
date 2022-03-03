@@ -149,7 +149,6 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
                     val frag1 = DiaryListFragment()
                     frag1.arguments = args
                     startActivity(intent)
-                    startActivity(intent)
                     finish()
                 } else { // 로그인이 실패했으면..
                     Toast.makeText(

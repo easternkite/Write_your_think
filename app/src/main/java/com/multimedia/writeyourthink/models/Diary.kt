@@ -1,18 +1,25 @@
 package com.multimedia.writeyourthink.models
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
-@Entity(
-    tableName = "diaries"
-)
-data class Diary (
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null,
-    var userUID: String?,
-    var profile: String?,
-    var where: String?,
-    var contents: String?,
-    var date: String?,
-    var location: String?,
-)
+
+@Parcelize
+data class Diary(
+    var userUID: String = "",
+    var profile: String? = "",
+    var where: String? = "",
+    var contents: String? = "",
+    var date: String = "",
+    var location: String? = "",
+) : Parcelable {
+    companion object {
+        val EMPTY = Diary("","","","","","")
+    }
+}
+
+

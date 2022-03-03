@@ -1,12 +1,6 @@
 package com.multimedia.writeyourthink.ui.fragments
 
-import android.annotation.SuppressLint
-
 import android.view.animation.AnimationSet
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
 import android.graphics.drawable.Drawable
 import android.app.DatePickerDialog.OnDateSetListener
 import android.view.animation.LayoutAnimationController
@@ -16,35 +10,31 @@ import android.os.Bundle
 import android.content.Intent
 import androidx.recyclerview.widget.GridLayoutManager
 import android.app.DatePickerDialog
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
-import android.view.animation.AlphaAnimation
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import com.bumptech.glide.Glide
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.adapters.DiaryAdapter
-import com.multimedia.writeyourthink.adapters.OnItemClickListener
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
-import com.multimedia.writeyourthink.db.SQLiteManager
-import com.multimedia.writeyourthink.models.Diary
+import com.multimedia.writeyourthink.ui.DiaryActivity
+import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDialogFragment.BottomSheetListener {
-    private lateinit var binding: FragmentDiaryListBinding
+    private var _binding: FragmentDiaryListBinding? = null
+    private val binding get() = _binding!!
+
     val set = AnimationSet(true)
-    var sqLiteManager: SQLiteManager? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
     private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
     private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
@@ -59,25 +49,14 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
     /**
      * FireBase Setting
      */
-    private var arrayList: ArrayList<Diary>? = null
-    private var database: FirebaseDatabase? = null
-    private var auth // 파이어 베이스 인증 객체
-            : FirebaseAuth? = null
-    private var user: FirebaseUser? = null
-    private var databaseReference: DatabaseReference? = null
-    private val idIndicator = ArrayList<String>()
-    private val matchtitle = ArrayList<String>()
-    private val matchdate = ArrayList<String>()
-    private val matchtime = ArrayList<String>()
-    private val matchProfile = ArrayList<String>()
-    private val matchContents = ArrayList<String>()
-    private val matchAddress = ArrayList<String?>()
-    private val matchID = ArrayList<String>()
+
     private var date: String? = null
     var drawable: Drawable? = null
 
+
+    private lateinit var diaryAdapter: DiaryAdapter
+    private lateinit var viewModel: DiaryViewModel
     //리사이클러뷰 등장
-    var diaryAdapter: DiaryAdapter? = null
     val words = arrayOf("수정", "삭제")
     var myCalendar = Calendar.getInstance()
     var myDatePicker = OnDateSetListener { view, year, month, dayOfMonth ->
@@ -86,9 +65,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         myCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
         date = "$year/$month/$dayOfMonth"
         updateLabel()
-        updateList()
-        val controller = LayoutAnimationController(set, 0.17f)
-        binding.rv.layoutAnimation = controller
     }
 
     override fun onCreateView(
@@ -96,71 +72,55 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
+        _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
+        viewModel = (activity as DiaryActivity).viewModel
+        setRecyclerView()
+        viewModel.getData().observe(viewLifecycleOwner, Observer {  diary ->
+            diaryAdapter.differ.submitList(diary)
+        })
+
         var fblogin = 0
         val intent = requireActivity().intent
         val Token = intent.getStringExtra("accessToken")
         fblogin = intent.getIntExtra("fbLogin", 0)
-        auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
-        userName = user!!.uid
+
 
         Thread(r).start()
         binding.rv.setHasFixedSize(true)
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
-        arrayList = ArrayList() // User 객체를 담을 어레이 리스트 (어댑터쪽으로)
-        diaryAdapter = DiaryAdapter()
-        diaryAdapter!!.setOnItemClickListener(object : OnItemClickListener {
-            override fun onItemClick(holder: DiaryAdapter.ViewHolder?, view: View?, position: Int) {
-                AlertDialog.Builder(context).setItems(words) { dialog, which ->
-                    when (which) {
-                        0 -> {
-                            val args = Bundle()
-                            args.putString("where", matchtitle[position])
-                            args.putString("contents", matchContents[position])
-                            args.putString("url", matchProfile[position])
-                            args.putString("date", matchdate[position])
-                            args.putString("time", matchtime[position])
-                            args.putString("address", matchAddress[position])
-                            args.putString("id", matchID[position])
-                            Log.d(
-                                "Lee", """
-                                 where : ${matchtitle[position]}
-                                 contents : ${matchContents[position]}
-                                 date : ${matchdate[position]}
-                                 time : ${matchtime[position]}
-                                 Address : ${matchAddress[position]}"""
-                            )
-                            val bottomSheet = BottomSheetDialogFragment()
-                            bottomSheet.arguments = args
-                            bottomSheet.show(fragmentManager!!, "BS")
+        diaryAdapter.setOnItemClickListener { diary ->
+            AlertDialog.Builder(context).setItems(words) { dialog, which ->
+                when (which) {
+                    0 -> {
+                        val args = Bundle().apply {
+                            putParcelable("diary", diary)
                         }
-                        1 -> {
-                            val builder = AlertDialog.Builder(context)
-                            builder.setPositiveButton("예") { dialog, which ->
-                                delete(position)
-                                sqLiteManager!!.delete(idIndicator[position])
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "[" + matchdate[position] + "]" + matchtitle[position] + " 삭제 완료",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                updateList()
-                                val controller = LayoutAnimationController(set, 0.17f)
-                                binding.rv.layoutAnimation = controller
-                            }
-                            builder.setCancelable(true)
-                            builder.setNegativeButton("아니오", null)
-                            builder.setTitle("데이터 삭제")
-                            builder.setMessage("[" + matchdate[position] + "]" + matchtitle[position] + " 데이터를 삭제하시겠습니까?")
-                            builder.show()
-                        }
+                        val bottomSheet = BottomSheetDialogFragment()
+                        bottomSheet.arguments = args
+                        bottomSheet.show(requireFragmentManager(), "BS")
                     }
-                }.show()
-            }
-        })
-        binding.tvDate.setOnClickListener {
+                    1 -> {
+                        val builder = AlertDialog.Builder(context)
+                        builder.setPositiveButton("예") { dialog, which ->
+                            viewModel.deleteDiary(diary)
+                            Toast.makeText(
+                                requireActivity().applicationContext,
+                                "삭제 완료",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        builder.setCancelable(true)
+                        builder.setNegativeButton("아니오", null)
+                        builder.setTitle("데이터 삭제")
+                        builder.setMessage("[ + ${diary.date?.substring(0, 10)} ] 데이터를 삭제하시겠습니까?")
+                        builder.show()
+                    }
+                }
+            }.show()
+        }
+
+        binding.tvDateAndTime.setOnClickListener {
             DatePickerDialog(
                 requireContext(),
                 myDatePicker,
@@ -183,12 +143,10 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
-            binding.tvDate.text = dayDown
-            updateList()
-            val controller = LayoutAnimationController(set, 0.17f)
-            binding.rv.layoutAnimation = controller
+            binding.tvDateAndTime.text = dayDown
+
         })
-        binding.DateUp.setOnClickListener(View.OnClickListener {
+        binding.DateUp.setOnClickListener {
             var dayUp = sdf.format(myCalendar.time).replace("-", "")
             var dayUpint = dayUp.toInt()
             dayUpint = dayUpint + 1
@@ -201,39 +159,21 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             } catch (e: ParseException) {
                 e.printStackTrace()
             }
-            binding.tvDate.text = dayUp
-            updateList()
-            val controller = LayoutAnimationController(set, 0.17f)
-            binding.rv.layoutAnimation = controller
-        })
-        val rtl: Animation = TranslateAnimation(
-            Animation.RELATIVE_TO_SELF, -1f,
-            Animation.RELATIVE_TO_SELF, 0f,
-            Animation.RELATIVE_TO_SELF, -1f,
-            Animation.RELATIVE_TO_SELF, 0f
-        )
-        rtl.duration = 500
-        set.addAnimation(rtl)
-        val alpha: Animation = AlphaAnimation(0f, 1f)
-        alpha.duration = 700
-        set.addAnimation(alpha)
-        val controller = arrayOf(LayoutAnimationController(set, 0.17f))
-        binding.rv.layoutAnimation = controller[0]
-        /**
-         * SQLite 제어 설정
-         */
-        // SQLite 객체 초기화
-        sqLiteManager = SQLiteManager(requireActivity().applicationContext, "writeYourThink.db", null, 1)
-        Log.d("Lee", fblogin.toString() + "ㅁ낭ㄴ망ㅁ")
-        if (fblogin > 1) {
-            firebaseUpdate()
-            fblogin = 0
-        } else {
-            updateList()
+            binding.tvDateAndTime.text = dayUp
         }
+
+
+
         return binding.root
     }
-
+    private fun setRecyclerView() {
+        diaryAdapter = DiaryAdapter()
+        binding.rv.apply {
+            adapter = diaryAdapter
+            layoutManager = LinearLayoutManager(activity)
+        }
+    }
+    /*
     @SuppressLint("NotifyDataSetChanged")
     private fun updateList() {
         idIndicator.clear()
@@ -297,6 +237,8 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         diaryAdapter!!.notifyDataSetChanged()
     }
 
+     */
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE) {
@@ -314,7 +256,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
 
     private fun updateLabel() {
         date = sdf.format(myCalendar.time)
-        binding.tvDate.text = sdf.format(myCalendar.time)
+        binding.tvDateAndTime.text = sdf.format(myCalendar.time)
     }
 
     var r = Runnable {
@@ -330,15 +272,8 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
     }
 
     override fun onButtonClicked(text: String?) {}
-    private fun delete(position: Int) {
-        if (matchtime.size > 0) {
-            database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
-            databaseReference = database!!.getReference(userName!!) // DB 테이블 연결
-            databaseReference!!.child(matchdate[position] + "(" + matchtime[position] + ")")
-                .setValue(null)
-        }
-    }
 
+    /*
     private fun firebaseUpdate() {
         val progressDialog = ProgressDialog(context)
         progressDialog.setTitle(getString(R.string.syncData))
@@ -360,9 +295,9 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
                     if (diary!!.date != null) {
                         date = diary.date
                         location1 = diary.location
-                        with1 = diary.where
+                        with1 = diary.place
                         contents1 = diary.contents
-                        profile1 = diary.profile
+                        profile1 = diary.uploadedPictureUrl
                         userUID1 = diary.userUID
                         /** Firebase DB 데이터를 불러오자마자 바로 SQLite DB에 삽입  */
                         sqLiteManager!!.insert2(
@@ -378,7 +313,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
                 }
                 val controller = LayoutAnimationController(set, 0.17f)
                 binding.rv.layoutAnimation = controller
-                updateList()
+                //updateList()
                 progressDialog.dismiss()
             }
 
@@ -388,6 +323,8 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             }
         })
     }
+
+     */
 
     companion object {
         private const val REQUEST_CODE = 0
