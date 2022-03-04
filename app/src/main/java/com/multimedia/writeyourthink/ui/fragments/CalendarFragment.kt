@@ -23,6 +23,7 @@ import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private var _binding: FragmentCalendarBinding? = null
@@ -46,7 +47,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     var c: Date? = null
     var df: SimpleDateFormat? = null
     var formattedDate: String? = null
-    private val selectedDate = ArrayList<String>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,12 +59,17 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             Glide.with(requireActivity()).load(it.userProfile).into(binding.ivProfile)
             binding.tvNickname.text = it.userName
         }
+        myCalendar = Calendar.getInstance()
+        viewModel.countDiaryContents.observe(viewLifecycleOwner) {
+
+            Setdate(it, myCalendar.time, false)
+            calendarlistener(it)
+        }
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
         userUID = user!!.uid
 
-        calendarlistener()
-        Setdate()
+
         binding.btnLogout.setOnClickListener {
             auth!!.signOut()
             LoginManager.getInstance().logOut()
@@ -85,13 +90,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         return binding.root
     }
 
-    fun calendarlistener() {
+    fun calendarlistener(countDate: HashMap<String, Int>) {
         binding.compactcalendarView.setListener(object : CompactCalendarViewListener {
             override fun onDayClick(dateClicked: Date) {
-                val profile_counts = 0
+                val profile_counts = countDate[DateFormat!!.format(dateClicked)] ?: 0
 
                 binding.tvSelDate.text = DateFormat.format(dateClicked)
-                if (profile_counts > 0) {
+                if (profile_counts!! > 0) {
                     binding.tvCount.text =
                         getString(R.string.frag3_2) + " : " + profile_counts + " " + getString(R.string.cases)
                 } else {
@@ -101,35 +106,40 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
             override fun onMonthScroll(firstDayOfNewMonth: Date) {
                 binding.compactcalendarView.removeAllEvents()
-                Setdate()
+                Setdate(countDate, firstDayOfNewMonth, true)
                 binding.text.text = simpleDateFormat.format(firstDayOfNewMonth)
             }
         })
     }
 
     //get current date
-    fun Setdate() {
+    fun Setdate(itemCount: HashMap<String, Int>, firstDayofNewMonth: Date, isSlide: Boolean) {
         c = Calendar.getInstance().time
+        if (isSlide) c = firstDayofNewMonth
+
         df = SimpleDateFormat("yyyy-MM-dd")
-        val profile_counts = 0
+        val profile_counts = itemCount[DateFormat.format(c)] ?: 0
         binding.compactcalendarView.setUseThreeLetterAbbreviation(true)
         sdf = SimpleDateFormat("MMMM yyyy")
         formattedDate = df!!.format(c)
         binding.tvSelDate.text = formattedDate
-        if (profile_counts > 0) {
+        if (profile_counts!! > 0) {
             binding.tvCount.text =
                 getString(R.string.frag3_2) + " : " + profile_counts + " " + getString(R.string.cases)
         } else {
             binding.tvCount.text = getString(R.string.frag3_1)
         }
-        myCalendar = Calendar.getInstance()
-        for (j in selectedDate.indices) {
-            val mon = selectedDate[j].substring(5, 7).toInt()
-            myCalendar.set(Calendar.YEAR, selectedDate[j].substring(0, 4).toInt())
-            myCalendar.set(Calendar.MONTH, mon - 1)
-            myCalendar.set(Calendar.DAY_OF_MONTH, selectedDate[j].substring(8).toInt())
-            val event = Event(Color.RED, myCalendar.getTimeInMillis(), "test")
-            binding.compactcalendarView.addEvent(event)
+
+        for (item in itemCount.keys) {
+            Log.d("Lee", item)
+            val value = itemCount[item]
+            myCalendar.set(Calendar.YEAR, item.substring(0, 4).toInt())
+            myCalendar.set(Calendar.MONTH, item.substring(5,7).toInt() - 1)
+            myCalendar.set(Calendar.DAY_OF_MONTH, item.substring(8).toInt())
+            val event = Event(Color.BLUE, myCalendar.timeInMillis, "test")
+            repeat(value!!) {
+                binding.compactcalendarView.addEvent(event)
+            }
         }
     }
     /**

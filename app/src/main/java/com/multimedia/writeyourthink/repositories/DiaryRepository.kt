@@ -8,6 +8,7 @@ import com.multimedia.writeyourthink.models.UserInfo
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class DiaryRepository(
     val databaseReference: DatabaseReference,
@@ -28,18 +29,30 @@ class DiaryRepository(
 
     fun getFirebaseData(
         mutableLiveData: MutableLiveData<MutableList<Diary>>,
-        selectedDateTime: MutableLiveData<String>
+        count: MutableLiveData<HashMap<String, Int>>
     ) {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val diaryList = mutableListOf<Diary>()
+                val itemCount = HashMap<String, Int>()
                 for (snapshot in snapshot.children) {
                     val diary = snapshot.getValue(Diary::class.java)
                     diaryList.add(diary!!)
 
+                    if (!diary.date.isNullOrEmpty()) {
+                        val dateYMD = diary.date.substring(0, 10)
+                        if (!itemCount.containsKey(dateYMD)) {
+                            itemCount[dateYMD] = 1
+                        }
+                        else {
+                            itemCount[dateYMD] = itemCount[dateYMD]!!.plus(1)
+                        }
+                    }
+
                 }
                 mutableLiveData.value = diaryList
-                Log.d("Lee", "Data Changed")
+                count.value = itemCount
+                Log.d("Lee", "Data Changed ${count.value}")
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

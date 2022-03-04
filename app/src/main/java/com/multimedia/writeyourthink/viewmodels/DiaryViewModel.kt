@@ -17,6 +17,7 @@ class DiaryViewModel(
     var filteredList = MutableLiveData<MutableList<Diary>>()
     var selectedDateTime = MutableLiveData<String>()
     var userInfo = MutableLiveData<UserInfo>()
+    var countDiaryContents = MutableLiveData<HashMap<String, Int>>()
 
     fun setFilter() {
         filteredList.value = diaryData.value?.filter {
@@ -28,7 +29,7 @@ class DiaryViewModel(
         selectedDateTime.value = date
     }
     fun getData(): MutableLiveData<MutableList<Diary>> {
-        diaryRepository.getFirebaseData(diaryData, selectedDateTime)
+        diaryRepository.getFirebaseData(diaryData, countDiaryContents)
         return diaryData
     }
 
