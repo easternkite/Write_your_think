@@ -10,20 +10,16 @@ import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationSet
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.gun0912.tedpermission.PermissionListener
@@ -46,10 +42,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var _binding: Frag2Binding? = null
     private val binding get() = _binding!!
 
-    private var mListener: BottomSheetListener? = null
     private var gpsTracker // 위치정보
             : GpsTracker? = null
-    private val bundle: Bundle? = null
     val set = AnimationSet(true)
 
     /** DB에 저장된 내용을 보여주기위한 리스트뷰  */
@@ -96,7 +90,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         var diary = Diary.EMPTY
 
         val mArgs = arguments
-        diary = mArgs?.getParcelable("diary") ?: Diary.EMPTY
+        diary = mArgs?.getParcelable("diary") ?: diary
 
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
             binding.tvDateAndTime.text = it
@@ -144,7 +138,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } else {
                 address = getCurrentAddress(latitude, longitude)
                 if ((binding.btnUpload.text.toString() == "수정")) { //수정일 때..ㅎ
-                    val diary = Diary(
+                    val input = Diary(
                         userName,
                         if (diary.profile != null) if (stringUri != null) stringUri else diary.profile else if (stringUri != null) stringUri else " ",
                         binding.editTitle.text.toString(),
@@ -152,9 +146,9 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                         diary.date,
                         diary.location
                     )
-                    viewModel.saveDiary(diary)
+                    viewModel.saveDiary(input)
                 } else {
-                    val diary = Diary(
+                    val input = Diary(
                         userName,
                         if (stringUri != null) stringUri else " ",
                         binding.editTitle.text.toString(),
@@ -164,7 +158,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                             address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
                         )
                     )
-                    viewModel.saveDiary(diary)
+                    viewModel.saveDiary(input)
                 }
                 Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
                 dismiss()

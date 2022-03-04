@@ -13,9 +13,13 @@ import android.app.Activity
 import android.app.AlertDialog
 import com.bumptech.glide.Glide
 import android.view.View
+import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.gamingservices.GameRequestDialog.show
 import com.google.android.material.snackbar.Snackbar
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
@@ -88,6 +92,36 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         Thread(r).start()
 
         binding.rv.setHasFixedSize(true)
+
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val diary = diaryAdapter.differ.currentList[position]
+                viewModel.deleteDiary(diary)
+                Snackbar.make(requireView(), "데이터를 성공적으로 삭제했습니다.", Snackbar.LENGTH_LONG)
+                    .apply {
+                        viewModel.deleteDiary(diary)
+                        setAction("복원") {
+                            viewModel.saveDiary(diary)
+                        }
+                        show()
+                    }
+            }
+        }
+        ItemTouchHelper(itemTouchHelperCallback).apply {
+            attachToRecyclerView(binding.rv)
+        }
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
         diaryAdapter.setOnItemClickListener { diary ->
