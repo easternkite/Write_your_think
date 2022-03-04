@@ -184,7 +184,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     }
 
     private fun updateLabel() {
-        date = sdf.format(myCalendar.time)
         binding.tvDateAndTime.text = sdf.format(myCalendar.time)
         viewModel.setDate(sdf.format(myCalendar.time))
     }

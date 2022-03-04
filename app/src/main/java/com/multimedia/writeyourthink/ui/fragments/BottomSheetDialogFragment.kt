@@ -54,6 +54,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     /** DB에 저장된 내용을 보여주기위한 리스트뷰  */
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
+    private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
     private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private var time: String? = null
     private var address: String? = null
@@ -77,6 +78,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             myCalendar[Calendar.MONTH] = month
             myCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
             date = "$year/$month/$dayOfMonth"
+            viewModel.setDate(sdf.format(myCalendar.time))
         }
 
     override fun onCreateView(
