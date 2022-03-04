@@ -40,12 +40,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
     private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
     private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private var time: String? = null
-    private var location1: String? = null
-    private var with1: String? = null
-    private var profile1: String? = null
-    private var userUID1: String? = null
-    private var contents1: String? = null
-    private var userName: String? = null
 
     /**
      * FireBase Setting
@@ -86,8 +80,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             // 데이터가 변경되면 filterlist를 바꿔주어야한다.
             viewModel.setDate(binding.tvDateAndTime.text.toString())
             viewModel.setFilter()
-            //diaryAdapter.differ.submitList(diary!!)
-            //diaryAdapter.differ.submitList(diary.filter { it.date.isNotEmpty() &&it.date.substring(0,10) == binding.tvDateAndTime.text.toString() })
+            hideProgressBar()
         })
 
         var fblogin = 0
@@ -195,7 +188,9 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             }
         }
     }
-
+    private fun hideProgressBar() {
+        binding.progressBar.visibility = View.INVISIBLE
+    }
     private fun updateLabel() {
         date = sdf.format(myCalendar.time)
         binding.tvDateAndTime.text = sdf.format(myCalendar.time)

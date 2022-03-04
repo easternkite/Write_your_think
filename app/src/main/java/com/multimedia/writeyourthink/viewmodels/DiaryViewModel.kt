@@ -28,8 +28,6 @@ class DiaryViewModel(
     }
     fun getData(): MutableLiveData<MutableList<Diary>> {
         diaryRepository.getFirebaseData(diaryData, selectedDateTime)
-        //diaryData.value!!.filter { it.date.isNotEmpty() }?.toMutableList()
-        Log.d("Lee", diaryData.value?.isEmpty().toString())
         return diaryData
     }
 
