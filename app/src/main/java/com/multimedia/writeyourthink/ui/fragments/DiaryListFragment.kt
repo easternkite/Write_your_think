@@ -3,7 +3,6 @@ package com.multimedia.writeyourthink.ui.fragments
 import android.view.animation.AnimationSet
 import android.graphics.drawable.Drawable
 import android.app.DatePickerDialog.OnDateSetListener
-import android.view.animation.LayoutAnimationController
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
@@ -13,14 +12,14 @@ import android.app.DatePickerDialog
 import android.app.Activity
 import android.app.AlertDialog
 import com.bumptech.glide.Glide
-import android.util.Log
 import android.view.View
-import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.multimedia.writeyourthink.*
+import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
+import com.multimedia.writeyourthink.Util.Constants.Companion.UP
 import com.multimedia.writeyourthink.adapters.DiaryAdapter
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
 import com.multimedia.writeyourthink.ui.DiaryActivity
@@ -31,7 +30,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDialogFragment.BottomSheetListener {
+class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
+    BottomSheetDialogFragment.BottomSheetListener {
     private var _binding: FragmentDiaryListBinding? = null
     private val binding get() = _binding!!
 
@@ -51,6 +51,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
 
     private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var viewModel: DiaryViewModel
+
     //리사이클러뷰 등장
     val words = arrayOf("수정", "삭제")
     var myCalendar = Calendar.getInstance()
@@ -72,24 +73,20 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         setRecyclerView()
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
             viewModel.setFilter()
+            binding.tvDateAndTime.text = it
         }
         viewModel.filteredList.observe(viewLifecycleOwner) {
             diaryAdapter.differ.submitList(it)
         }
-        viewModel.getData().observe(viewLifecycleOwner, Observer {  diary ->
+        viewModel.getData().observe(viewLifecycleOwner, Observer { diary ->
             // 데이터가 변경되면 filterlist를 바꿔주어야한다.
             viewModel.setDate(binding.tvDateAndTime.text.toString())
             viewModel.setFilter()
             hideProgressBar()
         })
 
-        var fblogin = 0
-        val intent = requireActivity().intent
-        val Token = intent.getStringExtra("accessToken")
-        fblogin = intent.getIntExtra("fbLogin", 0)
-
-
         Thread(r).start()
+
         binding.rv.setHasFixedSize(true)
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
@@ -105,13 +102,14 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
                         bottomSheet.show(requireFragmentManager(), "BS")
                     }
                     1 -> {
-                        Snackbar.make(requireView(), "데이터를 성공적으로 삭제했습니다.", Snackbar.LENGTH_LONG).apply {
-                            viewModel.deleteDiary(diary)
-                            setAction("복원") {
-                                viewModel.saveDiary(diary)
+                        Snackbar.make(requireView(), "데이터를 성공적으로 삭제했습니다.", Snackbar.LENGTH_LONG)
+                            .apply {
+                                viewModel.deleteDiary(diary)
+                                setAction("복원") {
+                                    viewModel.saveDiary(diary)
+                                }
+                                show()
                             }
-                            show()
-                        }
                     }
                 }
             }.show()
@@ -128,43 +126,34 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
         } //달력 꺼내기
         updateLabel()
         binding.DateDown.setOnClickListener(View.OnClickListener {
-            var dayDown = sdf.format(myCalendar.time).replace("-", "")
-            var dayDownint = dayDown.toInt()
-            dayDownint = dayDownint - 1
-            dayDown = dayDownint.toString()
-            val sdfmt = SimpleDateFormat("yyyyMMdd")
-            try {
-                val date = sdfmt.parse(dayDown)
-                dayDown = SimpleDateFormat("yyyy-MM-dd").format(date)
-                myCalendar.time = date
-            } catch (e: ParseException) {
-                e.printStackTrace()
-            }
-            viewModel.setDate(dayDown)
-            binding.tvDateAndTime.text = dayDown
-
+            dateUpDown(DOWN)
         })
         binding.DateUp.setOnClickListener {
-            var dayUp = sdf.format(myCalendar.time).replace("-", "")
-            var dayUpint = dayUp.toInt()
-            dayUpint = dayUpint + 1
-            dayUp = dayUpint.toString()
-            val sdfmt = SimpleDateFormat("yyyyMMdd")
-            try {
-                val date = sdfmt.parse(dayUp)
-                dayUp = SimpleDateFormat("yyyy-MM-dd").format(date)
-                myCalendar.time = date
-            } catch (e: ParseException) {
-                e.printStackTrace()
-            }
-            viewModel.setDate(dayUp)
-            binding.tvDateAndTime.text = dayUp
+            dateUpDown(UP)
         }
 
 
 
         return binding.root
     }
+
+    private fun dateUpDown(op: Int) {
+        var day = sdf.format(myCalendar.time).replace("-", "")
+        var dayInt = day.toInt()
+        dayInt += op
+        day = dayInt.toString()
+        val sdfmt = SimpleDateFormat("yyyyMMdd")
+        try {
+            val date = sdfmt.parse(day)
+            day = SimpleDateFormat("yyyy-MM-dd").format(date)
+            myCalendar.time = date
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        viewModel.setDate(day)
+        binding.tvDateAndTime.text = day
+    }
+
     private fun setRecyclerView() {
         diaryAdapter = DiaryAdapter()
         binding.rv.apply {
@@ -180,7 +169,8 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             if (resultCode == Activity.RESULT_OK) {
                 try {
                     val uri = data!!.data
-                    Glide.with(requireActivity().applicationContext).load(uri.toString()).into(binding.imageView)
+                    Glide.with(requireActivity().applicationContext).load(uri.toString())
+                        .into(binding.imageView)
                     binding.editUpload.setText(uri.toString())
                 } catch (e: Exception) {
                 }
@@ -188,9 +178,11 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list), BottomSheetDia
             }
         }
     }
+
     private fun hideProgressBar() {
         binding.progressBar.visibility = View.INVISIBLE
     }
+
     private fun updateLabel() {
         date = sdf.format(myCalendar.time)
         binding.tvDateAndTime.text = sdf.format(myCalendar.time)

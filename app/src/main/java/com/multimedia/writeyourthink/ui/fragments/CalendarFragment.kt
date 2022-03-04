@@ -124,4 +124,5 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             binding.compactcalendarView.addEvent(event)
         }
     }
+
 }
