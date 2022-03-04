@@ -22,7 +22,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
-    private lateinit var binding: FragmentCalendarBinding
+    private var _binding: FragmentCalendarBinding? = null
+    private val binding get() = _binding!!
+
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val text: String? = null
@@ -45,7 +47,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentCalendarBinding.inflate(inflater, container, false)
+        _binding = FragmentCalendarBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
 
@@ -124,5 +126,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             binding.compactcalendarView.addEvent(event)
         }
     }
-
+    /**
+     * Fragment에서 View Binding을 사용할 경우 Fragment는 View보다 오래 지속되어,
+     * Fregment의 Lifecycle로 인해 메모리 누수가 발생할 수 있다.
+     * 따라서 반드시 binding 변수를 onDestroyView() 이후에 null로 만들어 주어야한다.
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

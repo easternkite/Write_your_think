@@ -43,7 +43,9 @@ import java.util.*
 
 class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private lateinit var binding: Frag2Binding
+    private var _binding: Frag2Binding? = null
+    private val binding get() = _binding!!
+
     private var mListener: BottomSheetListener? = null
     private var gpsTracker // 위치정보
             : GpsTracker? = null
@@ -51,15 +53,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     val set = AnimationSet(true)
 
     /** DB에 저장된 내용을 보여주기위한 리스트뷰  */
-    private val adapter: ArrayAdapter<String>? = null
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
-    private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
     private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private var time: String? = null
     private var address: String? = null
     private var storage: FirebaseStorage? = null
-    private var database: FirebaseDatabase? = null
-    private var databaseReference: DatabaseReference? = null
     private var filePath: Uri? = null
     private var storageRef: StorageReference? = null
     private var stringUri: String? = null
@@ -72,7 +70,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     lateinit var viewModel: DiaryViewModel
 
-    //리사이클러뷰 등장
     var myCalendar = Calendar.getInstance()
     var myDatePicker: DatePickerDialog.OnDateSetListener =
         DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -87,7 +84,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = Frag2Binding.inflate(inflater, container, false)
+        _binding = Frag2Binding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -358,9 +355,17 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
     companion object {
         private const val REQUEST_CODE = 0
-        private val GPS_ENABLE_REQUEST_CODE = 2001
-        private val PERMISSIONS_REQUEST_CODE = 100
     }
 
     override fun getTheme(): Int = R.style.AppBottomSheetDialogTheme
+
+    /**
+     * Fragment에서 View Binding을 사용할 경우 Fragment는 View보다 오래 지속되어,
+     * Fregment의 Lifecycle로 인해 메모리 누수가 발생할 수 있다.
+     * 따라서 반드시 binding 변수를 onDestroyView() 이후에 null로 만들어 주어야한다.
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
