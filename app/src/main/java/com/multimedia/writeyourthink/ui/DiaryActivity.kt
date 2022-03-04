@@ -92,14 +92,12 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         viewModel.saveUser(userInfo)
 
         val photoUrl = "$userProfile?height=500&access_token=$Token"
-        if (isSignedIn == 1) {
+        if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
             if (Locale.getDefault().isO3Language == "kor") {
                 Toast.makeText(this, user!!.displayName + "님, 환영합니다!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
-        } else if (isSignedIn == 2) {
-            
         }
 
         binding.button3.setOnClickListener(View.OnClickListener {

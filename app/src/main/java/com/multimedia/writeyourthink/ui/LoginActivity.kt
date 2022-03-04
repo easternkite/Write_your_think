@@ -55,9 +55,9 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
         if (viewNum == 1) {
-            binding.loginView.setBackground(getDrawable(R.drawable.write_your_think_1))
+            binding.loginView.background = getDrawable(R.drawable.write_your_think_1)
         } else if (viewNum == 2) {
-            binding.loginView.setBackground(getDrawable(R.drawable.write_your_think_2))
+            binding.loginView.background = getDrawable(R.drawable.write_your_think_2)
         }
         val animation = AnimationUtils.loadAnimation(applicationContext, R.anim.alpha)
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -73,21 +73,15 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
 
         animation.isFillEnabled = false //애니메이션 이 끝난곳에 고정할지 아닐지
         binding.btnGoogle.startAnimation(animation) //애니메이션 시작
-        binding.btnGoogle.setOnClickListener(
-            View.OnClickListener
-            // 구글 로그인 버튼을 클릭했을 때 이곳을 수행.
-            {
+        binding.btnGoogle.setOnClickListener{
+                // 구글 로그인 버튼을 클릭했을 때 이곳을 수행.
                 val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
                 startActivityForResult(intent, REQ_SIGN_GOOGLE)
-            })
+            }
         /** 만약 이미 로그인이 되어있는 상태라면?
          * 바로 메인액티비티로 간다(자동 로그인)  */
         if (user != null) {
             val intent = Intent(applicationContext, DiaryActivity::class.java)
-            intent.putExtra("nickName", user!!.displayName)
-            intent.putExtra("photoUrl", user!!.photoUrl.toString())
-            intent.putExtra("accessToken", accessToken)
-            intent.putExtra("fbLogin", 1)
             startActivity(intent)
             finish()
         }
@@ -128,6 +122,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
                 val account = task.getResult(ApiException::class.java)
                 //firebaseAuthWithGoogle(account);
             } catch (e: ApiException) {
+                Toast.makeText(this, "Sign in Error Occured: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -138,16 +133,6 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { // 로그인이 성공했으면...
                     val intent = Intent(applicationContext, DiaryActivity::class.java)
-                    intent.putExtra("nickName", account.givenName)
-                    intent.putExtra(
-                        "photoUrl",
-                        account.photoUrl.toString()
-                    ) // String.valueOf() 특정 자료형을 String 형태로 변환.
-                    intent.putExtra("fbLogin", 2)
-                    val args = Bundle()
-                    args.putInt("fbLogin", 2)
-                    val frag1 = DiaryListFragment()
-                    frag1.arguments = args
                     startActivity(intent)
                     finish()
                 } else { // 로그인이 실패했으면..
@@ -173,13 +158,6 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
                 if (task.isSuccessful) {
                     // 로그인 성공
                     val intent = Intent(applicationContext, DiaryActivity::class.java)
-                    intent.putExtra("loginNum", 2)
-                    intent.putExtra("accessToken", accessToken)
-                    intent.putExtra("fbLogin", 2)
-                    val args = Bundle()
-                    args.putInt("fbLogin", 2)
-                    val frag1 = DiaryListFragment()
-                    frag1.arguments = args
                     startActivity(intent)
                     finish()
                 } else {
@@ -193,19 +171,8 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             }
     }
 
-    protected fun setGooglePlusButtonText(signInButton: SignInButton, buttonText: String?) {
-        // Find the TextView that is inside of the SignInButton and set its text
-        for (i in 0 until signInButton.childCount) {
-            val v = signInButton.getChildAt(i)
-            if (v is TextView) {
-                v.text = buttonText
-                return
-            }
-        }
-    }
-
     companion object {
         private const val REQ_SIGN_GOOGLE = 100 // 구글 로그인 결과 코드
-        private const val REQ_SIGN_FACEBOOK = 200 // 구글 로그인 결과 코드
+        private const val REQ_SIGN_FACEBOOK = 200 // 페이스북 로그인 결과 코드
     }
 }

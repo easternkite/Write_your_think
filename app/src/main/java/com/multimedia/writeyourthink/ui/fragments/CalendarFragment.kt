@@ -33,7 +33,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val text: String? = null
     private lateinit var myCalendar: Calendar
 
     /**
@@ -60,11 +59,21 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             binding.tvNickname.text = it.userName
         }
         myCalendar = Calendar.getInstance()
-        viewModel.countDiaryContents.observe(viewLifecycleOwner) {
 
-            Setdate(it, myCalendar.time, false)
-            calendarlistener(it)
+        viewModel.currentCalendarDate.observe(viewLifecycleOwner) {
+            binding.calendarTitle.text = simpleDateFormat.format(it)
+            binding.tvSelDate.text = DateFormat.format(it)
+            binding.compactcalendarView.setCurrentDate(it)
         }
+
+        viewModel.countDiaryContents.observe(viewLifecycleOwner) {
+            Setdate(it, viewModel.currentCalendarDate.value ?: myCalendar.time, false)
+            calendarlistener(it)
+
+        }
+
+
+
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
         userUID = user!!.uid
@@ -78,7 +87,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             startActivity(intent1)
             requireActivity().finish()
         }
-        binding.text.text = simpleDateFormat.format(myCalendar!!.time)
         binding.layoutLeft!!.setOnClickListener {
             binding.compactcalendarView.showCalendarWithAnimation()
             binding.compactcalendarView.showNextMonth()
@@ -93,6 +101,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     fun calendarlistener(countDate: HashMap<String, Int>) {
         binding.compactcalendarView.setListener(object : CompactCalendarViewListener {
             override fun onDayClick(dateClicked: Date) {
+                viewModel.setCalendarTitle(dateClicked)
                 val profile_counts = countDate[DateFormat!!.format(dateClicked)] ?: 0
 
                 binding.tvSelDate.text = DateFormat.format(dateClicked)
@@ -107,22 +116,22 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             override fun onMonthScroll(firstDayOfNewMonth: Date) {
                 binding.compactcalendarView.removeAllEvents()
                 Setdate(countDate, firstDayOfNewMonth, true)
-                binding.text.text = simpleDateFormat.format(firstDayOfNewMonth)
             }
         })
     }
 
     //get current date
     fun Setdate(itemCount: HashMap<String, Int>, firstDayofNewMonth: Date, isSlide: Boolean) {
-        c = Calendar.getInstance().time
-        if (isSlide) c = firstDayofNewMonth
+        c = firstDayofNewMonth
 
         df = SimpleDateFormat("yyyy-MM-dd")
         val profile_counts = itemCount[DateFormat.format(c)] ?: 0
         binding.compactcalendarView.setUseThreeLetterAbbreviation(true)
         sdf = SimpleDateFormat("MMMM yyyy")
         formattedDate = df!!.format(c)
-        binding.tvSelDate.text = formattedDate
+        viewModel.setCalendarTitle(c!!)
+
+
         if (profile_counts!! > 0) {
             binding.tvCount.text =
                 getString(R.string.frag3_2) + " : " + profile_counts + " " + getString(R.string.cases)
@@ -138,7 +147,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             myCalendar.set(Calendar.DAY_OF_MONTH, item.substring(8).toInt())
             val event = Event(Color.BLUE, myCalendar.timeInMillis, "test")
             repeat(value!!) {
-                binding.compactcalendarView.addEvent(event)
+
+                binding.compactcalendarView.addEvent(event, false)
             }
         }
     }

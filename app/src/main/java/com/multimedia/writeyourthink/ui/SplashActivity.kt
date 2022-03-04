@@ -55,15 +55,4 @@ class SplashActivity : AppCompatActivity() {
             binding.SplashView.startAnimation(animation) //애니메이션 시작
         }
     }
-
-    private inner class MyAnimationListener : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation) {}
-        override fun onAnimationEnd(animation: Animation) {
-            val intent2 = Intent(this@SplashActivity, DiaryActivity::class.java)
-            startActivity(intent2)
-            finish()
-        }
-
-        override fun onAnimationRepeat(animation: Animation) {}
-    }
 }

@@ -9,6 +9,8 @@ import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.HashMap
 
 class DiaryViewModel(
     val diaryRepository: DiaryRepository
@@ -18,13 +20,17 @@ class DiaryViewModel(
     var selectedDateTime = MutableLiveData<String>()
     var userInfo = MutableLiveData<UserInfo>()
     var countDiaryContents = MutableLiveData<HashMap<String, Int>>()
-
+    var currentCalendarDate = MutableLiveData<Date>()
     fun setFilter() {
         filteredList.value = diaryData.value?.filter {
             it.date.isNotEmpty() && it.date.substring(0, 10) == selectedDateTime.value
         }?.toMutableList()
 
     }
+    fun setCalendarTitle(date: Date) {
+        currentCalendarDate.postValue(date)
+    }
+
     fun setDate(date: String) {
         selectedDateTime.value = date
     }

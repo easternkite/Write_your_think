@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
@@ -42,26 +41,20 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var _binding: Frag2Binding? = null
     private val binding get() = _binding!!
 
-    private var gpsTracker // 위치정보
-            : GpsTracker? = null
+    private lateinit var gpsTracker: GpsTracker
     val set = AnimationSet(true)
 
-    /** DB에 저장된 내용을 보여주기위한 리스트뷰  */
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
-    private val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-    private val sdf2 = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
-    private var time: String? = null
-    private var address: String? = null
-    private var storage: FirebaseStorage? = null
-    private var filePath: Uri? = null
-    private var storageRef: StorageReference? = null
-    private var stringUri: String? = null
-    private var userName = "Master"
-    private var auth // 파이어 베이스 인증 객체
-            : FirebaseAuth? = null
-    private var user: FirebaseUser? = null
-    private var date: String? = null
-    var drawable: Drawable? = null
+    private val dateFormatYMD = SimpleDateFormat(myFormat, Locale.KOREA)
+    private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
+    private lateinit var time: String
+    private lateinit var address: String
+    private lateinit var storage: FirebaseStorage
+    private lateinit var filePath: Uri
+    private lateinit var storageRef: StorageReference
+    private lateinit var stringUri: String
+    private lateinit var auth : FirebaseAuth
+    private lateinit var user: FirebaseUser
 
     lateinit var viewModel: DiaryViewModel
 
@@ -71,8 +64,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             myCalendar[Calendar.YEAR] = year
             myCalendar[Calendar.MONTH] = month
             myCalendar[Calendar.DAY_OF_MONTH] = dayOfMonth
-            date = "$year/$month/$dayOfMonth"
-            viewModel.setDate(sdf.format(myCalendar.time))
+            viewModel.setDate(dateFormatYMD.format(myCalendar.time))
         }
 
     override fun onCreateView(
@@ -96,8 +88,8 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             binding.tvDateAndTime.text = it
         }
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
-        userName = user!!.uid
+        user = auth!!.currentUser!!
+
         binding.invisibleLayout.setVisibility(View.GONE)
         gpsTracker = GpsTracker(requireActivity())
         val latitude = gpsTracker!!.latitude
@@ -139,7 +131,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 address = getCurrentAddress(latitude, longitude)
                 if ((binding.btnUpload.text.toString() == "수정")) { //수정일 때..ㅎ
                     val input = Diary(
-                        userName,
+                        viewModel.userInfo.value?.userUID ?: "null",
                         if (diary.profile != null) if (stringUri != null) stringUri else diary.profile else if (stringUri != null) stringUri else " ",
                         binding.editTitle.text.toString(),
                         binding.editContents.text.toString(),
@@ -149,7 +141,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     viewModel.saveDiary(input)
                 } else {
                     val input = Diary(
-                        userName,
+                        viewModel.userInfo.value?.userUID ?: "null",
                         if (stringUri != null) stringUri else " ",
                         binding.editTitle.text.toString(),
                         binding.editContents.text.toString(),
@@ -164,9 +156,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
-        binding.tvDateAndTime.text = date
-        binding.editTitle.setText("")
-        binding.editContents.setText("")
         binding.btnUpload.text = "업로드"
         if (diary.location != "") {
             reviceModeON(diary)
@@ -194,7 +183,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 try {
-                    filePath = data!!.data
+                    filePath = data!!.data!!
                     uploadFile()
                 } catch (e: Exception) {
                 }
@@ -212,7 +201,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             } catch (e: Exception) {
             }
             if (activity != null) {
-                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
+                requireActivity().runOnUiThread { time = dateFormatHms.format(Date()) }
             }
         }
     }
@@ -283,7 +272,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             val filename = formatter.format(now) + ".png"
             /** storage 주소와 폴더 파일명을 지정해 준다.  */
             storageRef = storage!!.getReferenceFromUrl("gs://diary-d5627.appspot.com/").child(
-                "images/$userName/$filename"
+                "images/${viewModel.userInfo.value!!.userUID}/$filename"
             )
             /** 올라가거라...  */
             storageRef!!.putFile(filePath!!)

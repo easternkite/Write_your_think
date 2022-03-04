@@ -185,7 +185,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
             e.printStackTrace()
         }
         viewModel.setDate(day)
-        binding.tvDateAndTime.text = day
     }
 
     private fun setRecyclerView() {
@@ -218,8 +217,9 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     }
 
     private fun updateLabel() {
-        binding.tvDateAndTime.text = sdf.format(myCalendar.time)
-        viewModel.setDate(sdf.format(myCalendar.time))
+        if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
+            viewModel.setDate(sdf.format(myCalendar.time))
+        }
     }
 
     var r = Runnable {
