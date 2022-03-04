@@ -126,11 +126,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             if ((binding.editTitle.text.toString() == "") || (binding.editContents.getText()
                     .toString() == "")
             ) {
-                Toast.makeText(requireActivity().applicationContext, "내용을 입력하십시오.", Toast.LENGTH_SHORT)
+                Toast.makeText(requireActivity().applicationContext, R.string.enterYourContent, Toast.LENGTH_SHORT)
                     .show()
             } else {
                 address = getCurrentAddress(latitude, longitude)
-                if ((binding.btnUpload.text.toString() == "수정")) { //수정일 때..ㅎ
+                if ((binding.btnUpload.text.toString() == getString(R.string.modify))) { //수정일 때..ㅎ
                     val input = Diary(
                         viewModel.userInfo.value?.userUID ?: "null",
                         if (diary.profile != null) if (stringUri != null) stringUri else diary.profile else if (stringUri != null) stringUri else " ",
@@ -153,11 +153,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                     )
                     viewModel.saveDiary(input)
                 }
-                Toast.makeText(requireActivity().applicationContext, "끄적끄적!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, R.string.squeaky, Toast.LENGTH_LONG).show()
                 dismiss()
             }
         }
-        binding.btnUpload.text = "업로드"
+        binding.btnUpload.text = getString(R.string.upload)
         if (diary.location != "") {
             reviceModeON(diary)
             Glide.with(requireActivity().applicationContext).load(diary.profile).into(binding.imageView)
@@ -167,7 +167,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         binding.tvDateAndTime.text = diary.date
         binding.editTitle.setText(diary.where)
         binding.editContents.setText(diary.contents)
-        binding.btnUpload.text = "수정"
+        binding.btnUpload.text = getString(R.string.modify)
         binding.tvDateAndTime.isFocusable = false
         binding.tvDateAndTime.isFocusableInTouchMode = false
         binding.tvDateAndTime.isEnabled = false
@@ -235,11 +235,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             )
         } catch (ioException: IOException) {
 //네트워크 문제
-            Toast.makeText(activity, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, R.string.geocoderUnavailable, Toast.LENGTH_LONG).show()
             tedPermission()
-            return "지오코더 서비스 사용불가"
+            return getString(R.string.geocoderUnavailable)
         } catch (illegalArgumentException: IllegalArgumentException) {
-            Toast.makeText(activity, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, R.string.wrongGps, Toast.LENGTH_LONG).show()
             tedPermission()
             return "잘못된 GPS 좌표"
         }

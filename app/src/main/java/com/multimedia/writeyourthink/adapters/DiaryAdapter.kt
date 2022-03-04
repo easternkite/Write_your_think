@@ -62,7 +62,7 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
             tvPlace.text = diary.where
             tvContent.text = diary.contents
             tvDateAndTime.text = diary.date
-            tvLocation.text = diary.location
+            tvLocation.text = if (diary.location!!.length > 3) "${diary.location}, " else ""
         }
         holder.itemView.setOnClickListener {
             onItemClickListener?.let { it(diary) }

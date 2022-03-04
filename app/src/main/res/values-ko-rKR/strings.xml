@@ -16,5 +16,12 @@
     <string name="frag3_2">기록된 사소한 일</string>
     <string name="syncData">데이터 동기화중..</string>
 
-
+    <string name="deleteData">데이터를 성공적으로 삭제했습니다.</string>
+    <string name="undo">복원</string>
+    <string name="modify">수정</string>
+    <string name="delete">삭제</string>
+    <string name="squeaky">끄적 끄적!</string>
+    <string name="geocoderUnavailable">지오코더 서비스 사용 불가</string>
+    <string name="wrongGps">잘못된 GPS 좌표</string>
+    <string name="enterYourContent">내용을 입력해주세요.</string>
 </resources>

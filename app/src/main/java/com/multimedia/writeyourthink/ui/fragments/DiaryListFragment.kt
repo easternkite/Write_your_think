@@ -57,7 +57,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     private lateinit var viewModel: DiaryViewModel
 
     //리사이클러뷰 등장
-    val words = arrayOf("수정", "삭제")
     var myCalendar = Calendar.getInstance()
     var myDatePicker = OnDateSetListener { view, year, month, dayOfMonth ->
         myCalendar[Calendar.YEAR] = year
@@ -109,10 +108,10 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
                 val position = viewHolder.adapterPosition
                 val diary = diaryAdapter.differ.currentList[position]
                 viewModel.deleteDiary(diary)
-                Snackbar.make(requireView(), "데이터를 성공적으로 삭제했습니다.", Snackbar.LENGTH_LONG)
+                Snackbar.make(requireView(), R.string.deleteData, Snackbar.LENGTH_LONG)
                     .apply {
                         viewModel.deleteDiary(diary)
-                        setAction("복원") {
+                        setAction(R.string.undo) {
                             viewModel.saveDiary(diary)
                         }
                         show()
@@ -125,28 +124,12 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
         diaryAdapter.setOnItemClickListener { diary ->
-            AlertDialog.Builder(context).setItems(words) { dialog, which ->
-                when (which) {
-                    0 -> {
-                        val args = Bundle().apply {
-                            putParcelable("diary", diary)
-                        }
-                        val bottomSheet = BottomSheetDialogFragment()
-                        bottomSheet.arguments = args
-                        bottomSheet.show(requireFragmentManager(), "BS")
-                    }
-                    1 -> {
-                        Snackbar.make(requireView(), "데이터를 성공적으로 삭제했습니다.", Snackbar.LENGTH_LONG)
-                            .apply {
-                                viewModel.deleteDiary(diary)
-                                setAction("복원") {
-                                    viewModel.saveDiary(diary)
-                                }
-                                show()
-                            }
-                    }
-                }
-            }.show()
+            val args = Bundle().apply {
+                putParcelable("diary", diary)
+            }
+            val bottomSheet = BottomSheetDialogFragment()
+            bottomSheet.arguments = args
+            bottomSheet.show(requireFragmentManager(), "BS")
         }
 
         binding.tvDateAndTime.setOnClickListener {

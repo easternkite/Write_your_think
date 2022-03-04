@@ -27,16 +27,14 @@
     <string name="frag3_1">There are no recorded events. Write it down!</string>
     <string name="frag3_2">Recorded ordinary activity</string>
 
+    <string name="deleteData">Successfully deleted data.</string>
+    <string name="undo">Undo</string>
+    <string name="modify">modify</string>
+    <string name="delete">delete</string>
+    <string name="squeaky">squeaky!</string>
+    <string name="geocoderUnavailable">geocoder not available</string>
+    <string name="wrongGps">wrong gps coordinates</string>
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
-    <string name="_0_kcal" translatable="false">0 kcal</string>
-    <string name="KCAL_SUM" translatable="false">총 열량</string>
-
-    <string name="foodName" translatable="false">음식 이름</string>
-    <string name="KCal" translatable="false">열량</string>
-    <string name="Tan" translatable="false">탄수화물 (g)</string>
-    <string name="Dan" translatable="false">단백질 (g)</string>
-    <string name="Ji" translatable="false">지방 (g)</string>
-    <string name="MOA" translatable="false">모아보기</string>
     <string name="contents" translatable="false">내용</string>
     <string name="titles" translatable="false">제목</string>
     <string name="todo" translatable="false">TODO</string>
@@ -46,5 +44,6 @@
     <string name="calendar" translatable="false">Calendar</string>
     <string name="login_failed">Login failed.</string>
     <string name="logout">You have been logged out.</string>
+    <string name="enterYourContent">Please enter your content.</string>
     <string name="cases">cases</string>
 </resources>
