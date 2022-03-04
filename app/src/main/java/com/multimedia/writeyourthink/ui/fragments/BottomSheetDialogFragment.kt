@@ -27,7 +27,7 @@ import com.multimedia.writeyourthink.services.GpsTracker
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
 import com.multimedia.writeyourthink.Util.Constants.Companion.UP
-import com.multimedia.writeyourthink.databinding.Frag2Binding
+import com.multimedia.writeyourthink.databinding.BottomsheetPreviewBinding
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
@@ -38,7 +38,7 @@ import java.util.*
 
 class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private var _binding: Frag2Binding? = null
+    private var _binding: BottomsheetPreviewBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var gpsTracker: GpsTracker
@@ -72,7 +72,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = Frag2Binding.inflate(inflater, container, false)
+        _binding = BottomsheetPreviewBinding.inflate(inflater, container, false)
         return binding.root
     }
 
