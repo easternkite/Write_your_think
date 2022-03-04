@@ -16,6 +16,7 @@ class DiaryViewModel(
     var diaryData = MutableLiveData<MutableList<Diary>>()
     var filteredList = MutableLiveData<MutableList<Diary>>()
     var selectedDateTime = MutableLiveData<String>()
+    var userInfo = MutableLiveData<UserInfo>()
 
     fun setFilter() {
         filteredList.value = diaryData.value?.filter {
@@ -33,6 +34,7 @@ class DiaryViewModel(
 
     fun saveUser(userInfo: UserInfo) {
         diaryRepository.writeNewUserToFirebase(userInfo)
+        this.userInfo.postValue(userInfo)
     }
 
     fun saveDiary(diary: Diary) = viewModelScope.launch {

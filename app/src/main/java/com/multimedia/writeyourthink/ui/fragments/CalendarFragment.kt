@@ -15,15 +15,20 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView.CompactCalend
 import com.github.sundeepk.compactcalendarview.domain.Event
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.ui.LoginActivity
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
+import com.multimedia.writeyourthink.ui.DiaryActivity
+import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var viewModel: DiaryViewModel
 
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -48,12 +53,14 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
+        viewModel = (activity as DiaryActivity).viewModel
+
+        viewModel.userInfo.observe(viewLifecycleOwner) {
+            Glide.with(requireActivity()).load(it.userProfile).into(binding.ivProfile)
+            binding.tvNickname.text = it.userName
+        }
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
-
-        val intent = requireActivity().intent
-        val nickName = intent.getStringExtra("nickName") // MainActivity로 부터 닉네임 전달받음.
-        val photoUrl = intent.getStringExtra("photoUrl") // MainActivity로 부터 프로필사진 Url 전달받음.
         userUID = user!!.uid
 
         calendarlistener()
@@ -77,7 +84,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
         return binding.root
     }
-
 
     fun calendarlistener() {
         binding.compactcalendarView.setListener(object : CompactCalendarViewListener {

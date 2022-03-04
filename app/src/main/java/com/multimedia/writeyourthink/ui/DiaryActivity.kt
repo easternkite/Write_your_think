@@ -39,17 +39,6 @@ import java.util.*
 
 class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: ActivityMainBinding
-    private var backpressedTime: Long = 0
-    private var fm: FragmentManager? = null
-    private var ft: FragmentTransaction? = null
-    private var bottomSheetFragment: BottomSheetDialogFragment? = null
-    private var diaryListFragment: DiaryListFragment? = null
-    private var calendarFragment: CalendarFragment? = null
-    private var userEmail: String? = null
-    private var userProfile: String? = null
-    private var userUID: String? = null
-    private var userName: String? = null
-    private var database: FirebaseDatabase? = null
     private lateinit var databaseReference: DatabaseReference
     private var isSignedIn = 0
 
@@ -87,11 +76,11 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
          */
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
         user = auth!!.currentUser
-        userUID = user!!.uid
-        userProfile = user!!.photoUrl.toString()
-        userName = user!!.displayName
-        userEmail = user!!.email
-        database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
+        val userUID = user!!.uid
+        val userProfile = user!!.photoUrl.toString()
+        val userName = user!!.displayName
+        val userEmail = user!!.email
+        val database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
         databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
 
 
@@ -99,6 +88,8 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val viewModelProviderFactory = DiaryViewModelProviderFactory(firebaseRepository)
         viewModel = ViewModelProvider(this, viewModelProviderFactory).get(DiaryViewModel::class.java)
 
+        val userInfo = UserInfo(userUID, userName, userProfile, userEmail)
+        viewModel.saveUser(userInfo)
 
         val photoUrl = "$userProfile?height=500&access_token=$Token"
         if (isSignedIn == 1) {
@@ -140,12 +131,5 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
 
     override fun onButtonClicked(text: String?) {
         mTextView!!.text = text
-    }
-
-
-
-    companion object {
-        private const val AD_UNIT_ID = "ca-app-pub-9450003299415787/4031932869"
-        private const val TAG = "MyActivity"
     }
 }
