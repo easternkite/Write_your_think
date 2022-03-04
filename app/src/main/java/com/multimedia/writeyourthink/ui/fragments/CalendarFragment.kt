@@ -3,7 +3,6 @@ package com.multimedia.writeyourthink.ui.fragments
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView.CompactCalend
 import com.github.sundeepk.compactcalendarview.domain.Event
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.ui.LoginActivity
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
@@ -140,7 +138,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
 
         for (item in itemCount.keys) {
-            Log.d("Lee", item)
             val value = itemCount[item]
             myCalendar.set(Calendar.YEAR, item.substring(0, 4).toInt())
             myCalendar.set(Calendar.MONTH, item.substring(5,7).toInt() - 1)

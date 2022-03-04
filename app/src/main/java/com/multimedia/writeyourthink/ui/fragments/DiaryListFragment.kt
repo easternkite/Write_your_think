@@ -202,9 +202,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
             if (resultCode == Activity.RESULT_OK) {
                 try {
                     val uri = data!!.data
-                    Glide.with(requireActivity().applicationContext).load(uri.toString())
-                        .into(binding.imageView)
-                    binding.editUpload.setText(uri.toString())
+
                 } catch (e: Exception) {
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {

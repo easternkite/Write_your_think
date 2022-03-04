@@ -48,13 +48,14 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private val dateFormatYMD = SimpleDateFormat(myFormat, Locale.KOREA)
     private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private lateinit var time: String
-    private lateinit var address: String
-    private lateinit var storage: FirebaseStorage
-    private lateinit var filePath: Uri
+
     private lateinit var storageRef: StorageReference
-    private lateinit var stringUri: String
     private lateinit var auth : FirebaseAuth
     private lateinit var user: FirebaseUser
+    private var address: String? = null
+    private var storage: FirebaseStorage? = null
+    private var filePath: Uri? = null
+    private var stringUri: String? = null
 
     lateinit var viewModel: DiaryViewModel
 
@@ -88,13 +89,13 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             binding.tvDateAndTime.text = it
         }
         auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser!!
+        user = auth.currentUser!!
 
         binding.invisibleLayout.setVisibility(View.GONE)
         gpsTracker = GpsTracker(requireActivity())
-        val latitude = gpsTracker!!.latitude
+        val latitude = gpsTracker.latitude
         /** 위도  */
-        val longitude = gpsTracker!!.longitude
+        val longitude = gpsTracker.longitude
         /** 경도  */
         address = getCurrentAddress(latitude, longitude)
         Thread(r).start()
@@ -145,7 +146,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                         if (stringUri != null) stringUri else " ",
                         binding.editTitle.text.toString(),
                         binding.editContents.text.toString(),
-                        binding.tvDateAndTime!!.text.toString() + "(" + time + ")",
+                        binding.tvDateAndTime.text.toString() + "(" + time + ")",
                         if ((address == "주소 미발견") || (address == null)) " " else address!!.substring(
                             address!!.indexOf(" ") + 1, address!!.lastIndexOf(" ")
                         )
@@ -188,6 +189,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 } catch (e: Exception) {
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(requireContext(), "Result Canceled.", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -275,7 +277,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
                 "images/${viewModel.userInfo.value!!.userUID}/$filename"
             )
             /** 올라가거라...  */
-            storageRef!!.putFile(filePath!!)
+            storageRef.putFile(filePath!!)
                 /** 성공시  */
                 .addOnSuccessListener {
                     clickLoad()
@@ -315,11 +317,11 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         /** 하위 폴더가 있다면 폴더명까지 포함  */
         if (storageRef != null) {
             /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기  */
-            storageRef!!.downloadUrl.addOnSuccessListener(OnSuccessListener { uri ->
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
                 /** 다운로드 URL이 파라미터로 전달되어 옴.  */
                 Glide.with(requireActivity().applicationContext).load(uri.toString()).into((binding.imageView))
                 stringUri = uri.toString()
-            })
+            }
         }
     }
     private fun dateUpDown(op: Int) {

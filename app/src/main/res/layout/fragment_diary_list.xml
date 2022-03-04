@@ -7,138 +7,76 @@
     android:orientation="vertical"
     tools:context=".ui.DiaryActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="50dp"
+        android:background="@color/my_orange"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+        <Button
+            android:id="@+id/DateDown"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="30dp"
+            android:background="@drawable/rounded_rec_clicked"
+            android:fontFamily="sans-serif"
+            android:text="@string/btn_previous"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvDateAndTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvDateAndTime"
+            android:layout_width="150dp"
+            android:layout_height="39dp"
             android:background="@color/my_orange"
-            android:visibility="visible">
+            android:gravity="center"
+            android:inputType="date"
+            android:text="@string/date"
+            android:textColor="#fff"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/DateDown"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="30dp"
-                android:background="@drawable/rounded_rec_clicked"
-                android:fontFamily="sans-serif"
-                android:text="@string/btn_previous"
-                android:textColor="#fff"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tvDateAndTime"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/DateUp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginEnd="30dp"
+            android:background="@drawable/rounded_rec_clicked"
+            android:text="@string/btnNext"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvDateAndTime"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tvDateAndTime"
-                android:layout_width="150dp"
-                android:layout_height="48dp"
-                android:background="@color/my_orange"
-                android:gravity="center"
-                android:inputType="date"
-                android:text="@string/date"
-                android:textColor="#000"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/DateUp"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="right"
-                android:layout_marginEnd="30dp"
-                android:background="@drawable/rounded_rec_clicked"
-                android:text="@string/btnNext"
-                android:textColor="#fff"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvDateAndTime"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <EditText
-            android:id="@+id/edit_title"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:hint="제목"
-            android:visibility="gone" />
-
-        <EditText
-            android:id="@+id/edit_contents"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:hint="내용"
-            android:inputType="text"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1.5"
-                android:visibility="visible"
-                app:srcCompat="@mipmap/ic_launcher_round" />
-
-            <EditText
-                android:id="@+id/edit_upload"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:enabled="false"
-                android:hint="사진첨부"
-                android:inputType="textUri" />
-
-            <Button
-                android:id="@+id/button"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1.5"
-                android:text="찾기" />
-
-            <Button
-                android:id="@+id/btn_upload"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1.5"
-                android:text="업로드" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="52dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
     </androidx.recyclerview.widget.RecyclerView>
 
