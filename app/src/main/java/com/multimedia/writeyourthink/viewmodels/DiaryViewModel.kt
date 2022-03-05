@@ -1,7 +1,5 @@
 package com.multimedia.writeyourthink.viewmodels
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,33 +13,41 @@ import kotlin.collections.HashMap
 class DiaryViewModel(
     val diaryRepository: DiaryRepository
 ) : ViewModel() {
-    var diaryData = MutableLiveData<MutableList<Diary>>()
-    var filteredList = MutableLiveData<MutableList<Diary>>()
-    var selectedDateTime = MutableLiveData<String>()
-    var userInfo = MutableLiveData<UserInfo>()
-    var countDiaryContents = MutableLiveData<HashMap<String, Int>>()
-    var currentCalendarDate = MutableLiveData<Date>()
+    private var _diaryData = MutableLiveData<MutableList<Diary>>()
+    private var _filteredList = MutableLiveData<MutableList<Diary>>()
+    private var _selectedDateTime = MutableLiveData<String>()
+    private var _userInfo = MutableLiveData<UserInfo>()
+    private var _countDiaryContents = MutableLiveData<HashMap<String, Int>>()
+    private var _currentCalendarDate = MutableLiveData<Date>()
+
+    val diaryData get() = getData()
+    val filteredList get() = _filteredList
+    val selectedDateTime get() = _selectedDateTime
+    val userInfo get() = _userInfo
+    val countDiaryContents get() = _countDiaryContents
+    val currentCalendarDate get() = _currentCalendarDate
+
     fun setFilter() {
-        filteredList.value = diaryData.value?.filter {
-            it.date.isNotEmpty() && it.date.substring(0, 10) == selectedDateTime.value
+        _filteredList.value = _diaryData.value?.filter {
+            it.date.isNotEmpty() && it.date.substring(0, 10) == _selectedDateTime.value
         }?.toMutableList()
 
     }
     fun setCalendarTitle(date: Date) {
-        currentCalendarDate.postValue(date)
+        _currentCalendarDate.postValue(date)
     }
 
     fun setDate(date: String) {
-        selectedDateTime.value = date
+        _selectedDateTime.value = date
     }
-    fun getData(): MutableLiveData<MutableList<Diary>> {
-        diaryRepository.getFirebaseData(diaryData, countDiaryContents)
-        return diaryData
+    private fun getData(): MutableLiveData<MutableList<Diary>> {
+        diaryRepository.getFirebaseData(_diaryData, _countDiaryContents)
+        return _diaryData
     }
 
     fun saveUser(userInfo: UserInfo) {
         diaryRepository.writeNewUserToFirebase(userInfo)
-        this.userInfo.postValue(userInfo)
+        this._userInfo.postValue(userInfo)
     }
 
     fun saveDiary(diary: Diary) = viewModelScope.launch {

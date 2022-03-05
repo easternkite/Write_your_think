@@ -74,6 +74,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         viewModel = (activity as DiaryActivity).viewModel
         setRecyclerView()
+
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
             viewModel.setFilter()
             binding.tvDateAndTime.text = it
@@ -81,7 +82,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         viewModel.filteredList.observe(viewLifecycleOwner) {
             diaryAdapter.differ.submitList(it)
         }
-        viewModel.getData().observe(viewLifecycleOwner, Observer { diary ->
+        viewModel.diaryData.observe(viewLifecycleOwner, Observer { diary ->
             // 데이터가 변경되면 filterlist를 바꿔주어야한다.
             viewModel.setDate(binding.tvDateAndTime.text.toString())
             viewModel.setFilter()

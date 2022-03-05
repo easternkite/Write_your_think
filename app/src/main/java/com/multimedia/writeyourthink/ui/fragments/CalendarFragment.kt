@@ -67,7 +67,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         viewModel.countDiaryContents.observe(viewLifecycleOwner) {
             Setdate(it, viewModel.currentCalendarDate.value ?: myCalendar.time, false)
             calendarlistener(it)
-
         }
 
 

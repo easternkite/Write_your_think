@@ -60,6 +60,5 @@ class DiaryRepository(
                 Log.e("firebase", databaseError.toException().toString()) // 에러문 출력
             }
         })
-        return
     }
 }
