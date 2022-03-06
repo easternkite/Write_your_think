@@ -34,7 +34,7 @@ Firebase를 활용하여 제작한 일일 일상기록 시스템입니다.
 
 
 
-## 👨‍💻 주요 기능
+## 📱 주요 기능
 * 리사이클러뷰 최적화 및 데이터 필터링 기능 구현 - DiffUtil 사용
 * 구글 페이스북 로그인 시스템 - Firebase Auth사용
 * 화면 구성 변경시에도 작업하던 데이터 유지 - ViewModel + LiveData 사용
@@ -42,7 +42,7 @@ Firebase를 활용하여 제작한 일일 일상기록 시스템입니다.
 * 캘린더 기능 - CompactCalendarView 외부 라이브러리 사용
 * 데이터 복원 및 삭제 기능 - 스낵바, 리사이클러뷰 Swipe 기능 사용
  
-## 👱‍♂️ Problem Solving
+## ☑️ Problem Solving
 * [1. MVVM 리팩토링을 시작하다](https://velog.io/@blucky8649/%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-MVVM-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81-%EB%8F%84%EC%A0%84)
 * [2. 리사이클러뷰의 데이터를 날짜별로 필터링해보자](https://velog.io/@blucky8649/%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EB%A6%AC%EC%82%AC%EC%9D%B4%ED%81%B4%EB%9F%AC%EB%B7%B0-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B2%80%EC%83%89-%ED%95%84%ED%84%B0%EB%A7%81-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0) 
 * [3. 스낵바를 사용하여 데이터 삭제 복원 기능을 추가해보자](https://velog.io/@blucky8649/%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-%EC%8A%A4%EB%82%B5%EB%B0%94%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%82%AD%EC%A0%9C-%EB%B3%B5%EC%9B%90-%EA%B8%B0%EB%8A%A5-%EB%A7%8C%EB%93%A4%EA%B8%B0)
