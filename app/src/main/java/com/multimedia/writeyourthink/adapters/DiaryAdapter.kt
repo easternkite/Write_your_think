@@ -78,7 +78,4 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
     fun setOnItemClickListener(listener: (Diary) -> Unit) {
         onItemClickListener = listener
     }
-
-
-
 }
