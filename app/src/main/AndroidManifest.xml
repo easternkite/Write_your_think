@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".DirayApplication"
         android:allowBackup="true"
         android:exported="false"
         android:icon="@mipmap/icon"
