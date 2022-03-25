@@ -20,6 +20,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
@@ -35,23 +36,26 @@ import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
 import com.multimedia.writeyourthink.ui.fragments.CalendarFragment
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModelProviderFactory
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var databaseReference: DatabaseReference
     private var isSignedIn = 0
 
+    val viewModel: DiaryViewModel by viewModels()
 
-    /**
-     * FireBase 등장
-     */
-    private var auth // 파이어 베이스 인증 객체
-            : FirebaseAuth? = null
-    private var user: FirebaseUser? = null
-    private val mTextView: TextView? = null
+    @Inject
+    lateinit var user: FirebaseUser
 
-    lateinit var viewModel: DiaryViewModel
+    @Inject
+    lateinit var safetyNetAppCheckProviderFactory: SafetyNetAppCheckProviderFactory
+
+    @Inject
+    lateinit var firebaseAppCheck: FirebaseAppCheck
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -62,36 +66,20 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         binding.bottomNavi.setupWithNavController(navController)
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
-        FirebaseApp.initializeApp( /*context=*/this)
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        FirebaseApp.initializeApp(this)
+
         firebaseAppCheck.installAppCheckProviderFactory(
-            SafetyNetAppCheckProviderFactory.getInstance()
+            safetyNetAppCheckProviderFactory
         )
         tedPermission()
         val intent = intent
         val Token = intent.getStringExtra("accessToken")
         isSignedIn = intent.getIntExtra("fbLogin", 0)
-        /**
-         * 파이어베이스 초기 셋팅
-         */
-        auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
-        val userUID = user!!.uid
-        val userProfile = user!!.photoUrl.toString()
-        val userName = user!!.displayName
-        val userEmail = user!!.email
-        val database = FirebaseDatabase.getInstance() // 파이어베이스 데이터베이스 연동
-        databaseReference = database!!.getReference(userUID!!) // DB 테이블 연결
 
 
-        val firebaseRepository = DiaryRepository(databaseReference)
-        val viewModelProviderFactory = DiaryViewModelProviderFactory(firebaseRepository)
-        viewModel = ViewModelProvider(this, viewModelProviderFactory).get(DiaryViewModel::class.java)
-
-        val userInfo = UserInfo(userUID, userName, userProfile, userEmail)
+        val userInfo = UserInfo(user.uid, user.displayName, user.photoUrl.toString(), user.email)
         viewModel.saveUser(userInfo)
 
-        val photoUrl = "$userProfile?height=500&access_token=$Token"
         if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
             if (Locale.getDefault().isO3Language == "kor") {
                 Toast.makeText(this, user!!.displayName + "님, 환영합니다!", Toast.LENGTH_SHORT).show()
@@ -128,6 +116,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
     }
 
     override fun onButtonClicked(text: String?) {
-        mTextView!!.text = text
+        binding.textViewButtonClicked.text = text
     }
 }

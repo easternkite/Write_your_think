@@ -35,6 +35,7 @@ import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
@@ -49,13 +50,19 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private lateinit var time: String
 
-    private lateinit var storageRef: StorageReference
-    private lateinit var auth : FirebaseAuth
-    private lateinit var user: FirebaseUser
+    lateinit var storageRef: StorageReference
+
+    @Inject
+    lateinit var auth : FirebaseAuth
+
+    @Inject
+    lateinit var user: FirebaseUser
+
     private var address: String? = null
-    private var storage: FirebaseStorage? = null
-    private var filePath: Uri? = null
-    private var stringUri: String? = null
+    @Inject
+    lateinit var storage: FirebaseStorage
+    private lateinit var filePath: Uri
+    private lateinit var stringUri: String
 
     lateinit var viewModel: DiaryViewModel
 
@@ -267,7 +274,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
             progressDialog.setTitle("업로드중...")
             progressDialog.setCancelable(false)
             progressDialog.show()
-            storage = FirebaseStorage.getInstance()
             /** Unique한 파일명을 만들자.  */
             val formatter = SimpleDateFormat("yyyyMMHH_mmss")
             val now = Date()

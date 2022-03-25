@@ -6,11 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.HashMap
 
-class DiaryViewModel(
+@HiltViewModel
+class DiaryViewModel @Inject constructor(
     val diaryRepository: DiaryRepository
 ) : ViewModel() {
     private var _diaryData = MutableLiveData<MutableList<Diary>>()

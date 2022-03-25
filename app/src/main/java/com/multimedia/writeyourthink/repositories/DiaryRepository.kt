@@ -8,10 +8,11 @@ import com.multimedia.writeyourthink.models.UserInfo
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.HashMap
 
-class DiaryRepository(
-    val databaseReference: DatabaseReference,
+class DiaryRepository @Inject constructor(
+    val databaseReference: DatabaseReference
 ) {
 
 
