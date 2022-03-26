@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationSet
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -31,6 +32,8 @@ import com.multimedia.writeyourthink.databinding.BottomsheetPreviewBinding
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -62,7 +65,7 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var storage: FirebaseStorage
     private lateinit var filePath: Uri
-    private lateinit var stringUri: String
+    private var stringUri: String = ""
 
     lateinit var viewModel: DiaryViewModel
 
@@ -81,12 +84,16 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = BottomsheetPreviewBinding.inflate(inflater, container, false)
+        viewModel = (activity as DiaryActivity).viewModel
+        countTime()
+
         return binding.root
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = (activity as DiaryActivity).viewModel
         var diary = Diary.EMPTY
 
         val mArgs = arguments
@@ -105,7 +112,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         val longitude = gpsTracker.longitude
         /** 경도  */
         address = getCurrentAddress(latitude, longitude)
-        Thread(r).start()
         /** 현재시간  */
         binding.button.setOnClickListener(View.OnClickListener {
             val intent = Intent()
@@ -201,19 +207,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-
-
-    var r: Runnable = Runnable {
-        while (true) {
-            try {
-                Thread.sleep(1000)
-            } catch (e: Exception) {
-            }
-            if (activity != null) {
-                requireActivity().runOnUiThread { time = dateFormatHms.format(Date()) }
-            }
-        }
-    }
 
     private fun tedPermission() {
         val permissionListener: PermissionListener = object : PermissionListener {
@@ -350,6 +343,13 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         private const val REQUEST_CODE = 0
     }
 
+    private fun countTime() {
+        lifecycleScope.launch {
+            viewModel.calcCurrentTime.collectLatest { currentTime ->
+                time = currentTime
+            }
+        }
+    }
     override fun getTheme(): Int = R.style.AppBottomSheetDialogTheme
 
     /**
@@ -361,4 +361,5 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
