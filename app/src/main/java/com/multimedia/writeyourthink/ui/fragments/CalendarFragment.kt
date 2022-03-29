@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.facebook.login.LoginManager
 import com.github.sundeepk.compactcalendarview.CompactCalendarView.CompactCalendarViewListener
@@ -19,30 +20,36 @@ import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.HashMap
 
+@AndroidEntryPoint
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: DiaryViewModel
+    val viewModel: DiaryViewModel by activityViewModels()
 
     private val simpleDateFormat = SimpleDateFormat("MMMM-YYYY", Locale.getDefault())
     private val DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private lateinit var myCalendar: Calendar
+    @Inject
+    lateinit var myCalendar: Calendar
 
     /**
      * 데이터 관련
      */
-    private var auth // 파이어 베이스 인증 객체
-            : FirebaseAuth? = null
-    private var user: FirebaseUser? = null
-    private var userUID: String? = null
-    var sdf: SimpleDateFormat? = null
-    var c: Date? = null
-    var df: SimpleDateFormat? = null
+    @Inject
+    lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var user: FirebaseUser
+
+    lateinit var userUID: String
+    lateinit var sdf: SimpleDateFormat
+    lateinit var c: Date
+    lateinit var df: SimpleDateFormat
     var formattedDate: String? = null
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,14 +57,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
-        viewModel = (activity as DiaryActivity).viewModel
 
         viewModel.userInfo.observe(viewLifecycleOwner) {
             Glide.with(requireActivity()).load(it.userProfile).into(binding.ivProfile)
             binding.tvNickname.text = it.userName
         }
-        myCalendar = Calendar.getInstance()
-
         viewModel.currentCalendarDate.observe(viewLifecycleOwner) {
             binding.calendarTitle.text = simpleDateFormat.format(it)
             binding.tvSelDate.text = DateFormat.format(it)
@@ -69,12 +73,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             calendarlistener(it)
         }
 
-
-
-        auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
+        user = auth!!.currentUser!!
         userUID = user!!.uid
-
 
         binding.btnLogout.setOnClickListener {
             auth!!.signOut()

@@ -1,5 +1,7 @@
 package com.multimedia.writeyourthink.di
 
+import android.content.Context
+import com.facebook.CallbackManager
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
@@ -8,10 +10,14 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.multimedia.writeyourthink.repositories.DiaryRepository
+import com.multimedia.writeyourthink.services.GpsTracker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.util.*
 import javax.inject.Singleton
 
 @Module
@@ -50,4 +56,16 @@ object AppModule {
     @Singleton
     @Provides
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance()
+
+    @Singleton
+    @Provides
+    fun getGPSTrackerInstance(@ApplicationContext context: Context) = GpsTracker(context)
+
+    @Singleton
+    @Provides
+    fun getCalendarInstance() = Calendar.getInstance()
+
+    @Singleton
+    @Provides
+    fun getCallbackManagerInstance() = CallbackManager.Factory.create()
 }

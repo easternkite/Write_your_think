@@ -28,20 +28,25 @@ import android.widget.TextView
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityLoginBinding
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
     private lateinit var binding: ActivityLoginBinding
-    private var auth // 파이어 베이스 인증 객체
-            : FirebaseAuth? = null
-    private var user: FirebaseUser? = null
+    @Inject
+    lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var user: FirebaseUser
 
     // 페이스북 콜백 매니저
-    private var callbackManager: CallbackManager? = null
+    @Inject
+    lateinit var callbackManager: CallbackManager
 
     // 파이어베이스 인증 객체 생성
-    private var googleApiClient // 구글 API 클라이언트 객체
-            : GoogleApiClient? = null
-    private var accessToken: String? = null
+    lateinit var googleApiClient: GoogleApiClient
+    lateinit var accessToken: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -68,8 +73,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             .enableAutoManage(this, this)
             .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
             .build()
-        auth = FirebaseAuth.getInstance() // 파이어베이스 인증 객체 초기화.
-        user = auth!!.currentUser
+        user = auth!!.currentUser!!
 
         animation.isFillEnabled = false //애니메이션 이 끝난곳에 고정할지 아닐지
         binding.btnGoogle.startAnimation(animation) //애니메이션 시작

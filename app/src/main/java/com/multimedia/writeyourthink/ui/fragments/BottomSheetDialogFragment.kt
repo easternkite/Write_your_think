@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationSet
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnSuccessListener
@@ -32,6 +33,7 @@ import com.multimedia.writeyourthink.databinding.BottomsheetPreviewBinding
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -40,18 +42,23 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class BottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private var _binding: BottomsheetPreviewBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var gpsTracker: GpsTracker
     val set = AnimationSet(true)
 
     private val myFormat = "yyyy-MM-dd" // 출력형식   2018/11/28
     private val dateFormatYMD = SimpleDateFormat(myFormat, Locale.KOREA)
     private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
     private lateinit var time: String
+    @Inject
+    lateinit var gpsTracker: GpsTracker
+
+    @Inject
+    lateinit var firebaseStorage: FirebaseStorage
 
     lateinit var storageRef: StorageReference
 
@@ -66,10 +73,10 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     lateinit var storage: FirebaseStorage
     private lateinit var filePath: Uri
     private var stringUri: String = ""
+    val viewModel: DiaryViewModel by activityViewModels()
 
-    lateinit var viewModel: DiaryViewModel
-
-    var myCalendar = Calendar.getInstance()
+    @Inject
+    lateinit var myCalendar: Calendar
     var myDatePicker: DatePickerDialog.OnDateSetListener =
         DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             myCalendar[Calendar.YEAR] = year
@@ -84,13 +91,10 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = BottomsheetPreviewBinding.inflate(inflater, container, false)
-        viewModel = (activity as DiaryActivity).viewModel
         countTime()
 
         return binding.root
     }
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -106,7 +110,6 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         user = auth.currentUser!!
 
         binding.invisibleLayout.setVisibility(View.GONE)
-        gpsTracker = GpsTracker(requireActivity())
         val latitude = gpsTracker.latitude
         /** 위도  */
         val longitude = gpsTracker.longitude
@@ -177,20 +180,23 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
     private fun reviceModeON(diary: Diary) {
-        binding.tvDateAndTime.text = diary.date
-        binding.editTitle.setText(diary.where)
-        binding.editContents.setText(diary.contents)
-        binding.btnUpload.text = getString(R.string.modify)
-        binding.tvDateAndTime.isFocusable = false
-        binding.tvDateAndTime.isFocusableInTouchMode = false
-        binding.tvDateAndTime.isEnabled = false
-        binding.DateUp.visibility = View.GONE
-        binding.DateDown.visibility = View.GONE
+        binding.apply {
+            tvDateAndTime.text = diary.date
+            editTitle.setText(diary.where)
+            editContents.setText(diary.contents)
+            btnUpload.text = getString(R.string.modify)
+            tvDateAndTime.isFocusable = false
+            tvDateAndTime.isFocusableInTouchMode = false
+            tvDateAndTime.isEnabled = false
+            DateUp.visibility = View.GONE
+            DateDown.visibility = View.GONE
+        }
         if (diary.profile!!.length > 3) {
             binding.invisibleLayout.visibility = View.VISIBLE
         } else {
             binding.invisibleLayout.visibility = View.GONE
         }
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -304,20 +310,9 @@ class BottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     fun clickLoad() {
-        /** Firebase Storage에 저장되어 있는 이미지 파일 읽어오기  */
-        /** 1. Firebase Storeage관리 객체 얻어오기  */
-        val firebaseStorage = FirebaseStorage.getInstance()
-        /** 2. 최상위노드 참조 객체 얻어오기  */
         val rootRef = firebaseStorage.reference
-        /**
-         * 읽어오길 원하는 파일의 참조객체 얻어오기
-         * 예제에서는 자식노드 이름은 monkey.png
-         */
-        /** 하위 폴더가 있다면 폴더명까지 포함  */
         if (storageRef != null) {
-            /** 참조객체로 부터 이미지의 다운로드 URL을 얻어오기  */
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                /** 다운로드 URL이 파라미터로 전달되어 옴.  */
                 Glide.with(requireActivity().applicationContext).load(uri.toString()).into((binding.imageView))
                 stringUri = uri.toString()
             }

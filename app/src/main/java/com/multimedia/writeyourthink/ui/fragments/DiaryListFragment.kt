@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import android.view.View
 import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,12 +29,14 @@ import com.multimedia.writeyourthink.adapters.DiaryAdapter
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     BottomSheetDialogFragment.BottomSheetListener {
     private var _binding: FragmentDiaryListBinding? = null
@@ -54,10 +57,11 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
 
 
     private lateinit var diaryAdapter: DiaryAdapter
-    private lateinit var viewModel: DiaryViewModel
+    val viewModel: DiaryViewModel by activityViewModels()
 
-    //리사이클러뷰 등장
-    var myCalendar = Calendar.getInstance()
+    @Inject
+    lateinit var myCalendar: Calendar
+
     var myDatePicker = OnDateSetListener { view, year, month, dayOfMonth ->
         myCalendar[Calendar.YEAR] = year
         myCalendar[Calendar.MONTH] = month
@@ -72,7 +76,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
-        viewModel = (activity as DiaryActivity).viewModel
         setRecyclerView()
 
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
@@ -88,9 +91,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
             viewModel.setFilter()
             hideProgressBar()
         })
-
-        Thread(r).start()
-
         binding.rv.setHasFixedSize(true)
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
@@ -201,18 +201,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     private fun updateLabel() {
         if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
             viewModel.setDate(sdf.format(myCalendar.time))
-        }
-    }
-
-    var r = Runnable {
-        while (true) {
-            try {
-                Thread.sleep(1000)
-            } catch (e: Exception) {
-            }
-            if (activity != null) {
-                requireActivity().runOnUiThread { time = sdf2.format(Date()) }
-            }
         }
     }
 
