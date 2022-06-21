@@ -26,6 +26,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import com.multimedia.writeyourthink.models.UserInfo
@@ -62,12 +64,13 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         setContentView(binding.root)
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
         val navController = navHostFragment.navController
-
+        MobileAds.initialize(this)
         binding.bottomNavi.setupWithNavController(navController)
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
         FirebaseApp.initializeApp(this)
-
+        val adRequest = AdRequest.Builder().build()
+        binding.adView.loadAd(adRequest)
         firebaseAppCheck.installAppCheckProviderFactory(
             safetyNetAppCheckProviderFactory
         )

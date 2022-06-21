@@ -25,6 +25,7 @@ import com.facebook.AccessToken
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.android.gms.common.SignInButton
 import android.widget.TextView
+import com.google.android.gms.ads.MobileAds
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityLoginBinding
 import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
@@ -37,8 +38,8 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
     private lateinit var binding: ActivityLoginBinding
     @Inject
     lateinit var auth: FirebaseAuth
-    @Inject
-    lateinit var user: FirebaseUser
+
+    var user: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
     // 페이스북 콜백 매니저
     @Inject
@@ -49,6 +50,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
     lateinit var accessToken: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         callbackManager = CallbackManager.Factory.create()
@@ -73,7 +75,6 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
             .enableAutoManage(this, this)
             .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
             .build()
-        user = auth!!.currentUser!!
 
         animation.isFillEnabled = false //애니메이션 이 끝난곳에 고정할지 아닐지
         binding.btnGoogle.startAnimation(animation) //애니메이션 시작
