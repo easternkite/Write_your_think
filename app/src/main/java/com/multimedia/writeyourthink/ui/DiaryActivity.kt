@@ -1,46 +1,34 @@
 package com.multimedia.writeyourthink.ui
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import android.widget.TextView
-import android.os.Bundle
 import android.content.Intent
-import com.google.firebase.FirebaseApp
-import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
-import android.widget.Toast
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
+import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
+import com.google.firebase.auth.FirebaseUser
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.*
+import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import com.multimedia.writeyourthink.models.UserInfo
-import com.multimedia.writeyourthink.repositories.DiaryRepository
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
 import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
-import com.multimedia.writeyourthink.ui.fragments.DiaryListFragment
-import com.multimedia.writeyourthink.ui.fragments.CalendarFragment
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
-import com.multimedia.writeyourthink.viewmodels.DiaryViewModelProviderFactory
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
@@ -58,6 +46,9 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
     @Inject
     lateinit var firebaseAppCheck: FirebaseAppCheck
 
+    private var mInterstitialAd: InterstitialAd? = null
+    private val TAG = "DiaryActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -65,11 +56,45 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
         val navController = navHostFragment.navController
         MobileAds.initialize(this)
+
+        var adRequest = AdRequest.Builder().build()
+        val test = Arrays.asList("8D3429159CBA267C445F2273BB6CE315")
+        val configuration = RequestConfiguration.Builder().setTestDeviceIds(test).build()
+        MobileAds.setRequestConfiguration(configuration)
+        InterstitialAd.load(this,"ca-app-pub-9450003299415787/4031932869", adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                Log.d(TAG, adError.message)
+                mInterstitialAd = null
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                Log.d(TAG, "Ad was loaded.")
+                mInterstitialAd = interstitialAd
+            }
+        })
+
+        mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                Log.d(TAG, "Ad was dismissed.")
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                Log.d(TAG, "Ad failed to show.")
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                Log.d(TAG, "Ad showed fullscreen content.")
+                mInterstitialAd = null;
+            }
+        }
+        if (mInterstitialAd != null) {
+            mInterstitialAd?.show(this)
+        } else {
+            Log.d(TAG, "The interstitial ad wasn't ready yet.")
+        }
         binding.bottomNavi.setupWithNavController(navController)
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
-        FirebaseApp.initializeApp(this)
-        val adRequest = AdRequest.Builder().build()
         binding.adView.loadAd(adRequest)
         firebaseAppCheck.installAppCheckProviderFactory(
             safetyNetAppCheckProviderFactory
@@ -92,12 +117,19 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         }
 
         binding.button3.setOnClickListener(View.OnClickListener {
+
             // Dialog창 중복 실행 방지를 위한 싱글톤 패턴 적용
             var bottomSheet : BottomSheetDialogFragment? = null
             if (bottomSheet == null) {
                 bottomSheet = BottomSheetDialogFragment()
             }
             bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
+
+            if (mInterstitialAd != null) {
+                mInterstitialAd?.show(this)
+            } else {
+                Log.d(TAG, "The interstitial ad wasn't ready yet.")
+            }
         })
     }
 
