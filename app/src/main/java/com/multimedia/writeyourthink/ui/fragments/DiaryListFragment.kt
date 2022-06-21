@@ -199,9 +199,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     }
 
     private fun updateLabel() {
-        if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
-            viewModel.setDate(sdf.format(myCalendar.time))
-        }
+        viewModel.setDate(sdf.format(myCalendar.time))
     }
 
     companion object {
