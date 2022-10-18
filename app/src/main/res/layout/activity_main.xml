@@ -64,33 +64,26 @@
         android:id="@+id/bottomNavi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFF"
-        app:itemIconTint="@color/bottom_navigation_item_selector"
-        app:itemTextColor="@color/bottom_navigation_item_selector"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/menu"
-        tools:layout_editor_absoluteX="-19dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="horizontal">
+        app:menu="@menu/menu" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal">
 
 
-            <ImageButton
-                android:id="@+id/button3"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_vertical"
-                android:visibility="gone"
-                android:background="@drawable/ic_baseline_add_circle_outline_24"
-                style="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
-                android:clickable="true"
-                android:src="@drawable/ripple_effect" />
+        <ImageButton
+            android:id="@+id/button3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone"
+            android:background="@drawable/ic_baseline_add_circle_outline_24"
+            style="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
+            android:clickable="true"
+            android:src="@drawable/ripple_effect" />
 
-        </LinearLayout>
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
