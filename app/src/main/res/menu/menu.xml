@@ -8,13 +8,6 @@
             android:title="@string/list" />
 
         <item
-
-            android:id="@+id/action_calendar"
-            android:enabled="false"
-            android:icon="@drawable/background_transparent"
-            android:title=" "/>
-
-        <item
             android:id="@+id/calendarFragment"
             android:enabled="true"
             android:icon="@drawable/ic_baseline_calendar_today_24"

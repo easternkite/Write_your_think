@@ -83,8 +83,9 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
+                android:visibility="gone"
                 android:background="@drawable/ic_baseline_add_circle_outline_24"
-                android:backgroundTint="@color/my_orange"
+                style="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
                 android:clickable="true"
                 android:src="@drawable/ripple_effect" />
 

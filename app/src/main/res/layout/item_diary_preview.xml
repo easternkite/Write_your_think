@@ -6,89 +6,100 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:cardBackgroundColor="#FFFFFFFF"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        app:cardUseCompatPadding="true">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp">
-
-                <TextView
-                    android:id="@+id/tvDateAndTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="date"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+            <androidx.cardview.widget.CardView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginVertical="5dp"
+                android:layout_marginStart="5dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp">
 
                 <ImageView
                     android:id="@+id/ivDiaryImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/todo"
-                    android:maxWidth="150dp" />
-
-                <TextView
-                    android:id="@+id/tvContent"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/contents"
-                    android:textColor="#4CAF50"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/todo" />
+
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="right"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvLocation"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tvContent"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView"
-                    android:textSize="10sp" />
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginTop="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="이렇게 긴 글을 써도 여기서는 한 줄만 표기됩니다." />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvPlace"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/tvLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="TextView"
+                        style="@style/TextAppearance.AppCompat.Caption" />
+
+                    <TextView
+                        android:id="@+id/tvPlace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:gravity="right"
+                        tools:text="@string/titles"
+                        style="@style/TextAppearance.AppCompat.Caption" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
                     android:gravity="right"
-                    android:text="@string/titles"
-                    android:textSize="10sp" />
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:id="@+id/tvDateAndTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="date"
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
             </LinearLayout>
-
-
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
 
+    </LinearLayout>
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="10dp"
+        android:background="@color/mid_light_gray"
+        />
+    </LinearLayout>
 </LinearLayout>
