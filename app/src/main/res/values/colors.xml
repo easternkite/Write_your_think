@@ -84,4 +84,9 @@
     <color name="md_theme_dark_onPrimary">#381E72</color>
     <color name="md_theme_dark_primaryContainer">#4F378B</color>
     <color name="md_theme_dark_primary">#D0BCFF</color>
+
+    <color name="overlay_light_primary">#9C4146</color>
+    <color name="overlay_light_onPrimary">#FFFFFF</color>
+    <color name= "overlay_light_primaryContainer">#FFDADB</color>
+    <color name="overlay_light_onPrimaryContainer">#400008</color>
 </resources>

@@ -28,6 +28,8 @@
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+
+
     </style>
 
 
@@ -73,5 +75,12 @@
 
     <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/radius</item>
+    </style>
+
+    <style name="AppTheme.Overlay" parent="ThemeOverlay.Material3.DynamicColors.Light">
+        <item name="colorPrimary">@color/overlay_light_primary</item>
+        <item name="colorOnPrimary">@color/overlay_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/overlay_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/overlay_light_onPrimaryContainer</item>
     </style>
 </resources>

@@ -57,6 +57,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val navController = navHostFragment.navController
         MobileAds.initialize(this)
 
+
         var adRequest = AdRequest.Builder().build()
         val test = Arrays.asList("8D3429159CBA267C445F2273BB6CE315")
         val configuration = RequestConfiguration.Builder().setTestDeviceIds(test).build()
@@ -149,7 +150,6 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
             .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
             .check()
     }
-
     override fun onButtonClicked(text: String?) {
         binding.textViewButtonClicked.text = text
     }

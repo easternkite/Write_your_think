@@ -11,17 +11,24 @@ import androidx.recyclerview.widget.GridLayoutManager
 import android.app.DatePickerDialog
 import android.app.Activity
 import android.app.AlertDialog
+import android.util.Log
 import com.bumptech.glide.Glide
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.gamingservices.GameRequestDialog.show
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.Hold
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialElevationScale
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
 import com.multimedia.writeyourthink.Util.Constants.Companion.UP
@@ -70,6 +77,10 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         updateLabel()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,6 +88,13 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     ): View? {
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         setRecyclerView()
+
+        binding.fab.setOnClickListener {
+            exitTransition = MaterialElevationScale(/* growing= */ true)
+            reenterTransition = MaterialElevationScale(/* growing= */ true)
+            val extras = FragmentNavigatorExtras(it to "fab_transition")
+            findNavController().navigate(R.id.action_diaryListFragment_to_addNoteFragment, null, null, extras)
+        }
 
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
             viewModel.setFilter()

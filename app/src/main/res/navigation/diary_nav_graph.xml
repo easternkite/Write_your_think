@@ -7,9 +7,17 @@
     <fragment
         android:id="@+id/diaryListFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.DiaryListFragment"
-        android:label="DiaryListFragment" />
+        android:label="DiaryListFragment" >
+        <action
+            android:id="@+id/action_diaryListFragment_to_addNoteFragment"
+            app:destination="@id/addNoteFragment" />
+    </fragment>
     <fragment
         android:id="@+id/calendarFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.CalendarFragment"
         android:label="CalendarFragment" />
+    <fragment
+        android:id="@+id/addNoteFragment"
+        android:name="com.multimedia.writeyourthink.ui.fragments.AddNoteFragment"
+        android:label="AddNoteFragment" />
 </navigation>
