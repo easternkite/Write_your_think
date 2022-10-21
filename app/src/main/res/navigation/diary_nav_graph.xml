@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_diaryListFragment_to_addNoteFragment"
             app:destination="@id/addNoteFragment" />
+        <action
+            android:id="@+id/action_diaryListFragment_to_diaryDetailFragment"
+            app:destination="@id/diaryDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/calendarFragment"
@@ -20,4 +23,15 @@
         android:id="@+id/addNoteFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.AddNoteFragment"
         android:label="AddNoteFragment" />
+    <fragment
+        android:id="@+id/diaryDetailFragment"
+        android:name="com.multimedia.writeyourthink.ui.diary_detail.DiaryDetailFragment"
+        android:label="DiaryDetailFragment">
+
+        <argument
+            android:name="urls"
+            app:argType="com.multimedia.writeyourthink.models.Diary"
+            />
+
+    </fragment>
 </navigation>

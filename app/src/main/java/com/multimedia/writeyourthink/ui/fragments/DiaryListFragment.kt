@@ -143,12 +143,9 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
         diaryAdapter.setOnItemClickListener { diary ->
-            val args = Bundle().apply {
-                putParcelable("diary", diary)
-            }
-            val bottomSheet = BottomSheetDialogFragment()
-            bottomSheet.arguments = args
-            bottomSheet.show(requireFragmentManager(), "BS")
+            val action = DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDetailFragment(diary)
+            findNavController().navigate(action)
+
         }
 
         binding.tvDateAndTime.setOnClickListener {
