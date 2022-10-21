@@ -27,6 +27,9 @@
     <string name="frag3_1">There are no recorded events. Write it down!</string>
     <string name="frag3_2">Recorded ordinary activity</string>
 
+    <string name="diary_item_transition_name" translatable="false">diary_item_%1$s</string>
+    <string name="diary_detail_transition_name" translatable="false">diary_detail</string>
+
     <string name="deleteData">Successfully deleted data.</string>
     <string name="undo">Undo</string>
     <string name="modify">modify</string>

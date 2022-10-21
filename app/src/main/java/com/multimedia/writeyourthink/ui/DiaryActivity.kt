@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -53,8 +54,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        initNav()
         MobileAds.initialize(this)
 
 
@@ -93,7 +93,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         } else {
             Log.d(TAG, "The interstitial ad wasn't ready yet.")
         }
-        binding.bottomNavi.setupWithNavController(navController)
+
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
         binding.adView.loadAd(adRequest)
@@ -116,24 +116,25 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
         }
-
-        binding.button3.setOnClickListener(View.OnClickListener {
-
-            // Dialog창 중복 실행 방지를 위한 싱글톤 패턴 적용
-            var bottomSheet : BottomSheetDialogFragment? = null
-            if (bottomSheet == null) {
-                bottomSheet = BottomSheetDialogFragment()
-            }
-            bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
-
-            if (mInterstitialAd != null) {
-                mInterstitialAd?.show(this)
-            } else {
-                Log.d(TAG, "The interstitial ad wasn't ready yet.")
-            }
-        })
     }
+    private fun initNav() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavi.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.diaryListFragment -> showHideBottomBar(true)
+                R.id.calendarFragment -> showHideBottomBar(true)
+                R.id.addNoteFragment -> showHideBottomBar(false)
+                R.id.diaryDetailFragment -> showHideBottomBar(false)
+            }
+        }
+    }
+    fun showHideBottomBar(isShow: Boolean) {
+        val visibility = if (isShow) View.VISIBLE else View.GONE
+        binding.bottomNavi.visibility = visibility
+    }
 
     private fun tedPermission() {
         val permissionListener: PermissionListener = object : PermissionListener {

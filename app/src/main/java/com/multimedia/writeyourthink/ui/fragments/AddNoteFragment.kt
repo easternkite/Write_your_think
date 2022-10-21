@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.transition.Slide
 import com.google.android.material.transition.MaterialContainerTransform
 import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.Util.themeColor
 import com.multimedia.writeyourthink.databinding.FragmentAddNoteBinding
 
@@ -18,6 +19,7 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
 
     private var _binding: FragmentAddNoteBinding? = null
     val binding get() = _binding!!
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,12 +37,15 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
         }
         return binding.root
     }
+
     private fun initToolbar() {
         binding.toolbar.inflateMenu(R.menu.top_menu)
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
+        binding.toolbar.isTitleCentered = true
+        binding.toolbar.menu.removeItem(R.id.action_edit)
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.action_add -> {

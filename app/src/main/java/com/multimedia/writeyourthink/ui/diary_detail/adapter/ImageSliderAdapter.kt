@@ -10,7 +10,7 @@ class ImageSliderAdapter(
     val urls: List<String>
 ): SliderViewAdapter<ImageSliderViewHolder>() {
     override fun getCount(): Int {
-        return if (urls.size == 1) 0 else urls.size
+        return urls.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?): ImageSliderViewHolder {

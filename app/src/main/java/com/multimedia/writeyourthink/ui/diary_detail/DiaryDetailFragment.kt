@@ -8,7 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavArgs
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.transition.MaterialContainerTransform
+import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.databinding.FragmentDiaryDetailBinding
 import com.multimedia.writeyourthink.ui.diary_detail.adapter.ImageSliderAdapter
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
@@ -22,25 +26,35 @@ class DiaryDetailFragment : Fragment() {
     val args: DiaryDetailFragmentArgs by navArgs()
 
     private val adapter by lazy {
-        Log.d("LEE", args.urls.profile.toString())
+        Log.d("LEE", args.diary.profile.toString())
         ImageSliderAdapter(
             listOf(
-                args.urls.profile ?: "",
-                "https://static.wikia.nocookie.net/pokemon/images/6/6c/Char-pikachu.png/revision/latest?cb=20190430034300",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTIfRjkXA9Vaj71vkqPKpG97hrSvgC1HTNxekAOKmVAcTKampfHVOABDe_VfEcurT8bIs&usqp=CAU"
+                args.diary.profile ?: "",
+
                 )
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            duration = 300L
+            scrimColor = Color.TRANSPARENT
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentDiaryDetailBinding.inflate(layoutInflater, container, false)
+        initToolbar()
+        binding.diary = args.diary
         binding.imageSlider.apply {
             val list = listOf(
-                args.urls.profile ?: "",
+                args.diary.profile ?: "",
+                "https://static.wikia.nocookie.net/pokemon/images/6/6c/Char-pikachu.png/revision/latest?cb=20190430034300",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTIfRjkXA9Vaj71vkqPKpG97hrSvgC1HTNxekAOKmVAcTKampfHVOABDe_VfEcurT8bIs&usqp=CAU"
 
             )
             val adapter = ImageSliderAdapter(
@@ -48,8 +62,22 @@ class DiaryDetailFragment : Fragment() {
             )
             setSliderAdapter(adapter)
             setIndicatorAnimation(IndicatorAnimationType.WORM)
+            if (list.size < 2) {
+                setInfiniteAdapterEnabled(false)
+            }
         }
         return binding.root
     }
-
+    private fun initToolbar() {
+        binding.toolbar.apply {
+            isTitleCentered = true
+            title = "diray"
+            inflateMenu(R.menu.top_menu)
+            menu.removeItem(R.id.action_add)
+            setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+        }
+    }
 }

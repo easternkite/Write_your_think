@@ -73,18 +73,6 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-
-        <ImageButton
-            android:id="@+id/button3"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_vertical"
-            android:visibility="gone"
-            android:background="@drawable/ic_baseline_add_circle_outline_24"
-            style="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
-            android:clickable="true"
-            android:src="@drawable/ripple_effect" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

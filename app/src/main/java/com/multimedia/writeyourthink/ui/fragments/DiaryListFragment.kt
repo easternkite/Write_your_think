@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.gamingservices.GameRequestDialog.show
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.Hold
 import com.google.android.material.transition.MaterialContainerTransform
@@ -32,6 +34,7 @@ import com.google.android.material.transition.MaterialElevationScale
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
 import com.multimedia.writeyourthink.Util.Constants.Companion.UP
+import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.adapters.DiaryAdapter
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
 import com.multimedia.writeyourthink.ui.DiaryActivity
@@ -81,6 +84,12 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         super.onCreate(savedInstanceState)
     }
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -142,9 +151,18 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         }
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
-        diaryAdapter.setOnItemClickListener { diary ->
+
+        diaryAdapter.setOnItemClickListener { cardView, diary ->
+            exitTransition = MaterialElevationScale(false).apply {
+                duration = 300L
+            }
+            reenterTransition = MaterialElevationScale(true).apply {
+                duration = 300L
+            }
+            val transitionName = getString(R.string.diary_detail_transition_name)
+            val extras = FragmentNavigatorExtras(cardView to transitionName)
             val action = DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDetailFragment(diary)
-            findNavController().navigate(action)
+            findNavController().navigate(action, extras)
 
         }
 
@@ -164,8 +182,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         binding.DateUp.setOnClickListener {
             dateUpDown(UP)
         }
-
-
 
         return binding.root
     }

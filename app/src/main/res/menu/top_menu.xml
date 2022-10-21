@@ -9,4 +9,10 @@
         android:title="edit note"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_edit"
+        android:icon="@drawable/ic_edit"
+        android:title="edit"
+        app:showAsAction="ifRoom"/>
+
 </menu>

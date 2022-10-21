@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.multimedia.writeyourthink.models.Diary
 import android.view.ViewGroup
 import android.view.LayoutInflater
+import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -60,6 +61,7 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
     override fun onBindViewHolder(holder: DiaryViewHolder, position: Int) {
         val diary = differ.currentList[position]
         holder.binding.apply {
+            setDiary(diary)
             Glide.with(root)
                 .load(diary.profile)
                 .placeholder(R.drawable.placeholder)
@@ -79,9 +81,9 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
             } catch (e: java.lang.IndexOutOfBoundsException) {
                 false
             }
-        }
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.let { it(diary) }
+            cvContainer.setOnClickListener {
+                onItemClickListener?.let { it(cvContainer, diary) }
+            }
         }
     }
 
@@ -89,9 +91,9 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
         return differ.currentList.size
     }
 
-    private var onItemClickListener: ((Diary) -> Unit)? = null
+    private var onItemClickListener: ((CardView, Diary) -> Unit)? = null
 
-    fun setOnItemClickListener(listener: (Diary) -> Unit) {
+    fun setOnItemClickListener(listener: (CardView, Diary) -> Unit) {
         onItemClickListener = listener
     }
 }

@@ -29,7 +29,7 @@
         android:label="DiaryDetailFragment">
 
         <argument
-            android:name="urls"
+            android:name="diary"
             app:argType="com.multimedia.writeyourthink.models.Diary"
             />
 
