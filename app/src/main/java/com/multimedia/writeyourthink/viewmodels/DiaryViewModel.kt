@@ -3,6 +3,7 @@ package com.multimedia.writeyourthink.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
@@ -15,12 +16,14 @@ import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class DiaryViewModel @Inject constructor(
     val diaryRepository: DiaryRepository
 ) : ViewModel() {
     private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
+    private val dateAndTimeFormat = SimpleDateFormat("yyyy-MM-dd(HH:mm:ss)", Locale.KOREA)
     private var _diaryData = MutableLiveData<MutableList<Diary>>()
     private var _filteredList = MutableLiveData<MutableList<Diary>>()
     private var _selectedDateTime = MutableLiveData<String>()
@@ -37,7 +40,7 @@ class DiaryViewModel @Inject constructor(
 
     val calcCurrentTime = flow {
         emit(dateFormatHms.format(Date()))
-        while(true) {
+        while (true) {
             delay(1000L)
             emit(dateFormatHms.format(Date()))
         }
@@ -48,10 +51,12 @@ class DiaryViewModel @Inject constructor(
 
     fun setFilter() {
         _filteredList.value = _diaryData.value?.filter {
+
             it.date.isNotEmpty() && it.date.substring(0, 10) == _selectedDateTime.value
         }?.toMutableList()
 
     }
+
     fun setCalendarTitle(date: Date) {
         _currentCalendarDate.postValue(date)
     }
@@ -59,6 +64,7 @@ class DiaryViewModel @Inject constructor(
     fun setDate(date: String) {
         _selectedDateTime.value = date
     }
+
     private fun getData(): MutableLiveData<MutableList<Diary>> {
         diaryRepository.getFirebaseData(_diaryData, _countDiaryContents)
         return _diaryData
@@ -70,6 +76,25 @@ class DiaryViewModel @Inject constructor(
     }
 
     fun saveDiary(diary: Diary) = viewModelScope.launch {
+        diaryRepository.writeNewDiaryToFirebase(diary)
+    }
+
+    fun addDiary(
+        location: String,
+        contents: String,
+        address: String = "",
+        profile: String = "",
+        date: String? = null
+    ) = viewModelScope.launch {
+        val diary = Diary(
+            userUID = FirebaseAuth.getInstance().uid.toString(),
+            profile = profile,
+            where = location,
+            contents = contents,
+            date = date ?: dateAndTimeFormat.format(Date()),
+            location = address,
+            diaryDate = dateAndTimeFormat.format(Date())
+        )
         diaryRepository.writeNewDiaryToFirebase(diary)
     }
 

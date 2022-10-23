@@ -23,7 +23,19 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/etLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_transparent"
+        android:hint="@string/question1"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
+
+    <EditText
+        android:id="@+id/etContents"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/background_transparent"
@@ -34,8 +46,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2"
-        tools:text="안녕 일기 \n 나는 일기를 쓰지 \n 이렇게에에" />
+        app:layout_constraintTop_toBottomOf="@+id/etLocation" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

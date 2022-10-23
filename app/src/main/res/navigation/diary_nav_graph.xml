@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/diary_nav_graph"
     app:startDestination="@id/diaryListFragment">
 
     <fragment
         android:id="@+id/diaryListFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.DiaryListFragment"
+        tools:layout="@layout/fragment_diary_list"
         android:label="DiaryListFragment" >
         <action
             android:id="@+id/action_diaryListFragment_to_addNoteFragment"
@@ -18,20 +20,51 @@
     <fragment
         android:id="@+id/calendarFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.CalendarFragment"
+        tools:layout="@layout/fragment_calendar"
         android:label="CalendarFragment" />
     <fragment
         android:id="@+id/addNoteFragment"
         android:name="com.multimedia.writeyourthink.ui.fragments.AddNoteFragment"
-        android:label="AddNoteFragment" />
-    <fragment
-        android:id="@+id/diaryDetailFragment"
-        android:name="com.multimedia.writeyourthink.ui.diary_detail.DiaryDetailFragment"
-        android:label="DiaryDetailFragment">
+        tools:layout="@layout/fragment_add_note"
+        android:label="AddNoteFragment" >
 
         <argument
             android:name="diary"
             app:argType="com.multimedia.writeyourthink.models.Diary"
             />
+
+        <action
+            android:id="@+id/action_addNoteFragment_to_diaryDetailFragment"
+            app:destination="@id/diaryDetailFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/addNoteFragment" />
+        <action
+            android:id="@+id/action_addNoteFragment_to_diaryListFragment"
+            app:destination="@id/diaryListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/diaryListFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/diaryDetailFragment"
+        android:name="com.multimedia.writeyourthink.ui.diary_detail.DiaryDetailFragment"
+        tools:layout="@layout/fragment_diary_detail"
+        android:label="DiaryDetailFragment">
+
+        <argument
+            android:name="diary"
+            app:argType="com.multimedia.writeyourthink.models.Diary"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            />
+        <action
+            android:id="@+id/action_diaryDetailFragment_to_addNoteFragment"
+            app:destination="@id/addNoteFragment" />
 
     </fragment>
 </navigation>

@@ -17,9 +17,10 @@ data class Diary(
     var contents: String = "",
     var date: String = "",
     var location: String = "",
+    var diaryDate: String = date
 ) : Parcelable {
     companion object {
-        val EMPTY = Diary("","","","","","")
+        val EMPTY = Diary()
     }
 }
 

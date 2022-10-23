@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.formatTime
 import com.multimedia.writeyourthink.databinding.ItemDiaryPreviewBinding
 
 class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
@@ -69,8 +70,8 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
                 .into(ivDiaryImage)
             tvPlace.text = if (!diary.where.isNullOrEmpty()) " • ${diary.where}" else ""
             tvContent.text = diary.contents
-            tvDateAndTime.text = diary.date
-            diary.location?.let {
+            tvDateAndTime.text = if (diary.diaryDate.isEmpty()) formatTime(diary.date) else formatTime(diary.diaryDate)
+            diary.location.let {
                 val location = it.split(" ")
                 tvLocation.text = location[location.size - 1]
             }

@@ -37,6 +37,7 @@ import com.multimedia.writeyourthink.Util.Constants.Companion.UP
 import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.adapters.DiaryAdapter
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
+import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,6 +91,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -101,8 +103,14 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         binding.fab.setOnClickListener {
             exitTransition = MaterialElevationScale(/* growing= */ true)
             reenterTransition = MaterialElevationScale(/* growing= */ true)
+            val action = DiaryListFragmentDirections.actionDiaryListFragmentToAddNoteFragment(
+                diary = Diary()
+            )
             val extras = FragmentNavigatorExtras(it to "fab_transition")
-            findNavController().navigate(R.id.action_diaryListFragment_to_addNoteFragment, null, null, extras)
+            findNavController().navigate(
+                directions = action,
+                extras
+            )
         }
 
         viewModel.selectedDateTime.observe(viewLifecycleOwner) {
@@ -161,7 +169,8 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
             }
             val transitionName = getString(R.string.diary_detail_transition_name)
             val extras = FragmentNavigatorExtras(cardView to transitionName)
-            val action = DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDetailFragment(diary)
+            val action =
+                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDetailFragment(diary)
             findNavController().navigate(action, extras)
 
         }
@@ -240,6 +249,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     override fun onButtonClicked(text: String?) {
 
     }
+
     /**
      * Fragment에서 View Binding을 사용할 경우 Fragment는 View보다 오래 지속되어,
      * Fregment의 Lifecycle로 인해 메모리 누수가 발생할 수 있다.

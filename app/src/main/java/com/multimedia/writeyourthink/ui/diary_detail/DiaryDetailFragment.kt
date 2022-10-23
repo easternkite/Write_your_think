@@ -42,6 +42,7 @@ class DiaryDetailFragment : Fragment() {
             scrimColor = Color.TRANSPARENT
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,6 +69,7 @@ class DiaryDetailFragment : Fragment() {
         }
         return binding.root
     }
+
     private fun initToolbar() {
         binding.toolbar.apply {
             isTitleCentered = true
@@ -77,6 +79,19 @@ class DiaryDetailFragment : Fragment() {
             setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
             setNavigationOnClickListener {
                 findNavController().popBackStack()
+            }
+            setOnMenuItemClickListener { menu ->
+                when (menu.itemId) {
+                    R.id.action_edit -> {
+                        val action =
+                            DiaryDetailFragmentDirections.actionDiaryDetailFragmentToAddNoteFragment(
+                                args.diary
+                            )
+                        findNavController().navigate(action)
+                        true
+                    }
+                    else -> true
+                }
             }
         }
     }
