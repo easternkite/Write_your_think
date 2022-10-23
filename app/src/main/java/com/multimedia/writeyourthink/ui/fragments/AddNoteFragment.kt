@@ -15,9 +15,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.Slide
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.firebase.auth.FirebaseAuth
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.formatDate
 import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.Util.themeColor
 import com.multimedia.writeyourthink.databinding.FragmentAddNoteBinding
@@ -74,17 +76,20 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
             when (it.itemId) {
                 R.id.action_add -> {
                     Toast.makeText(activity, "add item successfully.", Toast.LENGTH_LONG).show()
-                    viewModel.addDiary(
-                        location = binding.etLocation.text.toString(),
+                    val diary = args.diary.copy(
+                        userUID = FirebaseAuth.getInstance().uid.toString(),
+                        where = binding.etLocation.text.toString(),
                         contents = binding.etContents.text.toString(),
-                        address = getCurrentAddress(
+                        location = getCurrentAddress(
                             latitude = gpsTracker.latitude,
                             longitude = gpsTracker.longitude
                         ),
-                        date = args.diary.date.ifEmpty { null }
+                        date = args.diary.date.ifEmpty { Date().formatDate() },
+                        diaryDate = Date().formatDate()
                     )
-                    // TODO : 데이터 전달에 관한 예외처리를 할 것
-                    findNavController().popBackStack()
+                    viewModel.addDiary(diary)
+                    val action = AddNoteFragmentDirections.actionAddNoteFragmentToDiaryDetailFragment(diary)
+                    findNavController().navigate(action)
 
                     true
                 }

@@ -2,6 +2,7 @@ package com.multimedia.writeyourthink.Util
 
 import android.util.Log
 import java.text.SimpleDateFormat
+import java.util.Date
 
 fun formatTime(dateAndTime: String): String {
     if (dateAndTime.isEmpty()) return ""
@@ -45,4 +46,9 @@ fun formatTime(dateAndTime: String): String {
     }
    Log.d("Lee","MSG [${message}]")
     return message
+}
+
+fun Date.formatDate(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd(HH:mm:ss)")
+    return sdf.format(this)
 }

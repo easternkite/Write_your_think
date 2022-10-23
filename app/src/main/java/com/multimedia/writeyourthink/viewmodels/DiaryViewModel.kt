@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.multimedia.writeyourthink.Util.formatDate
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
@@ -80,21 +81,8 @@ class DiaryViewModel @Inject constructor(
     }
 
     fun addDiary(
-        location: String,
-        contents: String,
-        address: String = "",
-        profile: String = "",
-        date: String? = null
-    ) = viewModelScope.launch {
-        val diary = Diary(
-            userUID = FirebaseAuth.getInstance().uid.toString(),
-            profile = profile,
-            where = location,
-            contents = contents,
-            date = date ?: dateAndTimeFormat.format(Date()),
-            location = address,
-            diaryDate = dateAndTimeFormat.format(Date())
-        )
+        diary: Diary
+    ) {
         diaryRepository.writeNewDiaryToFirebase(diary)
     }
 
