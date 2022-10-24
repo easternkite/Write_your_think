@@ -70,7 +70,7 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
                 .into(ivDiaryImage)
             tvPlace.text = if (!diary.where.isNullOrEmpty()) " • ${diary.where}" else ""
             tvContent.text = diary.contents
-            tvDateAndTime.text = if (diary.diaryDate.isEmpty()) formatTime(diary.date) else formatTime(diary.diaryDate)
+            tvDateAndTime.text = if (diary.diaryDate.isEmpty()) formatTime(holder.itemView.context,diary.date) else formatTime(holder.itemView.context, diary.diaryDate)
             diary.location.let {
                 val location = it.split(" ")
                 tvLocation.text = location[location.size - 1]

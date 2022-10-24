@@ -1,10 +1,12 @@
 package com.multimedia.writeyourthink.Util
 
+import android.content.Context
 import android.util.Log
+import com.multimedia.writeyourthink.R
 import java.text.SimpleDateFormat
 import java.util.Date
 
-fun formatTime(dateAndTime: String): String {
+fun formatTime(context: Context, dateAndTime: String): String {
     if (dateAndTime.isEmpty()) return ""
     val format = SimpleDateFormat("yyyy-MM-dd(HH:mm:ss)")
     val date = format.parse(dateAndTime)
@@ -20,14 +22,22 @@ fun formatTime(dateAndTime: String): String {
     val DAY = 30
     val MONTH = 12
     val timeList = listOf(SEC, MIN, HOUR, DAY, MONTH)
-    val msgs = listOf("분 전", "시간 전", "일 전", "달 전")
+    context.apply {
+
+    }
+    val msgs = listOf(
+        context.getString(R.string.minutes),
+        context.getString(R.string.hour),
+        context.getString(R.string.days),
+        context.getString(R.string.months)
+    )
 
     var diffTime = (curTime - time) / 1000
     Log.d("Lee","diffTime [${diffTime}]")
 
     var message = ""
     if (diffTime < SEC) {
-        return "방금 전"
+        return context.getString(R.string.now)
     }
 
     timeList

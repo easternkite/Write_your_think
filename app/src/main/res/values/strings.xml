@@ -49,4 +49,10 @@
     <string name="logout">You have been logged out.</string>
     <string name="enterYourContent">Please enter your content.</string>
     <string name="cases">cases</string>
+    <string name="years"> years ago</string>
+    <string name="months"> months ago</string>
+    <string name="days"> days ago</string>
+    <string name="hour"> hours ago</string>
+    <string name="minutes"> minutes ago</string>
+    <string name="now"> just before</string>
 </resources>
