@@ -1,16 +1,20 @@
 package com.multimedia.writeyourthink.ui.fragments
 
 import android.Manifest
+import android.content.Context
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.Slide
@@ -27,6 +31,8 @@ import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.services.GpsTracker
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -61,6 +67,14 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
         }
         binding.etLocation.setText(args.diary.where)
         binding.etContents.setText(args.diary.contents)
+        binding.etLocation.clearFocus()
+        binding.etLocation.requestFocus()
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(500L)
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(binding.etLocation,0)
+        }
+
         return binding.root
     }
 
