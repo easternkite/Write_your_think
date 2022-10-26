@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +23,6 @@ import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
-import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -32,7 +30,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
+class DiaryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var isSignedIn = 0
 
@@ -109,7 +107,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val userInfo = UserInfo(user.uid, user.displayName, user.photoUrl.toString(), user.email)
         viewModel.saveUser(userInfo)
 
-        if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
+        if (viewModel.uiState.value.selectedDateTime.isEmpty()) {
             if (Locale.getDefault().isO3Language == "kor") {
                 Toast.makeText(this, user!!.displayName + "님, 환영합니다!", Toast.LENGTH_SHORT).show()
             } else {
@@ -150,8 +148,5 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
             .setDeniedMessage(resources.getString(R.string.permission_1))
             .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
             .check()
-    }
-    override fun onButtonClicked(text: String?) {
-        binding.textViewButtonClicked.text = text
     }
 }

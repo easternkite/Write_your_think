@@ -101,7 +101,7 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
                         date = args.diary.date.ifEmpty { Date().formatDate() },
                         diaryDate = Date().formatDate()
                     )
-                    viewModel.addDiary(diary)
+                    viewModel.saveDiary(diary)
                     val action = AddNoteFragmentDirections.actionAddNoteFragmentToDiaryDetailFragment(diary)
                     findNavController().navigate(action)
 

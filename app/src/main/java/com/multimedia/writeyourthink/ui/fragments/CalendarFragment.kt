@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.facebook.login.LoginManager
 import com.github.sundeepk.compactcalendarview.CompactCalendarView.CompactCalendarViewListener
@@ -21,6 +24,8 @@ import com.multimedia.writeyourthink.databinding.FragmentCalendarBinding
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -58,26 +63,18 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     ): View? {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
 
-        viewModel.userInfo.observe(viewLifecycleOwner) {
-            Glide.with(requireActivity()).load(it.userProfile).into(binding.ivProfile)
-            binding.tvNickname.text = it.userName
-        }
+        observeUiState()
         viewModel.currentCalendarDate.observe(viewLifecycleOwner) {
             binding.calendarTitle.text = simpleDateFormat.format(it)
             binding.tvSelDate.text = DateFormat.format(it)
             binding.compactcalendarView.setCurrentDate(it)
         }
 
-        viewModel.countDiaryContents.observe(viewLifecycleOwner) {
-            Setdate(it, viewModel.currentCalendarDate.value ?: myCalendar.time, false)
-            calendarlistener(it)
-        }
-
-        user = auth!!.currentUser!!
-        userUID = user!!.uid
+        user = auth.currentUser!!
+        userUID = user.uid
 
         binding.btnLogout.setOnClickListener {
-            auth!!.signOut()
+            auth.signOut()
             LoginManager.getInstance().logOut()
             Toast.makeText(activity, getString(R.string.logout), Toast.LENGTH_SHORT).show()
             val intent1 = Intent(activity, LoginActivity::class.java)
@@ -94,15 +91,31 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
         return binding.root
     }
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collectLatest { uiState ->
+                    uiState.userInfo.apply {
+                        Glide.with(requireActivity()).load(userProfile).into(binding.ivProfile)
+                        binding.tvNickname.text = userName
+                    }
+                    uiState.countMap.let {
+                        Setdate(it, viewModel.currentCalendarDate.value ?: myCalendar.time, false)
+                        calendarlistener(it)
+                    }
+                }
+            }
+        }
+    }
 
-    fun calendarlistener(countDate: HashMap<String, Int>) {
+    fun calendarlistener(countDate: Map<String, Int>) {
         binding.compactcalendarView.setListener(object : CompactCalendarViewListener {
             override fun onDayClick(dateClicked: Date) {
                 viewModel.setCalendarTitle(dateClicked)
-                val profile_counts = countDate[DateFormat!!.format(dateClicked)] ?: 0
+                val profile_counts = countDate[DateFormat.format(dateClicked)] ?: 0
 
                 binding.tvSelDate.text = DateFormat.format(dateClicked)
-                if (profile_counts!! > 0) {
+                if (profile_counts > 0) {
                     binding.tvCount.text =
                         getString(R.string.frag3_2) + " : " + profile_counts + " " + getString(R.string.cases)
                 } else {
@@ -118,18 +131,18 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     }
 
     //get current date
-    fun Setdate(itemCount: HashMap<String, Int>, firstDayofNewMonth: Date, isSlide: Boolean) {
+    fun Setdate(itemCount: Map<String, Int>, firstDayofNewMonth: Date, isSlide: Boolean) {
         c = firstDayofNewMonth
 
         df = SimpleDateFormat("yyyy-MM-dd")
         val profile_counts = itemCount[DateFormat.format(c)] ?: 0
         binding.compactcalendarView.setUseThreeLetterAbbreviation(true)
         sdf = SimpleDateFormat("MMMM yyyy")
-        formattedDate = df!!.format(c)
-        viewModel.setCalendarTitle(c!!)
+        formattedDate = df.format(c)
+        viewModel.setCalendarTitle(c)
 
 
-        if (profile_counts!! > 0) {
+        if (profile_counts > 0) {
             binding.tvCount.text =
                 getString(R.string.frag3_2) + " : " + profile_counts + " " + getString(R.string.cases)
         } else {

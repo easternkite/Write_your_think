@@ -10,11 +10,11 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.multimedia.writeyourthink.repositories.DiaryRepository
+import com.multimedia.writeyourthink.repositories.DiaryRepositoryImpl
 import com.multimedia.writeyourthink.services.GpsTracker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.util.*
@@ -42,7 +42,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun getRepository(firebaseRef: DatabaseReference) = DiaryRepository(firebaseRef)
+    fun getRepository(firebaseRef: DatabaseReference): DiaryRepository = DiaryRepositoryImpl(firebaseRef)
 
     @Singleton
     @Provides

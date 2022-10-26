@@ -17,9 +17,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -41,6 +45,8 @@ import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -48,8 +54,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
-    BottomSheetDialogFragment.BottomSheetListener {
+class DiaryListFragment : Fragment() {
     private var _binding: FragmentDiaryListBinding? = null
     private val binding get() = _binding!!
 
@@ -99,10 +104,15 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     ): View? {
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         setRecyclerView()
+        observeUiState()
+
+        val cur = sdf.format(Date()).also {
+            viewModel.setDate(it)
+        }
 
         binding.fab.setOnClickListener {
-            exitTransition = MaterialElevationScale(/* growing= */ true)
-            reenterTransition = MaterialElevationScale(/* growing= */ true)
+            exitTransition = MaterialElevationScale(true)
+            reenterTransition = MaterialElevationScale(true)
             val action = DiaryListFragmentDirections.actionDiaryListFragmentToAddNoteFragment(
                 diary = Diary()
             )
@@ -112,20 +122,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
                 extras
             )
         }
-
-        viewModel.selectedDateTime.observe(viewLifecycleOwner) {
-            viewModel.setFilter()
-            binding.tvDateAndTime.text = it
-        }
-        viewModel.filteredList.observe(viewLifecycleOwner) {
-            diaryAdapter.differ.submitList(it)
-        }
-        viewModel.diaryData.observe(viewLifecycleOwner, Observer { diary ->
-            // 데이터가 변경되면 filterlist를 바꿔주어야한다.
-            viewModel.setDate(binding.tvDateAndTime.text.toString())
-            viewModel.setFilter()
-            hideProgressBar()
-        })
         binding.rv.setHasFixedSize(true)
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
@@ -184,7 +180,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
                 myCalendar[Calendar.DAY_OF_MONTH]
             ).show()
         } //달력 꺼내기
-        updateLabel()
+
         binding.DateDown.setOnClickListener(View.OnClickListener {
             dateUpDown(DOWN)
         })
@@ -194,7 +190,33 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
 
         return binding.root
     }
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collectLatest { uiState ->
 
+                    if (uiState.diaryList.isNotEmpty()) {
+                        showHideProgressBar(false)
+                    }
+
+                    diaryAdapter.differ.submitList(uiState.filteredByDate)
+
+                    if (uiState.errorMassege.isNotEmpty()) {
+                        hideProgressBar()
+                        Toast.makeText(requireContext(), "error occurred : ${uiState.errorMassege}", Toast.LENGTH_LONG).show()
+                    }
+
+                    uiState.selectedDateTime.let {
+                        binding.tvDateAndTime.text = it
+                        viewModel.setDate(it)
+                    }
+
+                    viewModel.setFilter(uiState.selectedDateTime)
+
+                }
+            }
+        }
+    }
     private fun dateUpDown(op: Int) {
         var day = sdf.format(myCalendar.time).replace("-", "")
         var dayInt = day.toInt()
@@ -234,6 +256,10 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         }
     }
 
+    private fun showHideProgressBar(isVisible: Boolean) {
+        binding.progressBar.isVisible = isVisible
+    }
+
     private fun hideProgressBar() {
         binding.progressBar.visibility = View.INVISIBLE
     }
@@ -244,10 +270,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
 
     companion object {
         private const val REQUEST_CODE = 0
-    }
-
-    override fun onButtonClicked(text: String?) {
-
     }
 
     /**
