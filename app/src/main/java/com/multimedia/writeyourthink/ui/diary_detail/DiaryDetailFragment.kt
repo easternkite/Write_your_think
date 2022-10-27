@@ -73,7 +73,7 @@ class DiaryDetailFragment : Fragment() {
     private fun initToolbar() {
         binding.toolbar.apply {
             isTitleCentered = true
-            title = "diray"
+            title = "Diary"
             inflateMenu(R.menu.top_menu)
             menu.removeItem(R.id.action_add)
             setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
