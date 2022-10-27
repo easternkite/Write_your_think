@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:gravity="center"
+        android:visibility="gone"
         android:background="@color/colorPrimary">
 
         <ImageView
@@ -35,13 +36,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/layout_shape"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_weight="1"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
+            android:background="?attr/colorPrimaryContainer"
             android:layout_height="60dp"
             android:gravity="center"
             android:orientation="horizontal">
@@ -50,7 +51,7 @@
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:gravity="center">
-                <ImageView
+                <TextView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:background="@drawable/ic_baseline_arrow_back_ios_new_24" />
@@ -67,7 +68,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="Date"
-                    android:textColor="@color/my_orange"
                     android:textSize="17dp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -77,58 +77,61 @@
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:gravity="center">
-                <ImageView
+                <TextView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:background="@drawable/ic_baseline_arrow_forward_ios_24" />
             </LinearLayout>
         </LinearLayout>
-        <View
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/my_orange" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.2">
-            <com.github.sundeepk.compactcalendarview.CompactCalendarView
-                android:id="@+id/compactcalendar_view"
+            android:layout_height="match_parent">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
-                android:layout_margin="5dp"
-                app:compactCalendarBackgroundColor="@android:color/white"
-                app:compactCalendarCurrentDayBackgroundColor="@color/my_orange"
-                app:compactCalendarCurrentSelectedDayBackgroundColor="@color/my_orange"
-                app:compactCalendarMultiEventIndicatorColor="@color/my_orange"
-                app:compactCalendarTargetHeight="360dp"
-                app:compactCalendarTextColor="@android:color/black"
-                app:compactCalendarTextSize="15dp" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <com.github.sundeepk.compactcalendarview.CompactCalendarView
+                    android:id="@+id/compactcalendar_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:layout_margin="5dp"
+                    app:compactCalendarBackgroundColor="?attr/colorSurface"
+                    app:compactCalendarCurrentDayBackgroundColor="?attr/colorPrimaryContainer"
+                    app:compactCalendarCurrentSelectedDayBackgroundColor="?attr/colorPrimary"
+                    app:compactCalendarMultiEventIndicatorColor="?attr/colorSecondary"
+                    app:compactCalendarTargetHeight="360dp"
+                    app:compactCalendarTextSize="15dp" />
+                <View style="@style/Divider"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_selDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/frag3_1"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_count"
+                        tools:layout_editor_absoluteX="-6dp" />
+
+                    <TextView
+                        android:id="@+id/tv_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:layout_editor_absoluteX="-2dp" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </LinearLayout>
+        </ScrollView>
+
     </LinearLayout>
-    <View style="@style/Divider"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="160">
 
-        <TextView
-            android:id="@+id/tv_selDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/frag3_1"
-            app:layout_constraintTop_toBottomOf="@+id/tv_count"
-            tools:layout_editor_absoluteX="-6dp" />
-
-        <TextView
-            android:id="@+id/tv_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="-2dp" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
@@ -137,7 +140,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -146,15 +148,15 @@
             android:id="@+id/iv_profile"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_weight="1"
+            android:layout_marginHorizontal="10dp"
             app:srcCompat="@mipmap/ic_launcher_round" />
 
         <TextView
             android:id="@+id/tv_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="7"
             android:text="Name"
+            android:layout_weight="1"
             android:textSize="20sp" />
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
@@ -171,14 +173,9 @@
             <Button
                 android:id="@+id/btn_logout"
                 android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
-                android:layout_weight="1"
-                android:textColor="@color/gray"
-                android:background="@drawable/ripple_effect"
-                android:text="Logout"
-                android:textStyle="bold" />
+                android:text="Logout" />
         </androidx.cardview.widget.CardView>
     </LinearLayout>
-
 </LinearLayout>
