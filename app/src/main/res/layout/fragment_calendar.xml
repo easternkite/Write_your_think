@@ -90,18 +90,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <com.github.sundeepk.compactcalendarview.CompactCalendarView
-                    android:id="@+id/compactcalendar_view"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="320dp"
-                    android:layout_margin="5dp"
-                    app:compactCalendarBackgroundColor="?attr/colorSurface"
-                    app:compactCalendarCurrentDayBackgroundColor="?attr/colorPrimaryContainer"
-                    app:compactCalendarCurrentSelectedDayBackgroundColor="?attr/colorPrimary"
-                    app:compactCalendarMultiEventIndicatorColor="?attr/colorSecondary"
-                    app:compactCalendarTargetHeight="360dp"
-                    app:compactCalendarTextSize="15dp" />
-                <View style="@style/Divider"/>
+                    android:orientation="horizontal">
+                    <com.github.sundeepk.compactcalendarview.CompactCalendarView
+                        android:id="@+id/compactcalendar_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="320dp"
+                        android:layout_margin="5dp"
+                        app:compactCalendarBackgroundColor="?attr/colorSurface"
+                        app:compactCalendarCurrentDayBackgroundColor="?attr/colorPrimaryContainer"
+                        app:compactCalendarCurrentSelectedDayBackgroundColor="?attr/colorPrimaryContainer"
+                        app:compactCalendarMultiEventIndicatorColor="?attr/colorSecondary"
+                        app:compactCalendarTargetHeight="360dp"
+                        app:compactCalendarTextSize="15dp" />
+                    <View style="@style/Divider"/>
+
+                </LinearLayout>
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
