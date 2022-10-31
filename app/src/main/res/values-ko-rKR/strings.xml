@@ -30,4 +30,5 @@
     <string name="hour">시간 전</string>
     <string name="minutes">분 전</string>
     <string name="now">방금 전</string>
+    <string name="all_notifications">전체 알림</string>
 </resources>
