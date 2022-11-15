@@ -8,6 +8,7 @@ import android.view.animation.Animation
 import android.content.Intent
 import android.view.animation.AnimationUtils
 import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.NotificationUtil
 import com.multimedia.writeyourthink.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
@@ -16,6 +17,13 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initNotification()
+        initSplashSettings()
+    }
+    private fun initNotification() {
+        NotificationUtil.createNotificationChannel(this)
+    }
+    private fun initSplashSettings() {
         // 스플래시 액티비티를 랜덤 교체
         val actRand = (Math.random() * 2).toInt() + 1
         when (actRand) {

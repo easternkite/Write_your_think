@@ -24,4 +24,11 @@
     <string name="geocoderUnavailable">지오코더 서비스 사용 불가</string>
     <string name="wrongGps">잘못된 GPS 좌표</string>
     <string name="enterYourContent">내용을 입력해주세요.</string>
+    <string name="years">년 전</string>
+    <string name="months">개월 전</string>
+    <string name="days">일 전</string>
+    <string name="hour">시간 전</string>
+    <string name="minutes">분 전</string>
+    <string name="now">방금 전</string>
+    <string name="all_notifications">전체 알림</string>
 </resources>

@@ -1,7 +1,13 @@
 package com.multimedia.writeyourthink
 
 import android.app.Application
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class DirayApplication : Application()
+class DirayApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        DynamicColors.applyToActivitiesIfAvailable(this)
+    }
+}

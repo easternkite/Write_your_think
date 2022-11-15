@@ -5,9 +5,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.multimedia.writeyourthink.models.Diary
 import android.view.ViewGroup
 import android.view.LayoutInflater
+import androidx.cardview.widget.CardView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
+import com.multimedia.writeyourthink.R
+import com.multimedia.writeyourthink.Util.formatTime
 import com.multimedia.writeyourthink.databinding.ItemDiaryPreviewBinding
 
 class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
@@ -58,14 +62,29 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
     override fun onBindViewHolder(holder: DiaryViewHolder, position: Int) {
         val diary = differ.currentList[position]
         holder.binding.apply {
-            Glide.with(root).load(diary.profile).into(ivDiaryImage)
-            tvPlace.text = diary.where
+            setDiary(diary)
+            Glide.with(root)
+                .load(diary.profile)
+                .placeholder(R.drawable.placeholder)
+                .centerCrop()
+                .into(ivDiaryImage)
+            tvPlace.text = if (!diary.where.isNullOrEmpty()) " • ${diary.where}" else ""
             tvContent.text = diary.contents
-            tvDateAndTime.text = diary.date
-            tvLocation.text = if (diary.location!!.length > 3) "${diary.location}, " else ""
-        }
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.let { it(diary) }
+            tvDateAndTime.text = if (diary.diaryDate.isEmpty()) formatTime(holder.itemView.context,diary.date) else formatTime(holder.itemView.context, diary.diaryDate)
+            diary.location.let {
+                val location = it.split(" ")
+                tvLocation.text = location[location.size - 1]
+            }
+
+            divider.isVisible = try {
+                differ.currentList[position + 1]
+                true
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                false
+            }
+            cvContainer.setOnClickListener {
+                onItemClickListener?.let { it(cvContainer, diary) }
+            }
         }
     }
 
@@ -73,9 +92,9 @@ class DiaryAdapter : RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>() {
         return differ.currentList.size
     }
 
-    private var onItemClickListener: ((Diary) -> Unit)? = null
+    private var onItemClickListener: ((CardView, Diary) -> Unit)? = null
 
-    fun setOnItemClickListener(listener: (Diary) -> Unit) {
+    fun setOnItemClickListener(listener: (CardView, Diary) -> Unit) {
         onItemClickListener = listener
     }
 }

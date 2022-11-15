@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.repositories.DiaryRepository
+import com.multimedia.writeyourthink.repositories.DiaryRepositoryImpl
+import com.multimedia.writeyourthink.ui.fragments.DiaryUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -14,66 +16,76 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class DiaryViewModel @Inject constructor(
     val diaryRepository: DiaryRepository
 ) : ViewModel() {
+    private val sf = SimpleDateFormat("yyyy-MM-dd")
     private val dateFormatHms = SimpleDateFormat("HH:mm:ss", Locale.KOREA)
-    private var _diaryData = MutableLiveData<MutableList<Diary>>()
-    private var _filteredList = MutableLiveData<MutableList<Diary>>()
-    private var _selectedDateTime = MutableLiveData<String>()
-    private var _userInfo = MutableLiveData<UserInfo>()
-    private var _countDiaryContents = MutableLiveData<HashMap<String, Int>>()
+    private val dateAndTimeFormat = SimpleDateFormat("yyyy-MM-dd(HH:mm:ss)", Locale.KOREA)
     private var _currentCalendarDate = MutableLiveData<Date>()
 
-    val diaryData get() = getData()
-    val filteredList get() = _filteredList
-    val selectedDateTime get() = _selectedDateTime
-    val userInfo get() = _userInfo
-    val countDiaryContents get() = _countDiaryContents
     val currentCalendarDate get() = _currentCalendarDate
+
+    private val _uiState = MutableStateFlow(DiaryUiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        fetchDiaryData()
+    }
+
+    fun fetchDiaryData() = viewModelScope.launch {
+        diaryRepository.getDiaryList { diaries, countMap, error ->
+            diaries?.let { diaryList ->
+                _uiState.update { it.copy(diaryList = diaryList, errorMassege = "") }
+            }
+            countMap?.let { count ->
+                _uiState.update { it.copy(countMap = count, errorMassege = "") }
+            }
+
+            error?.let { err ->
+                _uiState.update { it.copy(errorMassege = err.message.toString()) }
+            }
+        }
+    }
 
     val calcCurrentTime = flow {
         emit(dateFormatHms.format(Date()))
-        while(true) {
+        while (true) {
             delay(1000L)
             emit(dateFormatHms.format(Date()))
         }
     }
 
-    private var _currentTime = MutableLiveData<String>()
-    val currentTime get() = _currentTime
-
-    fun setFilter() {
-        _filteredList.value = _diaryData.value?.filter {
-            it.date.isNotEmpty() && it.date.substring(0, 10) == _selectedDateTime.value
-        }?.toMutableList()
-
-    }
     fun setCalendarTitle(date: Date) {
         _currentCalendarDate.postValue(date)
     }
 
-    fun setDate(date: String) {
-        _selectedDateTime.value = date
+    fun setFilter(date: String) {
+        val filtered = uiState.value.diaryList.filter {
+            it.date.isNotEmpty() && it.date.substring(0, 10) == date
+        }
+        _uiState.update { it.copy(filteredByDate = filtered) }
     }
-    private fun getData(): MutableLiveData<MutableList<Diary>> {
-        diaryRepository.getFirebaseData(_diaryData, _countDiaryContents)
-        return _diaryData
+
+    fun setDate(date: String) = viewModelScope.launch {
+        _uiState.update { it.copy(selectedDateTime = date) }
     }
 
     fun saveUser(userInfo: UserInfo) {
-        diaryRepository.writeNewUserToFirebase(userInfo)
-        this._userInfo.postValue(userInfo)
+        diaryRepository.setUserInfo(userInfo)
+        _uiState.update { it.copy(userInfo = userInfo) }
     }
 
     fun saveDiary(diary: Diary) = viewModelScope.launch {
-        diaryRepository.writeNewDiaryToFirebase(diary)
+        diaryRepository.setDiary(diary)
     }
 
     fun deleteDiary(diary: Diary) = viewModelScope.launch {
-        diaryRepository.deleteFromFirebase(diary)
+        diaryRepository.deleteDiray(diary)
     }
 }

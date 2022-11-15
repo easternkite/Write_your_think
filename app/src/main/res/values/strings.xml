@@ -27,6 +27,9 @@
     <string name="frag3_1">There are no recorded events. Write it down!</string>
     <string name="frag3_2">Recorded ordinary activity</string>
 
+    <string name="diary_item_transition_name" translatable="false">diary_item_%1$s</string>
+    <string name="diary_detail_transition_name" translatable="false">diary_detail</string>
+
     <string name="deleteData">Successfully deleted data.</string>
     <string name="undo">Undo</string>
     <string name="modify">modify</string>
@@ -46,4 +49,11 @@
     <string name="logout">You have been logged out.</string>
     <string name="enterYourContent">Please enter your content.</string>
     <string name="cases">cases</string>
+    <string name="years"> years ago</string>
+    <string name="months"> months ago</string>
+    <string name="days"> days ago</string>
+    <string name="hour"> hours ago</string>
+    <string name="minutes"> minutes ago</string>
+    <string name="now"> just before</string>
+    <string name="all_notifications">All Notification</string>
 </resources>

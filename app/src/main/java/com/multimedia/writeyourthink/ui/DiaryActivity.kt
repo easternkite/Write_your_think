@@ -23,7 +23,6 @@ import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
 import com.multimedia.writeyourthink.models.UserInfo
 import com.multimedia.writeyourthink.services.MyFirebaseMessaging
-import com.multimedia.writeyourthink.ui.fragments.BottomSheetDialogFragment
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -31,7 +30,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheetListener {
+class DiaryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var isSignedIn = 0
 
@@ -53,9 +52,9 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        initNav()
         MobileAds.initialize(this)
+
 
         var adRequest = AdRequest.Builder().build()
         val test = Arrays.asList("8D3429159CBA267C445F2273BB6CE315")
@@ -92,7 +91,7 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         } else {
             Log.d(TAG, "The interstitial ad wasn't ready yet.")
         }
-        binding.bottomNavi.setupWithNavController(navController)
+
         val fcm = Intent(applicationContext, MyFirebaseMessaging::class.java)
         startService(fcm)
         binding.adView.loadAd(adRequest)
@@ -108,31 +107,32 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
         val userInfo = UserInfo(user.uid, user.displayName, user.photoUrl.toString(), user.email)
         viewModel.saveUser(userInfo)
 
-        if (viewModel.selectedDateTime.value.isNullOrEmpty()) {
+        if (viewModel.uiState.value.selectedDateTime.isEmpty()) {
             if (Locale.getDefault().isO3Language == "kor") {
                 Toast.makeText(this, user!!.displayName + "님, 환영합니다!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "hello, " + user!!.displayName, Toast.LENGTH_SHORT).show()
             }
         }
-
-        binding.button3.setOnClickListener(View.OnClickListener {
-
-            // Dialog창 중복 실행 방지를 위한 싱글톤 패턴 적용
-            var bottomSheet : BottomSheetDialogFragment? = null
-            if (bottomSheet == null) {
-                bottomSheet = BottomSheetDialogFragment()
-            }
-            bottomSheet.show(supportFragmentManager, "exampleBottomSheet")
-
-            if (mInterstitialAd != null) {
-                mInterstitialAd?.show(this)
-            } else {
-                Log.d(TAG, "The interstitial ad wasn't ready yet.")
-            }
-        })
     }
+    private fun initNav() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.diaryNavHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavi.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.diaryListFragment -> showHideBottomBar(true)
+                R.id.calendarFragment -> showHideBottomBar(true)
+                R.id.addNoteFragment -> showHideBottomBar(false)
+                R.id.diaryDetailFragment -> showHideBottomBar(false)
+            }
+        }
+    }
+    fun showHideBottomBar(isShow: Boolean) {
+        val visibility = if (isShow) View.VISIBLE else View.GONE
+        binding.bottomNavi.visibility = visibility
+    }
 
     private fun tedPermission() {
         val permissionListener: PermissionListener = object : PermissionListener {
@@ -148,9 +148,5 @@ class DiaryActivity : AppCompatActivity(), BottomSheetDialogFragment.BottomSheet
             .setDeniedMessage(resources.getString(R.string.permission_1))
             .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
             .check()
-    }
-
-    override fun onButtonClicked(text: String?) {
-        binding.textViewButtonClicked.text = text
     }
 }

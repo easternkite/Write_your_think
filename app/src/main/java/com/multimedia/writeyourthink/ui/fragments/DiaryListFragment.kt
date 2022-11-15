@@ -11,25 +11,42 @@ import androidx.recyclerview.widget.GridLayoutManager
 import android.app.DatePickerDialog
 import android.app.Activity
 import android.app.AlertDialog
+import android.util.Log
 import com.bumptech.glide.Glide
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.gamingservices.GameRequestDialog.show
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.Hold
+import com.google.android.material.transition.MaterialContainerTransform
+import com.google.android.material.transition.MaterialElevationScale
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
 import com.multimedia.writeyourthink.Util.Constants.Companion.UP
+import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.adapters.DiaryAdapter
 import com.multimedia.writeyourthink.databinding.FragmentDiaryListBinding
+import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.ui.DiaryActivity
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -37,8 +54,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
-    BottomSheetDialogFragment.BottomSheetListener {
+class DiaryListFragment : Fragment() {
     private var _binding: FragmentDiaryListBinding? = null
     private val binding get() = _binding!!
 
@@ -70,6 +86,17 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         updateLabel()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,20 +104,24 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
     ): View? {
         _binding = FragmentDiaryListBinding.inflate(inflater, container, false) // view binding
         setRecyclerView()
+        observeUiState()
 
-        viewModel.selectedDateTime.observe(viewLifecycleOwner) {
-            viewModel.setFilter()
-            binding.tvDateAndTime.text = it
+        val cur = sdf.format(Date()).also {
+            viewModel.setDate(it)
         }
-        viewModel.filteredList.observe(viewLifecycleOwner) {
-            diaryAdapter.differ.submitList(it)
+
+        binding.fab.setOnClickListener {
+            exitTransition = MaterialElevationScale(true)
+            reenterTransition = MaterialElevationScale(true)
+            val action = DiaryListFragmentDirections.actionDiaryListFragmentToAddNoteFragment(
+                diary = Diary()
+            )
+            val extras = FragmentNavigatorExtras(it to "fab_transition")
+            findNavController().navigate(
+                directions = action,
+                extras
+            )
         }
-        viewModel.diaryData.observe(viewLifecycleOwner, Observer { diary ->
-            // 데이터가 변경되면 filterlist를 바꿔주어야한다.
-            viewModel.setDate(binding.tvDateAndTime.text.toString())
-            viewModel.setFilter()
-            hideProgressBar()
-        })
         binding.rv.setHasFixedSize(true)
 
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
@@ -124,13 +155,20 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         }
         val layoutManager = GridLayoutManager(context, 1)
         binding.rv.layoutManager = layoutManager
-        diaryAdapter.setOnItemClickListener { diary ->
-            val args = Bundle().apply {
-                putParcelable("diary", diary)
+
+        diaryAdapter.setOnItemClickListener { cardView, diary ->
+            exitTransition = MaterialElevationScale(false).apply {
+                duration = 300L
             }
-            val bottomSheet = BottomSheetDialogFragment()
-            bottomSheet.arguments = args
-            bottomSheet.show(requireFragmentManager(), "BS")
+            reenterTransition = MaterialElevationScale(true).apply {
+                duration = 300L
+            }
+            val transitionName = getString(R.string.diary_detail_transition_name)
+            val extras = FragmentNavigatorExtras(cardView to transitionName)
+            val action =
+                DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDetailFragment(diary)
+            findNavController().navigate(action, extras)
+
         }
 
         binding.tvDateAndTime.setOnClickListener {
@@ -142,7 +180,7 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
                 myCalendar[Calendar.DAY_OF_MONTH]
             ).show()
         } //달력 꺼내기
-        updateLabel()
+
         binding.DateDown.setOnClickListener(View.OnClickListener {
             dateUpDown(DOWN)
         })
@@ -150,11 +188,35 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
             dateUpDown(UP)
         }
 
-
-
         return binding.root
     }
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collectLatest { uiState ->
 
+                    if (uiState.diaryList.isNotEmpty()) {
+                        showHideProgressBar(false)
+                    }
+
+                    diaryAdapter.differ.submitList(uiState.filteredByDate)
+
+                    if (uiState.errorMassege.isNotEmpty()) {
+                        hideProgressBar()
+                        Toast.makeText(requireContext(), "error occurred : ${uiState.errorMassege}", Toast.LENGTH_LONG).show()
+                    }
+
+                    uiState.selectedDateTime.let {
+                        binding.tvDateAndTime.text = it
+                        viewModel.setDate(it)
+                    }
+
+                    viewModel.setFilter(uiState.selectedDateTime)
+
+                }
+            }
+        }
+    }
     private fun dateUpDown(op: Int) {
         var day = sdf.format(myCalendar.time).replace("-", "")
         var dayInt = day.toInt()
@@ -194,6 +256,10 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         }
     }
 
+    private fun showHideProgressBar(isVisible: Boolean) {
+        binding.progressBar.isVisible = isVisible
+    }
+
     private fun hideProgressBar() {
         binding.progressBar.visibility = View.INVISIBLE
     }
@@ -206,9 +272,6 @@ class DiaryListFragment : Fragment(R.layout.fragment_diary_list),
         private const val REQUEST_CODE = 0
     }
 
-    override fun onButtonClicked(text: String?) {
-
-    }
     /**
      * Fragment에서 View Binding을 사용할 경우 Fragment는 View보다 오래 지속되어,
      * Fregment의 Lifecycle로 인해 메모리 누수가 발생할 수 있다.
