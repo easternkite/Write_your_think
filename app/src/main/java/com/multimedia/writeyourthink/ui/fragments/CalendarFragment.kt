@@ -83,11 +83,11 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
         binding.layoutLeft!!.setOnClickListener {
             binding.compactcalendarView.showCalendarWithAnimation()
-            binding.compactcalendarView.showNextMonth()
+//            binding.compactcalendarView.showNextMonth()
         }
         binding.layoutRight!!.setOnClickListener {
             binding.compactcalendarView.showCalendarWithAnimation()
-            binding.compactcalendarView.showPreviousMonth()
+//            binding.compactcalendarView.showPreviousMonth()
         }
         return binding.root
     }

@@ -17,17 +17,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.transition.Slide
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.auth.FirebaseAuth
 import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
+import com.gun0912.tedpermission.normal.TedPermission
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.Util.formatDate
-import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.Util.themeColor
 import com.multimedia.writeyourthink.databinding.FragmentAddNoteBinding
-import com.multimedia.writeyourthink.models.Diary
 import com.multimedia.writeyourthink.services.GpsTracker
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -117,7 +114,7 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
     }
 
     fun getCurrentAddress(latitude: Double, longitude: Double): String { //지오코더... GPS를 주소로 변환
-        val geocoder = Geocoder(activity, Locale.getDefault())
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
         val addresses: List<Address>?
         try {
             addresses = geocoder.getFromLocation(
@@ -151,7 +148,7 @@ class AddNoteFragment: Fragment(R.layout.fragment_add_note) {
 
             override fun onPermissionDenied(deniedPermissions: List<String>) {}
         }
-        TedPermission.with(activity)
+        TedPermission.create()
             .setPermissionListener(permissionListener)
             .setRationaleMessage(resources.getString(R.string.permission_3))
             .setDeniedMessage(resources.getString(R.string.permission_1))

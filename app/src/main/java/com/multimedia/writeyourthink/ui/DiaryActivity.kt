@@ -17,7 +17,7 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseUser
 import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
+import com.gun0912.tedpermission.normal.TedPermission
 import com.multimedia.writeyourthink.*
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.databinding.ActivityMainBinding
@@ -142,7 +142,7 @@ class DiaryActivity : AppCompatActivity() {
 
             override fun onPermissionDenied(deniedPermissions: List<String>) {}
         }
-        TedPermission.with(this)
+        TedPermission.create()
             .setPermissionListener(permissionListener)
             .setRationaleMessage(resources.getString(R.string.permission_3))
             .setDeniedMessage(resources.getString(R.string.permission_1))

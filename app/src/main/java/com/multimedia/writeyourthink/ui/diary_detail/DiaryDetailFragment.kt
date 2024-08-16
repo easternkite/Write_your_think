@@ -7,16 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavArgs
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.transition.MaterialContainerTransform
 import com.multimedia.writeyourthink.R
-import com.multimedia.writeyourthink.Util.getDiaryActivity
 import com.multimedia.writeyourthink.databinding.FragmentDiaryDetailBinding
-import com.multimedia.writeyourthink.ui.diary_detail.adapter.ImageSliderAdapter
-import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
-import com.smarteist.autoimageslider.SliderView
 
 class DiaryDetailFragment : Fragment() {
 
@@ -27,12 +22,7 @@ class DiaryDetailFragment : Fragment() {
 
     private val adapter by lazy {
         Log.d("LEE", args.diary.profile.toString())
-        ImageSliderAdapter(
-            listOf(
-                args.diary.profile ?: "",
 
-                )
-        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,22 +41,7 @@ class DiaryDetailFragment : Fragment() {
         _binding = FragmentDiaryDetailBinding.inflate(layoutInflater, container, false)
         initToolbar()
         binding.diary = args.diary
-        binding.imageSlider.apply {
-            val list = listOf(
-                args.diary.profile ?: "",
-                "https://static.wikia.nocookie.net/pokemon/images/6/6c/Char-pikachu.png/revision/latest?cb=20190430034300",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTIfRjkXA9Vaj71vkqPKpG97hrSvgC1HTNxekAOKmVAcTKampfHVOABDe_VfEcurT8bIs&usqp=CAU"
 
-            )
-            val adapter = ImageSliderAdapter(
-                list
-            )
-            setSliderAdapter(adapter)
-            setIndicatorAnimation(IndicatorAnimationType.WORM)
-            if (list.size < 2) {
-                setInfiniteAdapterEnabled(false)
-            }
-        }
         return binding.root
     }
 
