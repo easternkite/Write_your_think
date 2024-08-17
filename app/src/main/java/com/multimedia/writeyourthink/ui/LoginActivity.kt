@@ -112,6 +112,7 @@ class LoginActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLis
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager!!.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQ_SIGN_GOOGLE) {
+            data ?: return
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result != null) {
                 if (result.isSuccess) { // 인증결과가 성공적이면..
