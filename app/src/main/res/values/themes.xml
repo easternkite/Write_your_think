@@ -32,6 +32,8 @@
 
     </style>
 
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar"/>
+
 
     <style name="black" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">#000</item>

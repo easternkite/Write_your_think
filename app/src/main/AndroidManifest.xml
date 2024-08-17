@@ -25,6 +25,16 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9450003299415787~5536586221"/>
+        <activity
+            android:name="com.multimedia.writeyourthink.ui.ComposeActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="com.multimedia.writeyourthink.ui.LoginActivity"
@@ -39,11 +49,6 @@
             android:fitsSystemWindows="true"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme2">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity

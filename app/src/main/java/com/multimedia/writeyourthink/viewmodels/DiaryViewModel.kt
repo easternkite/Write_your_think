@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.text.ParseException
 
 @HiltViewModel
 class DiaryViewModel @Inject constructor(
@@ -35,13 +36,17 @@ class DiaryViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        fetchDiaryData()
+
+        fetchDiaryData {
+            setDate(sf.format(Date()))
+        }
     }
 
-    fun fetchDiaryData() = viewModelScope.launch {
+    fun fetchDiaryData(onNext: () -> Unit) {
         diaryRepository.getDiaryList { diaries, countMap, error ->
             diaries?.let { diaryList ->
                 _uiState.update { it.copy(diaryList = diaryList, errorMassege = "") }
+                onNext()
             }
             countMap?.let { count ->
                 _uiState.update { it.copy(countMap = count, errorMassege = "") }
@@ -74,6 +79,23 @@ class DiaryViewModel @Inject constructor(
 
     fun setDate(date: String) = viewModelScope.launch {
         _uiState.update { it.copy(selectedDateTime = date) }
+        setFilter(date)
+    }
+
+    fun dateUpDown(op: Int) {
+        val currentDate = uiState.value.selectedDateTime
+        val sdfForParse = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val day = currentDate.replace("-", "")
+            .toInt()
+            .plus(op)
+            .toString()
+            .runCatching {
+                val parsed = sdfForParse.parse(this)
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(parsed)
+            }.onFailure { it.printStackTrace() }
+            .getOrNull() ?: return
+
+        setDate(day)
     }
 
     fun saveUser(userInfo: UserInfo) {
