@@ -40,6 +40,11 @@
 
     </style>
 
+    <style name="Theme.SplashScreen.WytSplash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FFD0BCFF</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/icon_round</item>
+    </style>
+
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/write_your_think_1</item>

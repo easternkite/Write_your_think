@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink.ui.screens
+package com.multimedia.writeyourthink.ui.diarylist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

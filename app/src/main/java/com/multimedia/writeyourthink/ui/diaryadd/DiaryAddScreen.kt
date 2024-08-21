@@ -1,4 +1,4 @@
-package com.multimedia.writeyourthink.ui.screens
+package com.multimedia.writeyourthink.ui.diaryadd
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column

@@ -9,7 +9,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -29,12 +28,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.multimedia.writeyourthink.R
-import com.multimedia.writeyourthink.ui.screens.DiaryAddScreen
-import com.multimedia.writeyourthink.ui.screens.DiaryListScreen
-import com.multimedia.writeyourthink.ui.screens.ROUTE_ADD_DIARY
-import com.multimedia.writeyourthink.ui.screens.ROUTE_DIARY_LIST
+import com.multimedia.writeyourthink.ui.diaryadd.DiaryAddScreen
+import com.multimedia.writeyourthink.ui.diarylist.DiaryListScreen
+import com.multimedia.writeyourthink.ui.diaryadd.ROUTE_ADD_DIARY
+import com.multimedia.writeyourthink.ui.diarylist.ROUTE_DIARY_LIST
+import com.multimedia.writeyourthink.ui.login.LoginScreen
+import com.multimedia.writeyourthink.ui.login.ROUTE_LOGIN
 import dagger.hilt.android.AndroidEntryPoint
-import org.checkerframework.common.subtyping.qual.Bottom
 
 @AndroidEntryPoint
 class ComposeActivity : ComponentActivity() {
@@ -55,8 +55,16 @@ class ComposeActivity : ComponentActivity() {
                     Surface(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                         NavHost(
                             navController,
-                            startDestination = ROUTE_DIARY_LIST
+                            startDestination = ROUTE_LOGIN
                         ) {
+                            composable(ROUTE_LOGIN) {
+                                LoginScreen(
+                                    onNavigateToDiary = {
+                                        navController.navigate(ROUTE_DIARY_LIST)
+                                    }
+                                )
+                            }
+
                             composable(ROUTE_DIARY_LIST) {
                                 DiaryListScreen(onAddDiaryClick = {
                                     navController.navigate(ROUTE_ADD_DIARY)

@@ -55,6 +55,7 @@ dependencies {
     implementation libs.androidx.constraintlayout
     implementation libs.compact.calendar.view
     implementation libs.firebase.appcheck.safetynet
+    implementation libs.androidx.core.splashscreen
 
     implementation libs.androidx.recyclerview
     implementation libs.androidx.cardview
