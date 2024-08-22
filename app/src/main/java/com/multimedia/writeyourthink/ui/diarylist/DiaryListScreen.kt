@@ -32,13 +32,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.Util.Constants.Companion.DOWN
 import com.multimedia.writeyourthink.Util.Constants.Companion.UP
 import com.multimedia.writeyourthink.models.Diary
+import com.multimedia.writeyourthink.ui.login.ROUTE_LOGIN
 import com.multimedia.writeyourthink.viewmodels.DiaryViewModel
 
 const val ROUTE_DIARY_LIST = "route_diary_list"
+fun NavHostController.navigateToDiaryList() {
+    navigate(ROUTE_DIARY_LIST) { popUpTo(ROUTE_LOGIN) { inclusive = true } }
+}
 
 @Composable
 fun DiaryListScreen(

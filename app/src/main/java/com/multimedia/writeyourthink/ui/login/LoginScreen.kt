@@ -1,9 +1,7 @@
 package com.multimedia.writeyourthink.ui.login
 
-import android.app.Activity
+import androidx.credentials.GetCredentialRequest
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,20 +31,21 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.credentials.CredentialManager
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.Util.handleAccessTokenForLogin
 import com.multimedia.writeyourthink.Util.showFailToast
+import kotlinx.coroutines.launch
 
 private val roundedRectangle = RoundedCornerShape(5.dp)
 const val ROUTE_LOGIN = "route_login"
@@ -84,34 +85,24 @@ fun GoogleSignInButton(
 ) {
     val googleButton = ImageVector.vectorResource(id = R.drawable.ic_google_sign_in)
     val context = LocalContext.current
-    val googleApiClient = remember {
-        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id))
-            .requestEmail()
+    val scope = rememberCoroutineScope()
+    val credentialManager = remember { CredentialManager.create(context) }
+    val request = remember {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setAutoSelectEnabled(true)
+            .setServerClientId(context.getString(R.string.default_web_client_id))
             .build()
 
-        GoogleApiClient.Builder(context)
-            .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+       GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
             .build()
     }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val data = result.data ?: return@rememberLauncherForActivityResult
-        when (result.resultCode) {
-            Activity.RESULT_OK -> {
-                val loginResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-                if (loginResult?.isSuccess == true) {
-                    val account = loginResult.signInAccount ?: return@rememberLauncherForActivityResult
-                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                    val auth = FirebaseAuth.getInstance()
-                    auth.handleAccessTokenForLogin(
-                        credential = credential,
-                        onLoginComplete = onNavigateToDiary,
-                        onLoginFailed = context::showFailToast
-                    )
-                } else { context.showFailToast() }
-            }
+
+    SideEffect {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            onNavigateToDiary()
         }
     }
 
@@ -120,8 +111,26 @@ fun GoogleSignInButton(
             .width(193.dp)
             .height(40.dp)
             .clickable {
-                val googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                launcher.launch(googleSignInIntent)
+                scope.launch {
+                    val result =
+                        credentialManager.getCredential(request = request, context = context)
+                    val credential = result.credential
+
+                    val googleIdTokenCredential = runCatching {
+                        GoogleIdTokenCredential.createFrom(credential.data)
+                    }
+                        .onFailure { it.printStackTrace() }
+                        .getOrNull() ?: return@launch
+
+                    val googleIdToken = googleIdTokenCredential.idToken
+                    val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+                    val auth = FirebaseAuth.getInstance()
+                    auth.handleAccessTokenForLogin(
+                        credential = firebaseCredential,
+                        onLoginComplete = onNavigateToDiary,
+                        onLoginFailed = context::showFailToast
+                    )
+                }
             },
         color = MaterialTheme.colorScheme.surfaceContainerLowest,
         shape = roundedRectangle
@@ -144,6 +153,29 @@ fun FacebookLoginButton(
     val context = LocalContext.current
     val fbBlue = colorResource(id = com.facebook.common.R.color.com_facebook_blue)
     val isPreview = LocalInspectionMode.current
+    val callback = remember {
+        object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                Log.d(tag, "login success")
+                val auth = FirebaseAuth.getInstance()
+                val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
+                auth.handleAccessTokenForLogin(
+                    credential = credential,
+                    onLoginComplete = onNavigateToDiary,
+                    onLoginFailed = context::showFailToast
+                )
+            }
+
+            override fun onCancel() {
+                Log.d(tag, "login canceled")
+            }
+
+            override fun onError(error: FacebookException) {
+                error.printStackTrace()
+                Log.d(tag, "login failed")
+            }
+        }
+    }
     Surface(
         modifier = modifier.height(40.dp),
         color = fbBlue,
@@ -154,30 +186,10 @@ fun FacebookLoginButton(
                 val cm = CallbackManager.Factory.create()
                 LoginButton(it).also { button ->
                     if (isPreview) return@also
-                    button.registerCallback(cm, object : FacebookCallback<LoginResult> {
-                        override fun onSuccess(result: LoginResult) {
-                            Log.d(tag, "login success")
-                            val auth = FirebaseAuth.getInstance()
-                            val credential = FacebookAuthProvider.getCredential(result.accessToken.token)
-                            auth.handleAccessTokenForLogin(
-                                credential = credential,
-                                onLoginComplete = onNavigateToDiary,
-                                onLoginFailed = context::showFailToast
-                            )
-                        }
-                        override fun onCancel() {
-                            Log.d(tag, "login canceled")
-                        }
-                        override fun onError(error: FacebookException) {
-                            error.printStackTrace()
-                            Log.d(tag, "login failed")
-                        }
-                    })
+                    button.registerCallback(cm, callback)
                 }
             },
-            update = {
-                it.setPermissions(listOf("email", "public_profile"))
-            }
+            update = { it.setPermissions(listOf("email", "public_profile")) }
         )
     }
 }

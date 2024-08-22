@@ -26,12 +26,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.multimedia.writeyourthink.R
 import com.multimedia.writeyourthink.ui.diaryadd.DiaryAddScreen
 import com.multimedia.writeyourthink.ui.diarylist.DiaryListScreen
 import com.multimedia.writeyourthink.ui.diaryadd.ROUTE_ADD_DIARY
 import com.multimedia.writeyourthink.ui.diarylist.ROUTE_DIARY_LIST
+import com.multimedia.writeyourthink.ui.diarylist.navigateToDiaryList
 import com.multimedia.writeyourthink.ui.login.LoginScreen
 import com.multimedia.writeyourthink.ui.login.ROUTE_LOGIN
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +48,9 @@ class ComposeActivity : ComponentActivity() {
             WytTheme {
                 Scaffold(
                     bottomBar = {
+                        val currentEntry by navController.currentBackStackEntryAsState()
+                        val isLoginScreen = currentEntry?.destination?.route == ROUTE_LOGIN
+                        if (isLoginScreen) return@Scaffold
                         BottomBar(selectedIndex) { item, index ->
                             navController.navigate(item.route)
                             selectedIndex = index
@@ -59,9 +64,7 @@ class ComposeActivity : ComponentActivity() {
                         ) {
                             composable(ROUTE_LOGIN) {
                                 LoginScreen(
-                                    onNavigateToDiary = {
-                                        navController.navigate(ROUTE_DIARY_LIST)
-                                    }
+                                    onNavigateToDiary = navController::navigateToDiaryList
                                 )
                             }
 

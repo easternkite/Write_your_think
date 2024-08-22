@@ -56,6 +56,9 @@ dependencies {
     implementation libs.compact.calendar.view
     implementation libs.firebase.appcheck.safetynet
     implementation libs.androidx.core.splashscreen
+    implementation libs.androidx.credentials
+    implementation libs.androidx.credentials.play.services.auth
+    implementation libs.googleid
 
     implementation libs.androidx.recyclerview
     implementation libs.androidx.cardview
