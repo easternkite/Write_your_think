@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hi">안녕하세요</string>
+    <string name="btn_logout">로그아웃</string>
     <string name="location2">의</string>
     <string name="location1">ㄹㄴ</string>
     <string name="upload">업로드</string>

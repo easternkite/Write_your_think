@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.credentials.CredentialManager
+import androidx.navigation.NavHostController
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -49,6 +51,10 @@ import kotlinx.coroutines.launch
 
 private val roundedRectangle = RoundedCornerShape(5.dp)
 const val ROUTE_LOGIN = "route_login"
+
+fun NavHostController.navigateToLogin() {
+    navigate(ROUTE_LOGIN)
+}
 
 @Composable
 fun LoginScreen(
@@ -99,7 +105,7 @@ fun GoogleSignInButton(
             .build()
     }
 
-    SideEffect {
+    LaunchedEffect(Unit) {
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
             onNavigateToDiary()

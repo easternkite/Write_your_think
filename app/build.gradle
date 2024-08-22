@@ -11,12 +11,12 @@ plugins {
 
 
 android {
-    compileSdkVersion 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.multimedia.writeyourthink"
         minSdkVersion 26
-        targetSdkVersion 34
+        targetSdk 34
         versionCode 7
         versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
