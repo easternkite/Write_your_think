@@ -1,6 +1,6 @@
 [versions]
 activity-compose = "1.9.1"
-appcompat = "1.7.0"
+appcompat = "1.8.0"
 cardview = "1.0.0"
 circleimageview = "3.1.0"
 compact-calendar-view = "3.0.0"
